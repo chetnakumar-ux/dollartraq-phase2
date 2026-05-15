@@ -242,7 +242,7 @@ class ProfilePassword extends Component {
 
             this.setState({ loading: true })
 
-            Api.post('handle/backend/employee/update/password', formData, function (data) {
+            Api.post('app/profile/update/password', formData, function (data) {
 
                 that.setState({ loading: false });
 

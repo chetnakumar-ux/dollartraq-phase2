@@ -30,6 +30,7 @@ import ProfileUpdate from 'pages/app/profile/ProfileUpdate';
 import ProfilePassword from 'pages/app/profile/ProfilePassword';
 
 import CarrierSearch from 'pages/app/carriers/CarrierSearch';
+import CarrierProfile from 'pages/app/carriers/CarrierProfile';
 
 
 function App(){
@@ -358,6 +359,7 @@ function App(){
                     <Route exact={true} path='/users' element={<UsersList />} />
 
                     <Route path="/search" element={<CarrierSearch />} />
+                    <Route path="/carrier/:row_id" element={<CarrierProfile />} />
 
                     <Route exact={true} path='/profile' element={<ProfileUpdate />} />
                     <Route exact={true} path='/profile/password' element={<ProfilePassword />} />

@@ -16,6 +16,8 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import Main from 'components/Main';
 import CarrierCard from 'components/blocks/CarrierCards';
 
+import { useNavigate } from 'react-router-dom';
+
 import Api from 'api/Api';
 
 const DEFAULT_FILTERS = {
@@ -68,6 +70,7 @@ function CarrierSearch() {
     const [successMessage] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
+	const navigate = useNavigate();
 
 
     useEffect(function () {
@@ -79,6 +82,11 @@ function CarrierSearch() {
         loadFilters(token);
 
     }, []);
+
+	function handleCarrierClick(carrier) {
+
+    navigate('/carrier/' + carrier.id);
+}
 
 
     function loadFilters(accountToken) {
@@ -122,12 +130,12 @@ function CarrierSearch() {
         const formData = new FormData();
 
         formData.append('query', searchText);
-        formData.append('page', pageNumber);
+        // formData.append('page', pageNumber);
 
         setLoading(true);
 
         fetch(
-            'http://192.168.20.12:8000/api/handle/backend/carrier/search',
+            'http://192.168.20.85:8000/api/handle/backend/carrier/search',
             {
                 method: 'POST',
                 headers: {
@@ -221,7 +229,7 @@ function CarrierSearch() {
 
                 <Grid size={12}>
 
-                    <div className='min-h-screen p-6 bg-gray-100'>
+                    <div className='min-h-screen p-3 md:p-4 lg:p-6 bg-gray-100'>
 
                         <div className='max-w-[1100px] mx-auto mb-[30px]'>
 
@@ -246,7 +254,7 @@ function CarrierSearch() {
 
                                         runSearch(query, 1);
                                     }}
-                                    className='absolute right-3 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg text-sm'
+                                    className='absolute right-2 md:right-3 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-3 md:px-4 py-2 rounded-lg text-sm'
                                 >
                                     Search
                                 </button>
@@ -255,7 +263,7 @@ function CarrierSearch() {
 
                                     <Close
                                         onClick={handleClearSearch}
-                                        className='absolute right-[95px] top-1/2 -translate-y-1/2 cursor-pointer text-gray-400'
+                                        className='absolute right-[85px] md:right-[95px] top-1/2 -translate-y-1/2 cursor-pointer text-gray-400'
                                     />
                                 )}
 
@@ -265,7 +273,7 @@ function CarrierSearch() {
 
                         <div className='max-w-[1100px] mx-auto'>
 
-                            <div className='flex justify-between items-center mb-10'>
+                            <div className='flex justify-between items-center mb-10 max-md:flex-col max-md:items-start max-md:gap-4'>
 
                                 <div className='text-sm text-gray-500'>
 
@@ -351,12 +359,16 @@ function CarrierSearch() {
 
                                             return (
 
-                                                <CarrierCard key={carrier.id} carrier={carrier} />
+                                                <CarrierCard
+													key={carrier.id}
+													carrier={carrier}
+													onClick={handleCarrierClick}
+												/>
                                             );
                                         })}
 
 
-                                        <div className='flex justify-center items-center gap-4 mt-1'>
+                                        <div className='flex flex-wrap justify-center items-center gap-4 mt-1'>
 
                                             <button disabled={currentPage === 1} onClick={handlePrevPage}>
 

@@ -101,58 +101,86 @@ function RiskBadge(props) {
 }
 
 
-function CarrierTypeTag(props) {
+function CarrierTag(props) {
 
-    const carrierType = (props.type || '').toLowerCase();
+    const value = (props.value || '').toLowerCase();
 
-    let className = 'inline-flex items-center gap-[6px] px-[10px] py-[4px] rounded-full text-[10px] font-[700] tracking-[0.02em] border uppercase leading-none ';
+    let className =
+        'inline-flex items-center gap-[6px] px-[10px] py-[4px] rounded-full text-[10px] font-[700] tracking-[0.02em] border uppercase leading-none ';
 
-    if (carrierType === 'interstate') {
+    if (value.includes('broker')) {
 
-        className = className + 'bg-[#eef4ff] text-[#2563eb] border-[#c7dbff]';
+        className =
+            className +
+            'bg-[#f5edff] text-[#7c3aed] border-[#ddd6fe]';
     }
-    else if (carrierType === 'intrastate') {
+    else if (value.includes('interstate')) {
 
-        className = className + 'bg-[#fff8e8] text-[#c27a07] border-[#fde7a7]';
+        className =
+            className +
+            'bg-[#f1f5f9] text-[#475569] border-[#e2e8f0]';
+    }
+    else if (value.includes('intrastate')) {
+
+        className =
+            className +
+            'bg-[#fff8e8] text-[#c27a07] border-[#fde7a7]';
     }
     else {
 
-        className = className + 'bg-[#f1f5f9] text-[#475569] border-[#e2e8f0]';
+        className =
+            className +
+            'bg-[#f3f4f6] text-[#6b7280] border-[#e5e7eb]';
     }
 
     return (
+
         <span className={className}>
 
             <FiberManualRecord className='!text-[8px]' />
 
-            {props.type}
+            {props.value}
 
         </span>
     );
 }
 
-
 function AuthorityTag(props) {
 
-    const authority = (props.authority || '').toLowerCase();
+    const isActive =
+        props.active === true ||
+        props.active === 1 ||
+        props.active === '1';
 
-    let className = 'inline-flex items-center gap-[6px] px-[11px] py-[4px] rounded-full text-[10px] font-[700] tracking-[0.02em] leading-none border uppercase ';
+    let className =
+        'inline-flex items-center gap-[6px] px-[11px] py-[4px] rounded-full text-[10px] font-[700] tracking-[0.02em] leading-none border uppercase ';
 
-    if (authority === 'active') {
+    let iconColor = '!text-[#2563eb]';
 
-        className = className + 'bg-[#eef4ff] text-[#2563eb] border-[#c7dbff]';
+    if (isActive) {
+
+        className =
+            className +
+            'bg-[#eef4ff] text-[#2563eb] border-[#c7dbff]';
+
+        iconColor = '!text-[#2563eb]';
     }
     else {
 
-        className = className + 'bg-[#fff1f1] text-[#dc2626] border-[#fecaca]';
+        className =
+            className +
+            'bg-[#fff1f1] text-[#dc2626] border-[#fecaca]';
+
+        iconColor = '!text-[#dc2626]';
     }
 
     return (
+
         <span className={className}>
 
-            <FiberManualRecord className='!text-[8px]' />
+            <FiberManualRecord className={`!text-[8px] ${iconColor}`} />
 
-            {props.authority}
+            ACTIVE AUTHORITY
 
         </span>
     );
@@ -229,9 +257,17 @@ function CarrierCard(props) {
 
                             <div className='flex flex-wrap gap-[8px]'>
 
-                                <CarrierTypeTag type={carrier.carrier_type} />
+                                {(carrier.tags || []).map(function (tag, index) {
 
-                                <AuthorityTag authority={carrier.authority_status} />
+                                    return (
+                                        <CarrierTag
+                                            key={index}
+                                            value={tag}
+                                        />
+                                    );
+                                })}
+
+                               <AuthorityTag active={carrier.active_authority} />
 
                             </div>
 
