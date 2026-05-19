@@ -6,7 +6,7 @@ function CarrierProfileSection(props) {
 
         return (
             <div className='overflow-hidden rounded-[16px] border border-[#d9e1ee] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.06)]'>
-                <div className='flex items-start justify-between gap-[20px] bg-gradient-to-r from-[#0f57c8] via-[#1a55cf] to-[#1e49ca] px-[36px] py-[28px]'>
+                <div className='flex items-start justify-between gap-[20px] bg-gradient-to-r from-[#0E57C0] via-[#1a55cf] to-[#1E40AF] px-[36px] py-[28px]'>
 
                     <div className='min-w-0'>
 

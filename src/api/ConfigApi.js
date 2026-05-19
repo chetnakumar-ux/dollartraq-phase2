@@ -42,7 +42,9 @@ ConfigApi.prototype._request = function (method, endpoint, formData, callback) {
 					method: 'POST', // or 'PUT'
 					body: formData,
 					headers: {
-						'X-API-KEY': api_key
+						'Accept': 'application/json',
+						'X-API-KEY': api_key,
+						'Authorization': 'Bearer ' + localStorage.getItem(import.meta.env.VITE_ACCOUNT_TOKEN)
 					}
 				}
 			).then(function (response) {

@@ -7,11 +7,11 @@ function InsuranceCard(props) {
 
     return (
         
-        <div className="relative overflow-hidden rounded-[16px] border border-[#d9e1ee] bg-[#e8f1ff] p-[30px] shadow-[0_2px_8px_rgba(16,24,40,0.04)]">
+        <div className="relative overflow-hidden rounded-[16px] border border-[#d9e1ee] bg-[#e8f1ff] p-[20px] shadow-[0_2px_8px_rgba(16,24,40,0.04)]">
 
             <div className="absolute top-0 right-0 h-[50px] w-[50px] bg-[#0f57c8] [clip-path:polygon(100%_0,0_0,100%_100%)]"></div>
 
-            <div className="mb-[32px] flex items-center gap-[12px]">
+            <div className="mb-[24px] flex items-center gap-[12px]">
                 <ShieldOutlined className="text-[#185abc] !text-[24px]" />
                 <h3 className="text-[18px] font-[500] tracking-tight text-[#111827]">
                     insurance
@@ -19,7 +19,7 @@ function InsuranceCard(props) {
             </div>
 
             <div className="space-y-[12px]">
-                <div className="flex items-center justify-between rounded-[10px] bg-white/80 px-[20px] py-[18px] backdrop-blur-sm">
+                <div className="flex items-center justify-between rounded-[10px] bg-white/80 px-[18px] py-[12px] backdrop-blur-sm">
                     <span className="text-[11px] font-[700] tracking-[0.08em] text-[#94a3b8] uppercase">
                         BIPD Coverage
                     </span>
@@ -28,7 +28,7 @@ function InsuranceCard(props) {
                     </span>
                 </div>
 
-                <div className="flex items-center justify-between rounded-[10px] bg-white/80 px-[20px] py-[18px] backdrop-blur-sm">
+                <div className="flex items-center justify-between rounded-[10px] bg-white/80 px-[18px] py-[12px] backdrop-blur-sm">
                     <span className="text-[11px] font-[700] tracking-[0.08em] text-[#94a3b8] uppercase">
                         Cargo Insurance
                     </span>
@@ -40,7 +40,7 @@ function InsuranceCard(props) {
 
             <button 
                 type="button"
-                className="mt-[28px] w-full cursor-pointer rounded-[10px] bg-white py-[16px] text-[15px] font-[700] text-[#334155] shadow-sm transition-all hover:underline"
+                className="mt-[20px] w-full cursor-pointer rounded-[10px] bg-white py-[16px] text-[15px] font-[700] text-[#334155] shadow-sm transition-all hover:underline"
             >
                 View COI Document
             </button>

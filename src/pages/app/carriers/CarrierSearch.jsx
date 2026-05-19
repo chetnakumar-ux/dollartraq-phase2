@@ -135,7 +135,7 @@ function CarrierSearch() {
         setLoading(true);
 
         fetch(
-            'http://192.168.20.85:8000/api/handle/backend/carrier/search',
+            'http://192.168.1.23:8000/api/handle/backend/carrier/search',
             {
                 method: 'POST',
                 headers: {
@@ -148,14 +148,42 @@ function CarrierSearch() {
 
                 return response.json();
             })
-            .then(function (data) {
+.then(function (data) {
 
-                setCarriers(data.data || []);
-                setTotal(Number(data.total_results) || 0);
-                setCurrentPage(data.current_page || 1);
-                setLastPage(data.last_page || 1);
-                setLoading(false);
-            })
+    const searchValue = searchText.trim().toLowerCase();
+
+    const exactResults = (data.data || []).filter(function (item) {
+
+        return (
+
+            (item.company_name &&
+                item.company_name.toLowerCase() === searchValue)
+
+            ||
+
+            (item.mc_number &&
+                String(item.mc_number).toLowerCase() === searchValue)
+
+            ||
+
+            (item.dot_number &&
+                String(item.dot_number).toLowerCase() === searchValue)
+
+            ||
+
+            (item.phone &&
+                String(item.phone).toLowerCase() === searchValue)
+        );
+    });
+
+    setCarriers(exactResults);
+
+    setTotal(exactResults.length);
+    setCurrentPage(1);
+    setLastPage(1);
+
+    setLoading(false);
+})
             .catch(function (error) {
 
                 console.log(error);

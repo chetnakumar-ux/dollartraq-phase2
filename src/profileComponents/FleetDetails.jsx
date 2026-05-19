@@ -140,17 +140,17 @@ function FleetDetails({ data }) {
 
             <div className="px-[28px] pt-[26px]">
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mt-2">
 
                     <div className="h-[7px] w-[7px] rounded-full bg-emerald-500" />
 
-                    <h2 className="text-[12px] font-[800] tracking-[1px] text-[#0f172a] uppercase">
+                    <h2 className="text-[14px] font-[800] tracking-[1px] text-[#0f172a] uppercase">
                         Fleet Details
                     </h2>
 
                 </div>
 
-                <p className="mt-3 text-[11px] text-[#7c8fac] leading-[18px] max-w-[900px]">
+                <p className="mt-1 text-[10px] text-[#45484c] leading-[18px] max-w-[900px]">
                     Fleet tractors and trailers identified through observations on the road.
                     Note: If the carrier has no recent observations, equipment may not be shown
                     even if power units are reported.
@@ -215,7 +215,7 @@ function FleetDetails({ data }) {
 
                                 <div className="flex items-end gap-1 mt-[14px]">
 
-                                    <h3 className={`text-[38px] leading-none font-[800] ${theme.value}`}>
+                                    <h3 className={`text-[30px] leading-none font-[800] ${theme.value}`}>
                                         {card.value}
                                     </h3>
 
@@ -482,7 +482,6 @@ function FleetDetails({ data }) {
 
             </div>
 
-            {/* FOOTER */}
 
             <div className="flex items-center justify-end gap-[18px] px-[28px] py-[18px]">
 

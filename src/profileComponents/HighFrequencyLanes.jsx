@@ -14,7 +14,7 @@ function HighFrequencyLanes(props) {
 
                 <h3 className="text-[18px] font-[500] text-[#1f2937]">High Frequency Lanes</h3>
             </div>
-            <div className="space-y-[28px]">
+            <div className="space-y-[32px]">
 
                 {props.lanes.map((lane) => (
                     <div key={lane.id} className="flex items-start gap-[16px]">

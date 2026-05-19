@@ -70,8 +70,9 @@ class AppHeader extends Component {
     }
 
     componentDidMount = () => {
-        let account_token = localStorage.getItem(process.env.REACT_APP_ACCOUNT_TOKEN);
-        let user = localStorage.getItem(process.env.REACT_APP_ACCOUNT_USER);
+
+    let account_token = localStorage.getItem(import.meta.env.VITE_ACCOUNT_TOKEN);
+    let user = localStorage.getItem(import.meta.env.VITE_ACCOUNT_USER);
         
         if(user && account_token){
             

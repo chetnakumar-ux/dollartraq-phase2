@@ -1,17 +1,22 @@
 import React, { useEffect, useState, useRef } from 'react';
-import CarrierProfileSection from './../../../profileComponents/CarrierProfileSection';
+import CarrierProfileSection from '@/profileComponents/CarrierProfileSection';
 import CarrierProfileApi from 'api/CarrierProfileApi';
-import RiskFactorCard from './../../../profileComponents/RiskFactorCard';
+import RiskFactorCard from '@/profileComponents/RiskFactorCard';
 
-// Dashboard Components
-import SafetyPerformance from './../../../profileComponents/SafetyPerformance';
-import FleetSummary from './../../../profileComponents/FleetSummary';
-import InsuranceCard from './../../../profileComponents/InsuranceCard';
-import HighFrequencyLanes from './../../../profileComponents/HighFrequencyLanes';
-import OperationalObservations from './../../../profileComponents/OperationalObservations';
-import SafetyIntelligenceConsole from './../../../profileComponents/safetyIntelligence/SafetyIntelligenceConsole';
-import FleetDetails from './../../../profileComponents/FleetDetails';
-import LoadHistory from './../../../profileComponents/LoadHistory';
+import SafetyPerformance from '@/profileComponents/SafetyPerformance';
+import FleetSummary from '@/profileComponents/FleetSummary';
+import InsuranceCard from '@/profileComponents/InsuranceCard';
+import HighFrequencyLanes from '@/profileComponents/HighFrequencyLanes';
+import OperationalObservations from '@/profileComponents/OperationalObservations';
+import SafetyIntelligenceConsole from '@/profileComponents/safetyIntelligence/SafetyIntelligenceConsole';
+import FleetDetails from '@/profileComponents/FleetDetails';
+import LoadHistory from '@/profileComponents/LoadHistory';
+import CompanySnapshot from '@/profileComponents/CompanySnapShot';
+
+import CompanyAssociationsView from '@/profileComponents/CompanyAssociationsView';
+// import EquipmentInsightsView from '@/profileComponents/EquipmentInsightsView';
+// import IndustryBenchmarksView from '@/profileComponents/IndustryBenchmarksView';
+// import ContactHistoryView from '@/profileComponents/ContactHistoryView';
 
 import {
     Add, Bolt, CheckCircle, WarningAmber, LocalShipping, 
@@ -96,7 +101,7 @@ function CarrierProfile() {
     const tabs = ['RISK FACTORS', 'COMPANY ASSOCIATIONS', 'EQUIPMENT INSIGHTS', 'INDUSTRY BENCHMARKS', 'CONTACT HISTORY'];
 
     return (
-        <div className='min-h-screen bg-[#f6f8fc] p-[32px]'>
+        <div className='min-h-screen bg-[#F6F7F0] p-[32px]'>
             <div className='mx-auto max-w-[1600px]'>
                 
                 <CarrierProfileSection
@@ -152,7 +157,6 @@ function CarrierProfile() {
 
                     <main className='flex-1 min-w-0 space-y-[32px]'>
                         
-                        {/* THE TABBED CONTAINER (Risk Factors, etc.) */}
                         <div className='rounded-[16px] border border-[#d9e1ee] bg-white overflow-hidden shadow-sm'>
                             <div className='sticky top-[0px] z-10 border-b border-[#d9e1ee] bg-[#EBF5FF] px-[62px]'>
                                 <div className='flex gap-[65px]'> 
@@ -174,13 +178,6 @@ function CarrierProfile() {
                             </div>
 
                             <div className='p-[32px] bg-[#fbfcfe]'>
-                                {activeTab !== 'RISK FACTORS' && (
-                                    <div ref={sectionRefs['INFORMATION']} data-section="INFORMATION" className='mb-[32px]'>
-                                        <div className='p-[20px] border border-dashed border-[#d9e1ee] rounded-[12px]'>
-                                            <h3 className='text-[14px] font-bold text-[#1656b8] mb-4'>CARRIER INFORMATION</h3>
-                                        </div>
-                                    </div>
-                                )}
 
                                 {activeTab === 'RISK FACTORS' && (
                                     <div ref={sectionRefs['RISK FACTORS']} data-section="RISK FACTORS" className='space-y-[32px]'>
@@ -196,6 +193,46 @@ function CarrierProfile() {
                                             badge="IMMEDIATE ATTENTION"
                                             items={carrier.risks?.items} 
                                         />
+                                    </div>
+                                )}
+
+                                {activeTab === 'COMPANY ASSOCIATIONS' && (
+                                    <div
+                                        ref={sectionRefs['INFORMATION']}
+                                        data-section="INFORMATION"
+                                        className='space-y-[32px]'
+                                    >
+                                        <CompanyAssociationsView
+                                            data={carrier?.companyAssociations || []}
+                                        />
+                                    </div>
+                                )}          
+
+                                {activeTab === 'EQUIPMENT INSIGHTS' && (
+                                    <div ref={sectionRefs['INFORMATION']} data-section="INFORMATION" className='space-y-[32px]'>
+                                        <div className='p-[20px] border border-dashed border-[#d9e1ee] rounded-[12px]'>
+                                            <h3 className='text-[14px] font-bold text-[#1656b8] mb-4'>EQUIPMENT INSIGHTS</h3>
+
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* 4. INDUSTRY BENCHMARKS TAB */}
+                                {activeTab === 'INDUSTRY BENCHMARKS' && (
+                                    <div ref={sectionRefs['INFORMATION']} data-section="INFORMATION" className='space-y-[32px]'>
+                                        <div className='p-[20px] border border-dashed border-[#d9e1ee] rounded-[12px]'>
+                                            <h3 className='text-[14px] font-bold text-[#1656b8] mb-4'>INDUSTRY BENCHMARKS</h3>
+
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'CONTACT HISTORY' && (
+                                    <div ref={sectionRefs['INFORMATION']} data-section="INFORMATION" className='space-y-[32px]'>
+                                        <div className='p-[20px] border border-dashed border-[#d9e1ee] rounded-[12px]'>
+                                            <h3 className='text-[14px] font-bold text-[#1656b8] mb-4'>CONTACT HISTORY</h3>
+
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -223,20 +260,18 @@ function CarrierProfile() {
                            <FleetDetails data={carrier.fleet} />
                         </section>
 
-  <section
-    ref={sectionRefs['LOAD HISTORY']}
-    data-section="LOAD HISTORY"
->
-    <LoadHistory data={carrier?.loadHistory} />
-</section>
+                        <section
+                            ref={sectionRefs['LOAD HISTORY']}
+                            data-section="LOAD HISTORY"
+                        >
+                            <LoadHistory data={carrier?.loadHistory} />
+                        </section>
 
-                        {/* 5. COMPANY SNAPSHOT */}
                         <section 
                             ref={sectionRefs['COMPANY SNAPSHOT']} 
                             data-section="COMPANY SNAPSHOT"
-                            className="min-h-[500px] rounded-[16px] border border-[#d9e1ee] bg-white p-[32px]"
                         >
-                            <h2 className="text-[14px] font-bold uppercase text-[#64748b]">COMPANY SNAPSHOT</h2>
+                             <CompanySnapshot data={carrier?.companySnapshot} />
                         </section>
 
                     </main>
