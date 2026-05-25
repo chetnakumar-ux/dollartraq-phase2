@@ -18,8 +18,12 @@ function CarrierProfileSection(props) {
         return (
 
             <div className='overflow-hidden rounded-[16px] border border-[#d9e1ee] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.06)]'>
+<<<<<<< HEAD
 
                 <div className='flex flex-col gap-[24px] bg-gradient-to-r from-[#0E57C0] via-[#1a55cf] to-[#1E40AF] px-[20px] py-[24px] md:px-[28px] md:py-[26px] xl:flex-row xl:items-start xl:justify-between xl:px-[36px] xl:py-[28px]'>
+=======
+                <div className='flex items-start justify-between gap-[20px] bg-gradient-to-r from-[#0E57C0] via-[#1a55cf] to-[#1E40AF] px-[36px] py-[28px]'>
+>>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
 
                     <div className='min-w-0'>
 

@@ -83,8 +83,13 @@ class AppHeader extends Component {
 
     componentDidMount = () => {
 
+<<<<<<< HEAD
         let account_token = localStorage.getItem(import.meta.env.VITE_ACCOUNT_TOKEN);
         let user = localStorage.getItem(import.meta.env.VITE_ACCOUNT_USER);
+=======
+    let account_token = localStorage.getItem(import.meta.env.VITE_ACCOUNT_TOKEN);
+    let user = localStorage.getItem(import.meta.env.VITE_ACCOUNT_USER);
+>>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
         
         if(user && account_token){
             

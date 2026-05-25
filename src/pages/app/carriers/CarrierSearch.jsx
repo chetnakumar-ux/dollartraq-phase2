@@ -184,7 +184,11 @@ function CarrierSearch() {
         }
 
         fetch(
+<<<<<<< HEAD
             `${import.meta.env.VITE_ROOT_PROD}/api/carrier/search?${params}`,
+=======
+            'http://192.168.1.23:8000/api/handle/backend/carrier/search',
+>>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
             {
                 method: 'GET',
                 headers: {
@@ -197,8 +201,9 @@ function CarrierSearch() {
                 return res.json();
 
             })
-            .then(function (data) {
+.then(function (data) {
 
+<<<<<<< HEAD
                 setCarriers(data.data || []);
                 setTotal(data.total || (data.data || []).length);
                 setCurrentPage(pageNumber);
@@ -206,6 +211,43 @@ function CarrierSearch() {
 
             })
             .catch(function (err) {
+=======
+    const searchValue = searchText.trim().toLowerCase();
+
+    const exactResults = (data.data || []).filter(function (item) {
+
+        return (
+
+            (item.company_name &&
+                item.company_name.toLowerCase() === searchValue)
+
+            ||
+
+            (item.mc_number &&
+                String(item.mc_number).toLowerCase() === searchValue)
+
+            ||
+
+            (item.dot_number &&
+                String(item.dot_number).toLowerCase() === searchValue)
+
+            ||
+
+            (item.phone &&
+                String(item.phone).toLowerCase() === searchValue)
+        );
+    });
+
+    setCarriers(exactResults);
+
+    setTotal(exactResults.length);
+    setCurrentPage(1);
+    setLastPage(1);
+
+    setLoading(false);
+})
+            .catch(function (error) {
+>>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
 
                 console.log(err);
 

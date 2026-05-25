@@ -239,6 +239,7 @@ function LoadHistory({ data }) {
                 the road. Note: If the carrier has no recent observations,
                 equipment may not be shown — even if power units are reported.
             </p>
+<<<<<<< HEAD
             <div className="mt-[20px] grid grid-cols-4 gap-[14px]">
                 {(history?.summaryCards || []).map((card, index) => {
                     const title = card?.title?.toLowerCase?.() || '';
@@ -399,6 +400,168 @@ function LoadHistory({ data }) {
                     </div>
                 </div>
 
+=======
+<div className="mt-[20px] grid grid-cols-4 gap-[14px]">
+    {(history?.summaryCards || []).map((card, index) => {
+        const title = card?.title?.toLowerCase?.() || '';
+        const isStrong = title.includes('strong');
+        const isDeadhead = title.includes('deadhead');
+        const isFullTruckload = title.includes('full');
+
+        return (
+            <div
+                key={card.id}
+                className={`rounded-[6px] border bg-white px-[16px] py-[14px] ${
+                    isStrong
+                        ? 'border-[#3b82f6]'
+                        : isDeadhead
+                        ? 'border-[#eadede]'
+                        : 'border-[#e5e7eb]'
+                }`}
+            >
+                {/* Header */}
+                <div className="flex items-center gap-[6px]">
+                    {isStrong && (
+                        <div className="flex h-[20px] w-[20px] items-center justify-center rounded-[4px] border border-[#cfe0ff] bg-[#f5f9ff]">
+                            {getSummaryCardIcon(card, index)}
+                        </div>
+                    )}
+
+                    {!isStrong && (
+                        <p
+                            className={`text-[9px] font-[700] uppercase tracking-[0.4px] ${
+                                isDeadhead
+                                    ? 'text-[#b91c1c]'
+                                    : 'text-[#6b7280]'
+                            }`}
+                        >
+                            {card.title}
+                        </p>
+                    )}
+
+                    {isStrong && (
+                        <p className="text-[11px] font-[700] text-[#111827]">
+                            {card.title}
+                        </p>
+                    )}
+                </div>
+
+                {/* Value */}
+                {isStrong ? (
+                    <div className="mt-[10px] flex items-end gap-[8px]">
+                        <h3 className="text-[30px] leading-none font-[800] text-[#111827]">
+                            {card.value}
+                        </h3>
+
+                        <span className="mb-[4px] text-[11px] text-[#6b7280]">
+                            {card.subtitle}
+                        </span>
+                    </div>
+                ) : (
+                    <>
+                        <div className="h-[36px]" />
+
+                        <h3
+                            className={`text-[30px] leading-none font-[800] ${
+                                isDeadhead
+                                    ? 'text-[#b91c1c]'
+                                    : 'text-[#111827]'
+                            }`}
+                        >
+                            {card.value}
+                        </h3>
+
+                        <p
+                            className={`mt-[10px] text-[11px] ${
+                                isDeadhead
+                                    ? 'text-[#9ca3af]'
+                                    : isFullTruckload
+                                    ? 'text-[#16a34a]'
+                                    : 'text-[#9ca3af]'
+                            }`}
+                        >
+                            {card.subtitle}
+                        </p>
+                    </>
+                )}
+
+                {/* Footer for Strong card */}
+                {isStrong && (
+                    <>
+                        <div className="mt-[16px] h-[1px] w-full bg-[#e5e7eb]" />
+
+                        <div className="mt-[10px] flex items-center justify-between">
+                            <span className="text-[9px] text-[#94a3b8]">
+                                {card.footerLabel || 'Confidence Score'}
+                            </span>
+
+                            <span className="text-[9px] font-[700] text-[#1d4ed8]">
+                                {card.footerValue || `${card.progress}%`}
+                            </span>
+                        </div>
+
+                        <div className="mt-[5px] h-[5px] overflow-hidden rounded-full bg-[#dbe4f0]">
+                            <div
+                                className="h-full rounded-full bg-[#1457c8]"
+                                style={{
+                                    width: `${card.progress || 0}%`
+                                }}
+                            />
+                        </div>
+                    </>
+                )}
+            </div>
+        );
+    })}
+</div>
+            <div className="mt-[18px] grid grid-cols-12 gap-[14px]">
+                <div className="col-span-7 overflow-hidden rounded-[8px] border border-[#dfe5ec] bg-white">
+                    <div className="flex h-[54px] items-center border-b border-[#e8edf3] px-[16px]">
+                        <div className="flex items-center gap-[9px]">
+                            <InsightsOutlined
+                                sx={{
+                                    fontSize: 18,
+                                    color: '#1457c8',
+                            
+                                }}
+                            />
+                            <p className="text-[14px] font-[700] text-[#111827]">
+                                Key Insights
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-[10px] p-[14px] ">
+                        {(history?.insights || []).map((item, index) => {
+                            const insightMeta = getInsightIcon(index);
+
+                            return (
+                                <div
+                                    key={item.id}
+                                    className="rounded-[6px] border border-[#eceff5] bg-[#f7f8fc] px-[12px] py-[16px]"
+                                >
+                                    <div className="flex items-center gap-[15px]">
+
+                                    <div className="relative h-[40px] w-[34px] flex-shrink-0 rounded-[8px] flex items-center justify-center"
+                                        style={{ backgroundColor: insightMeta.bg }}>
+
+                                        <div className="mt-[6px]">
+                                            {insightMeta.icon}
+                                        </div>
+                                        
+                                    </div>
+
+                                        <p className="text-[11px] leading-[18px] text-[#4b5563]">
+                                            {renderInsightText(item.title)}
+                                        </p>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+>>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
                 <div className="col-span-5 overflow-hidden rounded-[8px] border border-[#dfe5ec] bg-white">
                     <div className="flex h-[54px] items-center justify-between border-b border-[#e8edf3] px-[16px]">
                         <p className="text-[14px] font-[700] text-[#111827]">
@@ -443,7 +606,11 @@ function LoadHistory({ data }) {
                             />
                         </svg>
 
+<<<<<<< HEAD
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+=======
+                        <div className="absolute inset-0 flex flex-col items-center justify-center ml-[45px] text-center">
+>>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
                             <h3 className="text-[32px] leading-none font-[800] text-[#1f2937]">
                                 {concentration?.total || '0%'}
                             </h3>

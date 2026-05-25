@@ -1,8 +1,29 @@
 import React, { useEffect, useState, useRef } from 'react';
+<<<<<<< HEAD
 import { useParams } from 'react-router-dom';
 
 import CarrierProfileSection from '@/profileComponents/CarrierProfileSection';
 import RiskFactorCard from '@/profileComponents/RiskFactorCard';
+=======
+import CarrierProfileSection from '@/profileComponents/CarrierProfileSection';
+import CarrierProfileApi from 'api/CarrierProfileApi';
+import RiskFactorCard from '@/profileComponents/RiskFactorCard';
+
+import SafetyPerformance from '@/profileComponents/SafetyPerformance';
+import FleetSummary from '@/profileComponents/FleetSummary';
+import InsuranceCard from '@/profileComponents/InsuranceCard';
+import HighFrequencyLanes from '@/profileComponents/HighFrequencyLanes';
+import OperationalObservations from '@/profileComponents/OperationalObservations';
+import SafetyIntelligenceConsole from '@/profileComponents/safetyIntelligence/SafetyIntelligenceConsole';
+import FleetDetails from '@/profileComponents/FleetDetails';
+import LoadHistory from '@/profileComponents/LoadHistory';
+import CompanySnapshot from '@/profileComponents/CompanySnapShot';
+
+import CompanyAssociationsView from '@/profileComponents/CompanyAssociationsView';
+// import EquipmentInsightsView from '@/profileComponents/EquipmentInsightsView';
+// import IndustryBenchmarksView from '@/profileComponents/IndustryBenchmarksView';
+// import ContactHistoryView from '@/profileComponents/ContactHistoryView';
+>>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
 
 import SafetyPerformance from '@/profileComponents/SafetyPerformance';
 import FleetSummary from '@/profileComponents/FleetSummary';
@@ -568,12 +589,16 @@ function CarrierProfile() {
     ];
 
     return (
+<<<<<<< HEAD
 
 
         <Main active_page="carrier_profile" page="carrier_profile">
 
         <div className='min-h-screen bg-[#F6F7F0] p-[14px] sm:p-[20px] xl:p-[32px]'>
 
+=======
+        <div className='min-h-screen bg-[#F6F7F0] p-[32px]'>
+>>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
             <div className='mx-auto max-w-[1600px]'>
 
             <CarrierProfileSection
@@ -757,6 +782,7 @@ function CarrierProfile() {
 
                     </aside>
 
+<<<<<<< HEAD
                     <main className='min-w-0 flex-1 space-y-[24px] xl:space-y-[32px]'>
 
                         <div className='overflow-hidden rounded-[16px] border border-[#d9e1ee] bg-white shadow-sm'>
@@ -801,11 +827,36 @@ function CarrierProfile() {
 
                                     </div>
 
+=======
+                    <main className='flex-1 min-w-0 space-y-[32px]'>
+                        
+                        <div className='rounded-[16px] border border-[#d9e1ee] bg-white overflow-hidden shadow-sm'>
+                            <div className='sticky top-[0px] z-10 border-b border-[#d9e1ee] bg-[#EBF5FF] px-[62px]'>
+                                <div className='flex gap-[65px]'> 
+                                    {tabs.map((tab) => (
+                                        <button
+                                            key={tab}
+                                            onClick={() => setActiveTab(tab)}
+                                            className={`relative py-[20px] text-[11px] font-[700] tracking-[1px] uppercase transition-all ${
+                                                activeTab === tab ? '' : 'text-[#7c8fac] hover:text-[#111827]'
+                                            }`}
+                                        >
+                                            {tab}
+                                            {activeTab === tab && (
+                                                <div className='absolute bottom-0 left-[15%] h-[3px] w-[70%] rounded-t-[4px] bg-[#1c5dbe]' />
+                                            )}
+                                        </button>
+                                    ))}
+>>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
                                 </div>
 
                             </div>
 
+<<<<<<< HEAD
                             <div className='bg-[#fbfcfe] p-[16px] sm:p-[24px] xl:p-[32px]'>
+=======
+                            <div className='p-[32px] bg-[#fbfcfe]'>
+>>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
 
                                 {activeTab === 'RISK FACTORS' && (
 
@@ -840,6 +891,7 @@ function CarrierProfile() {
                                 )}
 
                                 {activeTab === 'COMPANY ASSOCIATIONS' && (
+<<<<<<< HEAD
 
                                     <div
                                         ref={sectionRefs['COMPANY ASSOCIATIONS']}
@@ -906,6 +958,46 @@ function CarrierProfile() {
 
                                 )}
 
+=======
+                                    <div
+                                        ref={sectionRefs['INFORMATION']}
+                                        data-section="INFORMATION"
+                                        className='space-y-[32px]'
+                                    >
+                                        <CompanyAssociationsView
+                                            data={carrier?.companyAssociations || []}
+                                        />
+                                    </div>
+                                )}          
+
+                                {activeTab === 'EQUIPMENT INSIGHTS' && (
+                                    <div ref={sectionRefs['INFORMATION']} data-section="INFORMATION" className='space-y-[32px]'>
+                                        <div className='p-[20px] border border-dashed border-[#d9e1ee] rounded-[12px]'>
+                                            <h3 className='text-[14px] font-bold text-[#1656b8] mb-4'>EQUIPMENT INSIGHTS</h3>
+
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* 4. INDUSTRY BENCHMARKS TAB */}
+                                {activeTab === 'INDUSTRY BENCHMARKS' && (
+                                    <div ref={sectionRefs['INFORMATION']} data-section="INFORMATION" className='space-y-[32px]'>
+                                        <div className='p-[20px] border border-dashed border-[#d9e1ee] rounded-[12px]'>
+                                            <h3 className='text-[14px] font-bold text-[#1656b8] mb-4'>INDUSTRY BENCHMARKS</h3>
+
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'CONTACT HISTORY' && (
+                                    <div ref={sectionRefs['INFORMATION']} data-section="INFORMATION" className='space-y-[32px]'>
+                                        <div className='p-[20px] border border-dashed border-[#d9e1ee] rounded-[12px]'>
+                                            <h3 className='text-[14px] font-bold text-[#1656b8] mb-4'>CONTACT HISTORY</h3>
+
+                                        </div>
+                                    </div>
+                                )}
+>>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
                             </div>
 
                         </div>
@@ -946,6 +1038,7 @@ function CarrierProfile() {
 
                         <section
                             ref={sectionRefs['LOAD HISTORY']}
+<<<<<<< HEAD
                             data-section='LOAD HISTORY'
                         >
 
@@ -967,6 +1060,18 @@ function CarrierProfile() {
                                data={carrier}
                             />
 
+=======
+                            data-section="LOAD HISTORY"
+                        >
+                            <LoadHistory data={carrier?.loadHistory} />
+                        </section>
+
+                        <section 
+                            ref={sectionRefs['COMPANY SNAPSHOT']} 
+                            data-section="COMPANY SNAPSHOT"
+                        >
+                             <CompanySnapshot data={carrier?.companySnapshot} />
+>>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
                         </section>
 
                     </main>
