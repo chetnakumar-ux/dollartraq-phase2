@@ -1,10 +1,13 @@
 import './assets/styles/theme.css';
 
-import { ThemeProvider, createTheme } from '@mui/material/styles'
+import { ThemeProvider, createTheme, StyledEngineProvider } from '@mui/material/styles'
 
 import {BrowserRouter, Route, Routes as Switch} from 'react-router-dom';
+import CssBaseline from '@mui/material/CssBaseline';
 
 import WdFormRouter from 'pages/app/WdFormRouter';
+
+import NoPage from 'pages/app/NoPage';
 
 import Signin from 'pages/auth/Signin';
 import Logout from 'pages/auth/Logout';
@@ -28,9 +31,12 @@ import Subscriptions from 'pages/app/subscriptions/Subscriptions';
 
 import ProfileUpdate from 'pages/app/profile/ProfileUpdate';
 import ProfilePassword from 'pages/app/profile/ProfilePassword';
+import ShortlistedCarriers from 'pages/app/profile/ShortlistedCarriers'
 
 import CarrierSearch from 'pages/app/carriers/CarrierSearch';
 import CarrierProfile from 'pages/app/carriers/CarrierProfile';
+
+import PricingPage from 'pages/app/pricing/PricingPage';
 
 
 function App(){
@@ -38,11 +44,11 @@ function App(){
     const theme = createTheme({
 
         body: {
-            fontSize: 12, fontFamily: 'Fira Sans'
+            fontSize: 12, fontFamily: 'Inter'
         },
         typography: {
             fontFamily: [
-                'Fira Sans'
+                'Inter'
             ],
         },
         shadows: [
@@ -322,72 +328,80 @@ function App(){
     })
 
     return (
-        <ThemeProvider theme={theme}>
-            <BrowserRouter basename={'/'}>
+        <StyledEngineProvider injectFirst>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <BrowserRouter basename={'/'}>
 
-                <Switch>
-              
-                    <Route exact={true} path='/' element={<Signin />} />
+                    <Switch>
+                
+                        <Route exact={true} path='/' element={<Signin />} />
 
-                    <Route path="/logout" element={<Logout />}>
-                            
-                        <Route path=':auto_logout' element={<Logout />} />
-                    </Route>
-                    
-                    <Route exact={true} path='/dashboard' element={<Dashboard />} />
-
-                    <Route exact={true} path='/control-tower' element={<ControlTowerList />} />
-
-                    <Route exact={true} path='/shipment' element={<ControlTowerShipment />}>
-                        <Route exact={true} path=':row_id' element={<ControlTowerShipment />} />
-                    </Route>
-
-                    <Route exact={true} path='/track-shipment' element={<TrackShipmentForm />}>
-                        <Route exact={true} path=':step' element={<TrackShipmentForm />}>
-                            <Route path=':row_id' element={<TrackShipmentForm />} />
+                        <Route path="/logout" element={<Logout />}>
+                                
+                            <Route path=':auto_logout' element={<Logout />} />
                         </Route>
-                    </Route>
+                        
+                        <Route exact={true} path='/dashboard' element={<Dashboard />} />
 
-                    <Route exact={true} path='/load-search' element={<LoadSearch />} />
+                        <Route exact={true} path='/control-tower' element={<ControlTowerList />} />
 
-                    <Route exact={true} path='/action-centre' element={<ActionCentre />} />
+                        <Route exact={true} path='/shipment' element={<ControlTowerShipment />}>
+                            <Route exact={true} path=':row_id' element={<ControlTowerShipment />} />
+                        </Route>
 
-                    <Route exact={true} path='/subscriptions' element={<Subscriptions />} />
-
-                    <Route exact={true} path='/carriers' element={<ShipmentCarriers />} />
-
-                    <Route exact={true} path='/users' element={<UsersList />} />
-
-                    <Route path="/search" element={<CarrierSearch />} />
-                    <Route path="/carrier/:row_id" element={<CarrierProfile />} />
-
-                    <Route exact={true} path='/profile' element={<ProfileUpdate />} />
-                    <Route exact={true} path='/profile/password' element={<ProfilePassword />} />
-
-                    <Route exact={true} path='/edit' element={<WdFormRouter />}>
-                        <Route path=':main_route' element={<WdFormRouter />}>
-                            <Route path=':module' element={<WdFormRouter />}>
-                                <Route path=':action' element={<WdFormRouter />}>
-                                    <Route path=':row_id' element={<WdFormRouter />} />
-                                </Route>
+                        <Route exact={true} path='/track-shipment' element={<TrackShipmentForm />}>
+                            <Route exact={true} path=':step' element={<TrackShipmentForm />}>
+                                <Route path=':row_id' element={<TrackShipmentForm />} />
                             </Route>
                         </Route>
-                    </Route>
 
-                    <Route exact={true} path='/edit' element={<WdFormRouter />}>
-                        <Route path=':main_route' element={<WdFormRouter />}>
-                            <Route path=':module' element={<WdFormRouter />}>
-                                <Route path=':action' element={<WdFormRouter />}>
-                                    <Route path=':sub_action' element={<WdFormRouter />}>
+                        <Route exact={true} path='/load-search' element={<LoadSearch />} />
+
+                        <Route exact={true} path='/action-centre' element={<ActionCentre />} />
+
+                        <Route exact={true} path='/subscriptions' element={<Subscriptions />} />
+
+                        <Route exact={true} path='/carriers' element={<ShipmentCarriers />} />
+
+                        <Route exact={true} path='/users' element={<UsersList />} />
+
+                        <Route path="/carriers/search" element={<CarrierSearch />} />
+                        <Route path="/carriers/:row_id" element={<CarrierProfile />} />
+
+                        <Route exact={true} path='/profile' element={<ProfileUpdate />} />
+                        <Route exact={true} path='/profile/password' element={<ProfilePassword />} />
+                        <Route exact={true} path='/profile/carriers/shortlisted' element={<ShortlistedCarriers />}/>
+
+                        <Route exact={true} path='/pricing' element={<PricingPage />} />
+
+                        <Route exact={true} path='/edit' element={<WdFormRouter />}>
+                            <Route path=':main_route' element={<WdFormRouter />}>
+                                <Route path=':module' element={<WdFormRouter />}>
+                                    <Route path=':action' element={<WdFormRouter />}>
                                         <Route path=':row_id' element={<WdFormRouter />} />
                                     </Route>
                                 </Route>
                             </Route>
                         </Route>
-                    </Route>
-                </Switch>
-            </BrowserRouter>
-        </ThemeProvider>
+
+                        <Route exact={true} path='/edit' element={<WdFormRouter />}>
+                            <Route path=':main_route' element={<WdFormRouter />}>
+                                <Route path=':module' element={<WdFormRouter />}>
+                                    <Route path=':action' element={<WdFormRouter />}>
+                                        <Route path=':sub_action' element={<WdFormRouter />}>
+                                            <Route path=':row_id' element={<WdFormRouter />} />
+                                        </Route>
+                                    </Route>
+                                </Route>
+                            </Route>
+                        </Route>
+
+                        <Route path="*" element={<NoPage />} />
+                    </Switch>
+                </BrowserRouter>
+            </ThemeProvider>
+        </StyledEngineProvider>
     );
 }
 

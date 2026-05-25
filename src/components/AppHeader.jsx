@@ -3,34 +3,43 @@ import { Link, Navigate } from "react-router-dom";
 
 import Snackbar from '@mui/material/Snackbar';
 import Slide from '@mui/material/Slide';
-import AppBar from '@mui/material/AppBar';
+import Button from '@mui/material/Button';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
+
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Avatar from '@mui/material/Avatar';
 import Popover from '@mui/material/Popover';
+
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
+
 import { Box } from '@mui/material';
 import Alert from '@mui/material/Alert';
 
-import Btn from './Btn';
-// import renderHTML from 'react-render-html';
+import Badge from '@mui/material/Badge';
 
 import { connect } from 'react-redux';
 import { User } from 'actions/user';
 
 import Api from 'api/Api';
 import Loader from './Loader';
-import MenuIcon from '@mui/icons-material/Menu';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import PowerSettingsNew from '@mui/icons-material/PowerSettingsNew';
+
 import PanTool from '@mui/icons-material/PanTool';
+import Search from '@mui/icons-material/Search';
+import NotificationsOutlined from '@mui/icons-material/NotificationsOutlined';
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
+
+import AssignmentInd from '@mui/icons-material/AssignmentInd';
+import Password from '@mui/icons-material/Password';
+import Checklist from '@mui/icons-material/Checklist';
+
+import logo from 'assets/images/logo.webp?v=3';
 
 import Time from './Time';
+import Navigation from './Navigation';
 
 class AppHeader extends Component { 
     constructor(props) {
@@ -47,31 +56,35 @@ class AppHeader extends Component {
             notifications: [],
             notifications_count: 0,
 
+            profile_menu: null,
+
             alert_sound: false,
             
             help_alert: false,
             help_message: '',
 
-            order_alert: false,
-            order_message: '',
-
             alert_requests: [],
 
             redirect_url: false,
+            search_query: '',
 
             notification_page: 1,
             notification_reloading: false,
 
-            entry_time: false,
-            exit_time: false,
+            profile_links: [
+                {key: "profile_page", label: "Profile", icon: <AssignmentInd />, link: "profile"},
+                {key: "profile_shortlisting", label: "Carriers Shortlisted", icon: <Checklist />, link: "profile/carriers/shortlisted"},
+                {key: "profile_password", label: "Password Update", icon: <Password />, link: "profile/password"},
+            ]
         }
 
         let interval = 0;
     }
 
     componentDidMount = () => {
-        let account_token = localStorage.getItem(process.env.REACT_APP_ACCOUNT_TOKEN);
-        let user = localStorage.getItem(process.env.REACT_APP_ACCOUNT_USER);
+
+        let account_token = localStorage.getItem(import.meta.env.VITE_ACCOUNT_TOKEN);
+        let user = localStorage.getItem(import.meta.env.VITE_ACCOUNT_USER);
         
         if(user && account_token){
             
@@ -115,21 +128,6 @@ class AppHeader extends Component {
         }
     }
 
-    headerProfileImage = () => {
-
-        if(this.props.user && this.props.user.profile_pic_url != ''){
-                
-            return <Avatar style={{width:25, height:25}} alt={this.props.user.name} src={this.props.user.profile_pic_url} />
-        }else{
-            
-            return (
-                <Avatar>
-                    <AccountCircle />
-                </Avatar>
-            )
-        }
-    }
-    
     renderChilds = (menu_item) => {
 
         var _childs = [];
@@ -173,45 +171,70 @@ class AppHeader extends Component {
 
                 {this.state.account_token
                     ?
-                        <AppBar className="header-bar" position="static" color="inherit" style={{boxShadow:'none', backgroundColor: 'transparent', padding:0}}>
+                        <Box className="flex items-center justify-between container-fluid h-[64px] px-6 shadow-xs border-b border-gray-100 relative">
+
+                            <Box>
+                                <Link to="/dashboard" className="logo">
+                                    <img src={logo} style={{width: 125}} alt="logo" />
+                                </Link>
+                            </Box>
+
+                            <div className='border border-gray-200 p-2 px-4 rounded-lg w-[400px] flex items-center justify-start transition hover:bg-slate-50 has-[:focus]:bg-slate-100 has-[:focus]:border-slate-300'>
+
+                                <Search style={{fontSize:16}} className='text-gray-500' />
+                                <input
+                                    type="text"
+                                    placeholder='Search MC, DOT, Company and Phone'
+                                    className='border-none flex-1 pl-3 text-xs'
+                                    value={this.state.search_query}
+                                    onChange={(e) => {
+                                        
+                                        this.setState({search_query: e.target.value})
+                                    }}
+                                    onKeyDown={(e) => {
+
+                                        if(e.key === 'Enter' && this.state.search_query.trim()){
+
+                                            this.setState({redirect_url: `/carriers/search?q=${encodeURIComponent(this.state.search_query.trim())}`})
+                                        }
+                                    }}
+                                />
+                            </div>
+
+                            <Navigation />
                             
-                            <Toolbar className="header-wrapper" style={{  minHeight: 35,  padding: '2px 10px',  display: 'flex',  justifyContent: 'space-between',  alignItems: 'center' }}>
+                            <Toolbar>
 
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
 
-                                    <IconButton  color="inherit" aria-label="open drawer" edge="start" onClick={this.props.onMenuClick}  sx={{ mr: 1, display: { sm: 'none' } }}  >
-                                        <MenuIcon />
-                                    </IconButton>
+                                    <IconButton id="notification_button" size="small" onClick={(e) => {
 
-                                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                                        <Time />
-                                    </Box>
-
-                                </div>
-
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    {/* <IconButton id="notification_button" onClick={(e) => {
                                         this.setState({notifications_popup: e.currentTarget});
                                         this.fetchNotifications(true);
                                     }}>
                                         <Badge badgeContent={this.state.notifications_count} color="secondary">
-                                            <Notifications />
+                                            <NotificationsOutlined fontSize='small' />
                                         </Badge>
-                                    </IconButton> */}
-                                    <Btn
-                                        className="ml-10"
-                                        color="secondary"
+                                    </IconButton>
+
+                                    <Button
                                         variant="text"
                                         size="small"
-                                        to='/profile'
-                                        style={{ display: 'flex', alignItems: 'center' }}
+                                        endIcon={<KeyboardArrowDown />}
+                                        sx={{backgroundColor:'rgba(241, 245, 249, 1)', border:'1px solid rgba(226, 232, 240, 1)', padding:'4px 15px 4px 4px'}}
+                                        onClick={(e) => {
+
+                                            this.setState({profile_menu: e.currentTarget})
+                                        }}
                                     >
-                                        {this.headerProfileImage()}
-                                        <span className="ml-10 fw-semibold gr-6 capitalize">
+                                        <Avatar style={{width:25, height:25}} alt={this.props.user.name} src={this.props.user.profile_pic_url} sx={{background:'linear-gradient(135deg, #3B82F6 0%, #4F46E5 100%)'}} />
+
+                                        <span className="ml-2 capitalize font-bold text-xs">
                                             {this.props.user ? `${this.props.user.first_name} ${this.props.user.last_name}` : ''}
                                         </span>
-                                    </Btn>
-                                    <Link className="ml-20" to="/logout" style={{ display: 'flex', alignItems: 'center' }}>
+                                    </Button>
+
+                                    {/* <Link className="ml-20" to="/logout" style={{ display: 'flex', alignItems: 'center' }}>
                                         <IconButton
                                             edge="end"
                                             color="inherit"
@@ -219,7 +242,7 @@ class AppHeader extends Component {
                                         >
                                             <PowerSettingsNew />
                                         </IconButton>
-                                    </Link>
+                                    </Link> */}
                                 </div>
                             </Toolbar>
 
@@ -257,23 +280,72 @@ class AppHeader extends Component {
                             </Popover>
 
                             <Menu
-                                style={{width:200}}
-                                anchorEl={this.state.header}
-                                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                                id="header_menu"
-                                keepMounted
-                                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                                open={this.state.header != false ? true : false}
+                                anchorEl={this.state.profile_menu}
+                                open={this.state.profile_menu !== null ? true : false}
                                 onClose={() => {
-                                    this.setState({header: false})
+    
+                                    this.setState({profile_menu: null})
+                                }}
+                                onClick={() => {
+    
+                                }}
+                                transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+                                anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                                slotProps={{
+                                    backdrop: {
+                                        invisible: true,
+                                    },
+                                    list: {
+                                        sx: {
+                                            backgroundColor: '#fff',
+                                        },
+                                    },
+                                    paper: {
+                                        elevation: 0,
+                                        borderRadius: 10,
+                                        sx: {
+                                            backgroundColor: '#fff',
+                                            overflow: 'visible',
+                                            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.1))',
+                                            borderRadius:3,
+                                            padding: 1,
+                                            width: 300,
+                                            mt: 1.5,
+                                            '& .MuiAvatar-root': {
+                                                width: 32,
+                                                height: 32,
+                                                ml: -0.5,
+                                                mr: 1,
+                                            },
+                                            '&::before': {
+                                                content: '""',
+                                                display: 'block',
+                                                position: 'absolute',
+                                                top: 0,
+                                                right: 50,
+                                                width: 10,
+                                                height: 10,
+                                                bgcolor: '#fff',
+                                                transform: 'translateY(-50%) rotate(45deg)',
+                                                zIndex: 0,
+                                            },
+                                        },
+                                    },
                                 }}
                             >
-                                <MenuItem style={{width:250, padding:0}}>
-                                    <Link style={{display:'block', padding:15, width:'100%'}} to="/profile">Profile</Link>
-                                </MenuItem>
-                                <MenuItem style={{width:250, padding:0}}>
-                                    <Link style={{display:'block', padding:15, width:'100%'}} to="/change-password">Change Password</Link>
-                                </MenuItem>
+    
+                                {this.state.profile_links.map((_profile) => {
+    
+                                    return (
+                                        <MenuItem component={Link} key={_profile.key} to={`/${_profile.link}`} >
+                                            <ListItemIcon>
+                                                {_profile.icon}
+                                            </ListItemIcon>
+                                            
+                                            <span>{_profile.label}</span>
+                                        </MenuItem>
+                                    )
+                                })}
                             </Menu>
 
                             <Snackbar
@@ -294,24 +366,7 @@ class AppHeader extends Component {
                             >
                                 <Alert elevation={6} variant="filled" severity="success">{this.state.help_message}</Alert>
                             </Snackbar>
-                            {/* <Snackbar
-                                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                                open={this.state.order_alert}
-                                onEntered={() => {
-                                    if(!this.state.alert_sound){
-                                        this.setState({alert_sound: true})
-                                    }
-                                }}
-                                onClick={() => {
-                                    this.setState({order_alert: false, alert_sound: false});
-                                }}
-                                onClose={() => {
-                                    this.setState({order_alert: false, alert_sound: false})
-                                }}
-                                TransitionComponent={Slide}
-                                message={this.state.order_message}
-                            /> */}
-                        </AppBar>
+                        </Box>
                     :
                         null
                 }
@@ -481,4 +536,4 @@ const mapStateToProps = state => {
 	}
 }
 
-export default connect(mapStateToProps, { User } )(AppHeader);
+export default connect(mapStateToProps, { User })(AppHeader);

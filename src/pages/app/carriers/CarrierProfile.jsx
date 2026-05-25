@@ -1,31 +1,64 @@
 import React, { useEffect, useState, useRef } from 'react';
-import CarrierProfileSection from './../../../profileComponents/CarrierProfileSection';
-import CarrierProfileApi from 'api/CarrierProfileApi';
-import RiskFactorCard from './../../../profileComponents/RiskFactorCard';
+import { useParams } from 'react-router-dom';
 
-// Dashboard Components
-import SafetyPerformance from './../../../profileComponents/SafetyPerformance';
-import FleetSummary from './../../../profileComponents/FleetSummary';
-import InsuranceCard from './../../../profileComponents/InsuranceCard';
-import HighFrequencyLanes from './../../../profileComponents/HighFrequencyLanes';
-import OperationalObservations from './../../../profileComponents/OperationalObservations';
-import SafetyIntelligenceConsole from './../../../profileComponents/safetyIntelligence/SafetyIntelligenceConsole';
-import FleetDetails from './../../../profileComponents/FleetDetails';
-import LoadHistory from './../../../profileComponents/LoadHistory';
+import CarrierProfileSection from '@/profileComponents/CarrierProfileSection';
+import RiskFactorCard from '@/profileComponents/RiskFactorCard';
 
-import {
-    Add, Bolt, CheckCircle, WarningAmber, LocalShipping, 
-    Groups, History, InfoOutlined, Timeline, Assessment 
-} from '@mui/icons-material';
+import SafetyPerformance from '@/profileComponents/SafetyPerformance';
+import FleetSummary from '@/profileComponents/FleetSummary';
+import InsuranceCard from '@/profileComponents/InsuranceCard';
+import HighFrequencyLanes from '@/profileComponents/HighFrequencyLanes';
+import OperationalObservations from '@/profileComponents/OperationalObservations';
+import SafetyIntelligenceConsole from '@/profileComponents/safetyIntelligence/SafetyIntelligenceConsole';
+import FleetDetails from '@/profileComponents/FleetDetails';
+import LoadHistory from '@/profileComponents/LoadHistory';
+import CompanySnapshot from '@/profileComponents/CompanySnapShot';
+
+import CompanyAssociationsView from '@/profileComponents/CompanyAssociationsView';
+import EquipmentInsightsView from '@/profileComponents/EquipmentInsightsView';
+import IndustryBenchMarksView from '@/profileComponents/IndustryBenchMarksView';
+import ContactHistoryView from '@/profileComponents/ContactHistoryView';
+
+import DescriptionOutlined from '@mui/icons-material/DescriptionOutlined';
+import LocationOnOutlined from '@mui/icons-material/LocationOnOutlined';
+import PhoneOutlined from '@mui/icons-material/PhoneOutlined';
+import AlternateEmail from '@mui/icons-material/AlternateEmail';
+import Language from '@mui/icons-material/Language';
+
+import Main from '@/components/Main';
+
+// Replaced CircularProgress with Skeleton
+import Skeleton from '@mui/material/Skeleton';
+
+import {Add,Bolt,CheckCircle,WarningAmber,LocalShipping,Groups,History,InfoOutlined,Timeline,Assessment} from '@mui/icons-material';
 
 function CarrierProfile() {
+
+    const { row_id } = useParams();
+
     const [carrier, setCarrier] = useState(null);
+
+    const [loading, setLoading] = useState(true);
+
+    const [error, setError] = useState('');
+
     const [activeTab, setActiveTab] = useState('RISK FACTORS');
+
     const [activeSidebar, setActiveSidebar] = useState('RISK FACTORS');
 
+    const informationTabs = [
+        'COMPANY ASSOCIATIONS',
+        'EQUIPMENT INSIGHTS',
+        'INDUSTRY BENCHMARKS',
+        'CONTACT HISTORY'
+    ];
+
     const sectionRefs = {
-        'INFORMATION': useRef(null),
         'RISK FACTORS': useRef(null),
+        'COMPANY ASSOCIATIONS': useRef(null),
+        'EQUIPMENT INSIGHTS': useRef(null),
+        'INDUSTRY BENCHMARKS': useRef(null),
+        'CONTACT HISTORY': useRef(null),
         'OPERATIONAL OBSERVATIONS': useRef(null),
         'SAFETY INTELLIGENCE CONSOLE': useRef(null),
         'FLEET DETAILS': useRef(null),
@@ -33,10 +66,115 @@ function CarrierProfile() {
         'COMPANY SNAPSHOT': useRef(null)
     };
 
+    // ───────────────── API CALL ─────────────────
+
     useEffect(function () {
-        CarrierProfileApi.getCarrierProfile().then(function (data) {
-            setCarrier(data);
-        });
+
+        if (!row_id) {
+
+            setError('No carrier ID provided.');
+
+            setLoading(false);
+
+            return;
+
+        }
+
+        setLoading(true);
+
+        setError('');
+
+        fetch(
+
+            `${import.meta.env.VITE_ROOT_PROD}/api/carrier/detail/${row_id}`,
+
+            {
+                method: 'POST',
+
+                headers: {
+                    Authorization: `Bearer ${import.meta.env.VITE_BARRIER_TOKEN}`
+                }
+            }
+
+        )
+
+            .then(function (res) {
+
+                if (!res.ok) {
+
+                    throw new Error(`Server error: ${res.status}`);
+
+                }
+
+                const contentType = res.headers.get('content-type');
+
+                if (
+                    !contentType ||
+                    !contentType.includes('application/json')
+                ) {
+
+                    throw new Error(
+                        'Server returned non-JSON response'
+                    );
+
+                }
+
+                return res.json();
+
+            })
+
+            .then(function (data) {
+
+                console.log('Carrier API response:', data);
+
+                const carrierData = data.data || data;
+
+                if (
+                    !carrierData ||
+                    typeof carrierData !== 'object'
+                ) {
+
+                    throw new Error(
+                        'Invalid carrier data received'
+                    );
+
+                }
+
+                setCarrier(carrierData);
+
+            })
+
+            .catch(function (err) {
+
+                console.error(
+                    'CarrierProfile fetch error:',
+                    err.message
+                );
+
+                setError(
+                    err.message ||
+                    'Failed to load carrier profile.'
+                );
+
+            })
+
+            .finally(function () {
+
+                setLoading(false);
+
+            });
+
+    }, [row_id]);
+
+    // ───────────────── SIDEBAR ACTIVE SECTION ─────────────────
+
+    useEffect(function () {
+
+        if (!carrier) {
+
+            return;
+
+        }
 
         const observerOptions = {
             root: null,
@@ -44,205 +182,801 @@ function CarrierProfile() {
             threshold: 0
         };
 
-        const observerCallback = (entries) => {
-            entries.forEach((entry) => {
+        const observerCallback = function (entries) {
+
+            entries.forEach(function (entry) {
+
                 if (entry.isIntersecting) {
-                    setActiveSidebar(entry.target.getAttribute('data-section'));
+
+                    setActiveSidebar(
+                        entry.target.getAttribute('data-section')
+                    );
+
                 }
+
             });
+
         };
 
-        const observer = new IntersectionObserver(observerCallback, observerOptions);
-        Object.values(sectionRefs).forEach((ref) => {
-            if (ref.current) observer.observe(ref.current);
+        const observer = new IntersectionObserver(
+            observerCallback,
+            observerOptions
+        );
+
+        Object.values(sectionRefs).forEach(function (ref) {
+
+            if (ref.current) {
+
+                observer.observe(ref.current);
+
+            }
+
         });
 
-        return () => observer.disconnect();
-    }, [carrier]);
+        return function () {
 
-    const scrollToSection = (label) => {
-        const element = sectionRefs[label].current;
+            observer.disconnect();
+
+        };
+
+    }, [carrier, activeTab]);
+
+    // ───────────────── SCROLL FUNCTIONS ─────────────────
+
+    const executeScroll = function (label) {
+
+        const element = sectionRefs[label]?.current;
+
         if (element) {
+
             const offset = 32;
-            const bodyRect = document.body.getBoundingClientRect().top;
-            const elementRect = element.getBoundingClientRect().top;
-            const elementPosition = elementRect - bodyRect;
-            const offsetPosition = elementPosition - offset;
+
+            const bodyRect =
+                document.body.getBoundingClientRect().top;
+
+            const elementRect =
+                element.getBoundingClientRect().top;
+
+            const elementPosition =
+                elementRect - bodyRect;
+
+            const offsetPosition =
+                elementPosition - offset;
 
             window.scrollTo({
                 top: offsetPosition,
                 behavior: 'smooth'
             });
+
         }
+
     };
 
-    if (!carrier) return null;
+    const scrollToSection = function (label) {
+
+        if (label === 'INFORMATION') {
+
+            if (informationTabs.includes(activeTab)) {
+
+                executeScroll(activeTab);
+
+                return;
+
+            }
+
+            setActiveTab('COMPANY ASSOCIATIONS');
+
+            setTimeout(function () {
+
+                executeScroll('COMPANY ASSOCIATIONS');
+
+            }, 80);
+
+            return;
+
+        }
+
+        if (label === 'RISK FACTORS') {
+
+            if (activeTab !== 'RISK FACTORS') {
+
+                setActiveTab('RISK FACTORS');
+
+                setTimeout(function () {
+
+                    executeScroll('RISK FACTORS');
+
+                }, 80);
+
+            } else {
+
+                executeScroll('RISK FACTORS');
+
+            }
+
+            return;
+
+        }
+
+        executeScroll(label);
+
+    };
+
+    // ───────────────── LOADING SKELETON ─────────────────
+
+    if (loading) {
+
+        return (
+
+            <Main active_page="carrier_profile" page="carrier_profile">
+
+                <div className='min-h-screen bg-[#F6F7F0] p-[14px] sm:p-[20px] xl:p-[32px]'>
+
+                    <div className='mx-auto max-w-[1600px] space-y-[24px]'>
+
+                        {/* Hero Section Skeleton */}
+                        <div className="bg-white rounded-[16px] p-6 border border-[#d9e1ee] shadow-sm flex flex-col md:flex-row justify-between gap-6">
+
+                            <div className="space-y-3 flex-1">
+
+                                <Skeleton variant="text" width="60%" height={32} />
+
+                                <Skeleton variant="text" width="40%" height={20} />
+
+                                <div className="flex gap-4 pt-2">
+
+                                    <Skeleton variant="rounded" width={100} height={24} />
+
+                                    <Skeleton variant="rounded" width={120} height={24} />
+
+                                </div>
+
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-2 min-w-[280px]">
+
+                                {[1, 2, 3, 4].map((i) => (
+
+                                    <div key={i}>
+
+                                        <Skeleton variant="text" width={40} height={14} />
+
+                                        <Skeleton variant="text" width={80} height={20} />
+
+                                    </div>
+
+                                ))}
+
+                            </div>
+
+                        </div>
+
+                        {/* Contact Info Skeleton */}
+                        <div className="bg-white rounded-[16px] p-6 border border-[#d9e1ee] shadow-sm">
+
+                            <Skeleton variant="text" width={200} height={24} className="mb-4" />
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+                                {[1, 2, 3, 4].map((i) => (
+
+                                    <div key={i} className="flex gap-3">
+
+                                        <Skeleton variant="circular" width={24} height={24} className="shrink-0" />
+
+                                        <div className="w-full">
+
+                                            <Skeleton variant="text" width="40%" height={14} />
+
+                                            <Skeleton variant="text" width="80%" height={20} />
+
+                                        </div>
+
+                                    </div>
+
+                                ))}
+
+                            </div>
+
+                        </div>
+
+                        {/* Mid Grid Columns Skeleton */}
+                        <div className='grid grid-cols-1 gap-[24px] xl:grid-cols-12 xl:gap-[32px]'>
+
+                            <div className='space-y-[24px] xl:col-span-8 xl:space-y-[32px]'>
+
+                                <Skeleton variant="rounded" height={280} className="w-full !rounded-[16px]" />
+
+                                <Skeleton variant="rounded" height={220} className="w-full !rounded-[16px]" />
+
+                            </div>
+
+                            <div className='space-y-[24px] xl:col-span-4 xl:space-y-[32px]'>
+
+                                <Skeleton variant="rounded" height={240} className="w-full !rounded-[16px]" />
+
+                                <Skeleton variant="rounded" height={260} className="w-full !rounded-[16px]" />
+
+                            </div>
+
+                        </div>
+
+                        {/* Bottom Layout Split (Sidebar + Content Panel) Skeleton */}
+                        <div className='flex flex-col gap-[24px] xl:flex-row xl:gap-[32px]'>
+
+                            <div className='w-full xl:w-[320px] xl:shrink-0'>
+
+                                <div className='flex gap-[10px] overflow-x-auto rounded-[16px] border border-[#d9e1ee] bg-white p-[12px] shadow-sm xl:min-h-[400px] xl:flex-col'>
+
+                                    {[1, 2, 3, 4, 5].map((i) => (
+
+                                        <Skeleton key={i} variant="rounded" height={54} className="w-[140px] xl:w-full !rounded-[10px]" />
+
+                                    ))}
+
+                                </div>
+
+                            </div>
+
+                            <div className='min-w-0 flex-1 space-y-[24px] xl:space-y-[32px]'>
+
+                                <div className='rounded-[16px] border border-[#d9e1ee] bg-white shadow-sm overflow-hidden'>
+
+                                    <div className="bg-[#EBF5FF] px-6 py-4 border-b border-[#d9e1ee]">
+
+                                        <div className="flex gap-6">
+
+                                            <Skeleton variant="text" width={100} height={24} />
+
+                                            <Skeleton variant="text" width={120} height={24} />
+
+                                            <Skeleton variant="text" width={110} height={24} />
+
+                                        </div>
+
+                                    </div>
+
+                                    <div className="p-6 space-y-4">
+
+                                        <Skeleton variant="rounded" height={140} className="w-full !rounded-[12px]" />
+
+                                        <Skeleton variant="rounded" height={140} className="w-full !rounded-[12px]" />
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </Main>
+
+        );
+
+    }
+
+    // ───────────────── ERROR ─────────────────
+
+    if (error || !carrier) {
+
+        return (
+
+            <div className='min-h-screen bg-[#F6F7F0] flex items-center justify-center'>
+
+                <div className='bg-white rounded-xl border border-red-200 p-8 max-w-md text-center shadow-sm'>
+
+                    <h2 className='text-lg font-bold text-gray-800 mb-2'>
+                        Failed to load carrier
+                    </h2>
+
+                    <p className='text-sm text-gray-500 mb-4'>
+                        {error || 'Carrier data is unavailable.'}
+                    </p>
+
+                    <button
+                        onClick={function () {
+
+                            window.location.reload();
+
+                        }}
+                        className='bg-blue-500 text-white px-5 py-2 rounded-lg text-sm hover:bg-blue-600 transition'
+                    >
+                        Try Again
+                    </button>
+
+                </div>
+
+            </div>
+
+        );
+
+    }
 
     const allSidebarOptions = [
-        { id: 'info', label: 'INFORMATION', icon: <InfoOutlined /> },
-        { id: 'risk', label: 'RISK FACTORS', icon: <WarningAmber /> },
-        { id: 'obs', label: 'OPERATIONAL OBSERVATIONS', icon: <Timeline /> },
-        { id: 'safety', label: 'SAFETY INTELLIGENCE CONSOLE', icon: <Assessment /> },
-        { id: 'fleet', label: 'FLEET DETAILS', icon: <LocalShipping /> },
-        { id: 'load', label: 'LOAD HISTORY', icon: <History /> },
-        { id: 'company', label: 'COMPANY SNAPSHOT', icon: <Groups /> }
+        {
+            id: 'info',
+            label: 'INFORMATION',
+            icon: <InfoOutlined />
+        },
+        {
+            id: 'risk',
+            label: 'RISK FACTORS',
+            icon: <WarningAmber />
+        },
+        {
+            id: 'obs',
+            label: 'OPERATIONAL OBSERVATIONS',
+            icon: <Timeline />
+        },
+        {
+            id: 'safety',
+            label: 'SAFETY INTELLIGENCE CONSOLE',
+            icon: <Assessment />
+        },
+        {
+            id: 'fleet',
+            label: 'FLEET DETAILS',
+            icon: <LocalShipping />
+        },
+        {
+            id: 'load',
+            label: 'LOAD HISTORY',
+            icon: <History />
+        },
+        {
+            id: 'company',
+            label: 'COMPANY SNAPSHOT',
+            icon: <Groups />
+        }
     ];
 
-    const filteredSidebarOptions = allSidebarOptions.filter(opt => {
-        if (activeTab === 'RISK FACTORS' && opt.label === 'INFORMATION') return false;
+    const filteredSidebarOptions = allSidebarOptions.filter(function (opt) {
+
+        if (
+            activeTab === 'RISK FACTORS' &&
+            opt.label === 'INFORMATION'
+        ) {
+
+            return false;
+
+        }
+
+        if (
+            informationTabs.includes(activeTab) &&
+            opt.label === 'RISK FACTORS'
+        ) {
+
+            return false;
+
+        }
+
         return true;
+
     });
 
-    const tabs = ['RISK FACTORS', 'COMPANY ASSOCIATIONS', 'EQUIPMENT INSIGHTS', 'INDUSTRY BENCHMARKS', 'CONTACT HISTORY'];
+    const tabs = [
+        'RISK FACTORS',
+        'COMPANY ASSOCIATIONS',
+        'EQUIPMENT INSIGHTS',
+        'INDUSTRY BENCHMARKS',
+        'CONTACT HISTORY'
+    ];
 
     return (
-        <div className='min-h-screen bg-[#f6f8fc] p-[32px]'>
+
+
+        <Main active_page="carrier_profile" page="carrier_profile">
+
+        <div className='min-h-screen bg-[#F6F7F0] p-[14px] sm:p-[20px] xl:p-[32px]'>
+
             <div className='mx-auto max-w-[1600px]'>
-                
+
+            <CarrierProfileSection
+                variant='hero'
+                title={carrier.company_name || 'NA'}
+                subtitle={carrier.dba_name || 'NA'}
+                leftItems={[
+                    {
+                        label: 'STATUS',
+                        value: carrier.status || 'NA',
+                        icon: (
+                            <CheckCircle className='!text-[15px]' />
+                        )
+                    },
+                    {
+                        label: 'YEARS ACTIVE',
+                        value: carrier.years_active || 'NA'
+                    }
+                ]}
+                rightItems={[
+            {
+                label: 'MC#',
+                value:
+                    carrier?.authority?.docket_number ||
+                    'NA'
+            },
+                    {
+                        label: 'DOT#',
+                        value: carrier.dot_number || 'NA'
+                    },
+                    {
+                        label: 'EIN#',
+                        value: carrier.ein || 'NA'
+                    },
+                    {
+                        label: 'DUNS#',
+                        value: carrier.duns || 'NA'
+                    }
+                ]}
+                actions={[
+                    {
+                        label: 'Add to Preferred',
+                        icon: (
+                            <Add className='!text-[18px]' />
+                        ),
+                        variant: 'secondary'
+                    },
+                    {
+                        label: 'Connect',
+                        icon: (
+                            <Bolt className='!text-[18px]' />
+                        ),
+                        variant: 'primary'
+                    }
+                ]}
+            />
+
+            <div className='mt-[24px]'>
+
                 <CarrierProfileSection
-                    variant='hero'
-                    title={carrier.company_name}
-                    subtitle={carrier.legal_name}
-                    leftItems={[
-                        { label: 'STATUS', value: carrier.status, icon: <CheckCircle className='!text-[15px]' /> },
-                        { label: 'BASE OPERATION', value: carrier.base_operation },
-                        { label: 'YEARS ACTIVE', value: carrier.years_active }
-                    ]}
-                    rightItems={[
-                        { label: 'MC#', value: carrier.mc_number },
-                        { label: 'DOT#', value: carrier.dot_number },
-                        { label: 'EIN#', value: carrier.ein },
-                        { label: 'DUNS#', value: carrier.duns }
-                    ]}
-                    actions={[
-                        { label: 'Add to Preferred', icon: <Add className='!text-[18px]' />, variant: 'secondary' },
-                        { label: 'Connect', icon: <Bolt className='!text-[18px]' />, variant: 'primary' }
+                    title='Contact Information'
+                    titleIcon={
+                        <DescriptionOutlined
+                            className='!text-[#185abc]'
+                        />
+                    }
+                    items={[
+                        {
+                            label: 'HEADQUARTERS',
+                            value: [
+                                carrier?.physical_address?.street,
+                                carrier?.physical_address?.city,
+                                carrier?.physical_address?.state,
+                                carrier?.physical_address?.zip,
+                                carrier?.physical_address?.country
+                            ]
+                                .filter(Boolean)
+                                .join(', ') || 'NA',
+                            icon: <LocationOnOutlined />
+                        },
+                        {
+                            label: 'DISPATCH PHONE',
+                            value:
+                                carrier.phone ||
+                                carrier.dispatch_phone ||
+                                'NA',
+                            icon: <PhoneOutlined />
+                        },
+                        {
+                            label: 'OFFICIAL EMAIL',
+                            value:
+                                carrier.email ||
+                                carrier.official_email ||
+                                'NA',
+                            icon: <AlternateEmail />
+                        },
+                        {
+                            label: 'WEB PRESENCE',
+                            value:
+                                carrier.website ||
+                                carrier.web_presence ||
+                                'NA',
+                            icon: <Language />
+                        }
                     ]}
                 />
 
-                <div className="mt-[32px] grid grid-cols-12 gap-[32px]">
-                    <div className="col-span-8 space-y-[32px]">
-                        <SafetyPerformance data={carrier.safety} />
-                        <FleetSummary data={carrier.fleet} />
+            </div>
+
+                <div className='mt-[24px] grid grid-cols-1 gap-[24px] xl:mt-[32px] xl:grid-cols-12 xl:gap-[32px]'>
+
+                    <div className='space-y-[24px] xl:col-span-8 xl:space-y-[32px]'>
+
+                        <SafetyPerformance
+                            data={carrier}
+                        />
+
+                       <FleetSummary
+                            data={carrier}
+                        />
+
                     </div>
-                    <div className="col-span-4 space-y-[32px]">
-                        <InsuranceCard data={carrier.insurance} />
-                        <HighFrequencyLanes lanes={carrier.lanes} />
+
+                    <div className='space-y-[24px] xl:col-span-4 xl:space-y-[32px]'>
+
+                        <InsuranceCard
+                            data={carrier}
+                        />
+
+                        <HighFrequencyLanes
+                            lanes={carrier.lanes || []}
+                        />
+
                     </div>
+
                 </div>
 
-                <div className='mt-[32px] flex gap-[32px] items-start'>
-                    
-                    <aside className='sticky top-[32px] w-[320px] h-fit shrink-0'>
-                        <div className='min-h-[500px] rounded-[16px] border border-[#d9e1ee] bg-white p-[12px] shadow-sm flex flex-col'>
-                            {filteredSidebarOptions.map((opt) => (
-                                <button
-                                    key={opt.id}
-                                    className={`flex w-full items-center gap-[14px] rounded-[10px] px-[16px] py-[25px] mb-[4px] text-[11px] font-[700] transition-all uppercase tracking-tight ${
-                                        activeSidebar === opt.label ? 'text-[#1656b8]' : 'text-[#64748b] hover:bg-gray-50'
-                                    }`}
-                                    onClick={() => scrollToSection(opt.label)}
-                                >
-                                    {React.cloneElement(opt.icon, { className: '!text-[18px]' })}
-                                    {opt.label}
-                                </button>
-                            ))}
+                <div className='mt-[24px] flex flex-col gap-[24px] xl:mt-[32px] xl:flex-row xl:gap-[32px] xl:items-start'>
+
+                    <aside className='w-full xl:sticky xl:top-[32px] xl:w-[320px] xl:shrink-0'>
+
+                        <div className='flex gap-[10px] overflow-x-auto rounded-[16px] border border-[#d9e1ee] bg-white p-[12px] shadow-sm xl:min-h-[500px] xl:flex-col xl:overflow-visible'>
+
+                            {filteredSidebarOptions.map(function (opt) {
+
+                                return (
+
+                                    <button
+                                        key={opt.id}
+                                        onClick={() => {
+
+                                            scrollToSection(opt.label);
+
+                                        }}
+                                        className={`flex shrink-0 items-center gap-[12px] rounded-[10px] px-[16px] py-[16px] text-[11px] font-[700] uppercase tracking-tight transition-all xl:w-full xl:py-[25px] ${
+                                            activeSidebar === opt.label ||
+                                            (
+                                                opt.label === 'INFORMATION' &&
+                                                informationTabs.includes(activeSidebar)
+                                            )
+                                                ? 'text-[#1656b8] bg-[#f8fbff]'
+                                                : 'text-[#64748b] hover:bg-gray-50'
+                                        }`}
+                                    >
+
+                                        {React.cloneElement(opt.icon, {
+                                            className: '!text-[18px]'
+                                        })}
+
+                                        <span className='whitespace-nowrap'>
+                                            {opt.label}
+                                        </span>
+
+                                    </button>
+
+                                );
+
+                            })}
+
                         </div>
+
                     </aside>
 
-                    <main className='flex-1 min-w-0 space-y-[32px]'>
-                        
-                        {/* THE TABBED CONTAINER (Risk Factors, etc.) */}
-                        <div className='rounded-[16px] border border-[#d9e1ee] bg-white overflow-hidden shadow-sm'>
-                            <div className='sticky top-[0px] z-10 border-b border-[#d9e1ee] bg-[#EBF5FF] px-[62px]'>
-                                <div className='flex gap-[65px]'> 
-                                    {tabs.map((tab) => (
-                                        <button
-                                            key={tab}
-                                            onClick={() => setActiveTab(tab)}
-                                            className={`relative py-[20px] text-[11px] font-[700] tracking-[1px] uppercase transition-all ${
-                                                activeTab === tab ? '' : 'text-[#7c8fac] hover:text-[#111827]'
-                                            }`}
-                                        >
-                                            {tab}
-                                            {activeTab === tab && (
-                                                <div className='absolute bottom-0 left-[15%] h-[3px] w-[70%] rounded-t-[4px] bg-[#1c5dbe]' />
-                                            )}
-                                        </button>
-                                    ))}
+                    <main className='min-w-0 flex-1 space-y-[24px] xl:space-y-[32px]'>
+
+                        <div className='overflow-hidden rounded-[16px] border border-[#d9e1ee] bg-white shadow-sm'>
+
+                            <div className='sticky top-0 z-10 border-b border-[#d9e1ee] bg-[#EBF5FF]'>
+
+                                <div className='overflow-x-auto'>
+
+                                    <div className='flex min-w-max gap-[28px] px-[15px] sm:gap-[40px] sm:px-[30px] xl:gap-[50px] xl:px-[62px]'>
+
+                                        {tabs.map(function (tab) {
+
+                                            return (
+
+                                                <button
+                                                    key={tab}
+                                                    onClick={() => {
+
+                                                        setActiveTab(tab);
+
+                                                    }}
+                                                    className={`relative py-[18px] text-[10px] font-[700] uppercase tracking-[1px] transition-all sm:text-[11px] ${
+                                                        activeTab === tab
+                                                            ? 'text-[#1c5dbe]'
+                                                            : 'text-[#7c8fac] hover:text-[#111827]'
+                                                    }`}
+                                                >
+
+                                                    {tab}
+
+                                                    {activeTab === tab && (
+
+                                                        <div className='absolute bottom-0 left-[15%] h-[3px] w-[70%] rounded-t-[4px] bg-[#1c5dbe]' />
+
+                                                    )}
+
+                                                </button>
+
+                                            );
+
+                                        })}
+
+                                    </div>
+
                                 </div>
+
                             </div>
 
-                            <div className='p-[32px] bg-[#fbfcfe]'>
-                                {activeTab !== 'RISK FACTORS' && (
-                                    <div ref={sectionRefs['INFORMATION']} data-section="INFORMATION" className='mb-[32px]'>
-                                        <div className='p-[20px] border border-dashed border-[#d9e1ee] rounded-[12px]'>
-                                            <h3 className='text-[14px] font-bold text-[#1656b8] mb-4'>CARRIER INFORMATION</h3>
-                                        </div>
-                                    </div>
-                                )}
+                            <div className='bg-[#fbfcfe] p-[16px] sm:p-[24px] xl:p-[32px]'>
 
                                 {activeTab === 'RISK FACTORS' && (
-                                    <div ref={sectionRefs['RISK FACTORS']} data-section="RISK FACTORS" className='space-y-[32px]'>
-                                        <RiskFactorCard 
-                                            type='success' 
-                                            title="RELIABILITY FACTORS"
-                                            badge="PREMIUM STANDING"
-                                            items={carrier.reliability?.items} 
+
+                                    <div
+                                        ref={sectionRefs['RISK FACTORS']}
+                                        data-section='RISK FACTORS'
+                                        className='space-y-[20px] xl:space-y-[32px]'
+                                    >
+
+                                        <RiskFactorCard
+                                            type='success'
+                                            title='RELIABILITY FACTORS'
+                                            badge='PREMIUM STANDING'
+                                            items={
+                                                carrier?.reliability?.items ||
+                                                []
+                                            }
                                         />
-                                        <RiskFactorCard 
-                                            type='risk' 
-                                            title="RISK FACTORS"
-                                            badge="IMMEDIATE ATTENTION"
-                                            items={carrier.risks?.items} 
+
+                                        <RiskFactorCard
+                                            type='risk'
+                                            title='RISK FACTORS'
+                                            badge='IMMEDIATE ATTENTION'
+                                            items={
+                                                carrier?.risks?.items ||
+                                                []
+                                            }
                                         />
+
                                     </div>
+
                                 )}
+
+                                {activeTab === 'COMPANY ASSOCIATIONS' && (
+
+                                    <div
+                                        ref={sectionRefs['COMPANY ASSOCIATIONS']}
+                                        data-section='COMPANY ASSOCIATIONS'
+                                        className='space-y-[24px] xl:space-y-[32px]'
+                                    >
+
+                                        <CompanyAssociationsView
+                                            data={
+                                                carrier?.companyAssociations ||
+                                                []
+                                            }
+                                        />
+
+                                    </div>
+
+                                )}
+
+                                {activeTab === 'EQUIPMENT INSIGHTS' && (
+
+                                    <div
+                                        ref={sectionRefs['EQUIPMENT INSIGHTS']}
+                                        data-section='EQUIPMENT INSIGHTS'
+                                        className='space-y-[24px] xl:space-y-[32px]'
+                                    >
+
+                                        <EquipmentInsightsView
+                                           data={carrier}
+                                        />
+
+                                    </div>
+
+                                )}
+
+                                {activeTab === 'INDUSTRY BENCHMARKS' && (
+
+                                    <div
+                                        ref={sectionRefs['INDUSTRY BENCHMARKS']}
+                                        data-section='INDUSTRY BENCHMARKS'
+                                        className='space-y-[24px] xl:space-y-[32px]'
+                                    >
+
+                                        <IndustryBenchMarksView
+                                            data={carrier}
+                                        />
+
+                                    </div>
+
+                                )}
+
+                                {activeTab === 'CONTACT HISTORY' && (
+
+                                    <div
+                                        ref={sectionRefs['CONTACT HISTORY']}
+                                        data-section='CONTACT HISTORY'
+                                        className='space-y-[24px] xl:space-y-[32px]'
+                                    >
+
+                                        <ContactHistoryView
+                                            data={carrier}
+                                        />
+
+                                    </div>
+
+                                )}
+
                             </div>
+
                         </div>
 
-                        <section 
-                            ref={sectionRefs['OPERATIONAL OBSERVATIONS']} 
-                            data-section="OPERATIONAL OBSERVATIONS"
+                        <section
+                            ref={sectionRefs['OPERATIONAL OBSERVATIONS']}
+                            data-section='OPERATIONAL OBSERVATIONS'
                         >
-                            <OperationalObservations data={carrier.observations} />
+
+                            <OperationalObservations
+                                data={carrier.observations || {}}
+                            />
+
                         </section>
 
-                        <section 
-                            ref={sectionRefs['SAFETY INTELLIGENCE CONSOLE']} 
-                            data-section="SAFETY INTELLIGENCE CONSOLE"
-                            className="scroll-mt-[32px]" 
+                        <section
+                            ref={sectionRefs['SAFETY INTELLIGENCE CONSOLE']}
+                            data-section='SAFETY INTELLIGENCE CONSOLE'
+                            className='scroll-mt-[32px]'
                         >
-                            <SafetyIntelligenceConsole data={carrier.safety} />
+
+                            <SafetyIntelligenceConsole
+                                data={carrier}
+                            />
+
                         </section>
 
                         <section
                             ref={sectionRefs['FLEET DETAILS']}
-                            data-section="FLEET DETAILS"
+                            data-section='FLEET DETAILS'
                         >
-                           <FleetDetails data={carrier.fleet} />
+
+                            <FleetDetails
+                                data={carrier.fleet || {}}
+                            />
+
                         </section>
 
-  <section
-    ref={sectionRefs['LOAD HISTORY']}
-    data-section="LOAD HISTORY"
->
-    <LoadHistory data={carrier?.loadHistory} />
-</section>
-
-                        {/* 5. COMPANY SNAPSHOT */}
-                        <section 
-                            ref={sectionRefs['COMPANY SNAPSHOT']} 
-                            data-section="COMPANY SNAPSHOT"
-                            className="min-h-[500px] rounded-[16px] border border-[#d9e1ee] bg-white p-[32px]"
+                        <section
+                            ref={sectionRefs['LOAD HISTORY']}
+                            data-section='LOAD HISTORY'
                         >
-                            <h2 className="text-[14px] font-bold uppercase text-[#64748b]">COMPANY SNAPSHOT</h2>
+
+                            <LoadHistory
+                                data={
+                                    carrier?.loadHistory ||
+                                    []
+                                }
+                            />
+
+                        </section>
+
+                        <section
+                            ref={sectionRefs['COMPANY SNAPSHOT']}
+                            data-section='COMPANY SNAPSHOT'
+                        >
+
+                            <CompanySnapshot
+                               data={carrier}
+                            />
+
                         </section>
 
                     </main>
+
                 </div>
+
             </div>
+
         </div>
+</Main>
     );
 }
 

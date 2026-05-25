@@ -1,6 +1,13 @@
 import React from 'react';
 
-import {Verified, GppMaybe, LocationOn, Phone, Email, FiberManualRecord} from '@mui/icons-material';
+import {
+    Verified,
+    GppMaybe,
+    LocationOn,
+    Phone,
+    Email,
+    FiberManualRecord
+} from '@mui/icons-material';
 
 function StatusBadge(props) {
 
@@ -10,7 +17,8 @@ function StatusBadge(props) {
 
     let icon = null;
 
-    let className = 'inline-flex items-center justify-center min-w-[165px] gap-[5px] px-[10px] py-[4px] rounded-full text-[11px] font-[700] tracking-[0.02em] whitespace-nowrap border leading-none uppercase ';
+    let className =
+        'inline-flex items-center justify-center min-w-[165px] gap-[5px] px-[10px] py-[4px] rounded-full text-[11px] font-[700] tracking-[0.02em] whitespace-nowrap border leading-none uppercase ';
 
     if (isActive === true) {
 
@@ -35,12 +43,93 @@ function StatusBadge(props) {
     }
 
     return (
-
-        <span className={className}>{icon}{label} </span>
-
+        <span className={className}>
+            {icon}{label}
+        </span>
     );
 }
 
+
+function CarrierOperationTag(props) {
+
+    const value = (props.value || '').toUpperCase();
+
+    const tags = [];
+
+    const hasIntrastate =
+        value.includes('B') || value.includes('C');
+
+    if (value.includes('A')) {
+
+        tags.push({
+            label: 'INTERSTATE',
+            bg: 'bg-[#eef4ff]',
+            border: 'border-[#c7dbff]',
+            text: 'text-[#2563eb]',
+            dot: '#2563eb'
+        });
+    }
+
+    if (hasIntrastate) {
+
+        tags.push({
+            label: 'INTRASTATE',
+            bg: 'bg-[#f1f5f9]',
+            border: 'border-[#dbe3ec]',
+            text: 'text-[#475569]',
+            dot: '#475569'
+        });
+    }
+
+    if (value.includes('B')) {
+
+        tags.push({
+            label: 'HAZMAT',
+            bg: 'bg-[#edfdf3]',
+            border: 'border-[#b7ebc6]',
+            text: 'text-[#15924c]',
+            dot: '#22c55e'
+        });
+    }
+
+    if (value.includes('C')) {
+
+        tags.push({
+            label: 'NON-HAZMAT',
+            bg: 'bg-[#fff1f1]',
+            border: 'border-[#fecaca]',
+            text: 'text-[#dc2626]',
+            dot: '#ef4444'
+        });
+    }
+
+    return (
+
+        <div className='flex flex-wrap gap-[8px]'>
+
+            {tags.map(function (tag, index) {
+
+                return (
+
+                    <span
+                        key={index}
+                        className={`inline-flex items-center gap-[6px] px-[10px] py-[4px] rounded-full text-[10px] font-[700] tracking-[0.02em] border uppercase leading-none ${tag.bg} ${tag.border} ${tag.text}`}
+                    >
+
+                        <span
+                            className='w-[7px] h-[7px] rounded-full shrink-0'
+                            style={{ background: tag.dot }}
+                        />
+
+                        {tag.label}
+
+                    </span>
+                );
+            })}
+
+        </div>
+    );
+}
 
 function RiskBadge(props) {
 
@@ -69,18 +158,9 @@ function RiskBadge(props) {
 
     let status = map.medium;
 
-    if (risk.includes('low')) {
-
-        status = map.low;
-    }
-    else if (risk.includes('high')) {
-
-        status = map.high;
-    }
-    else if (risk.includes('medium')) {
-
-        status = map.medium;
-    }
+    if (risk.includes('low')) status = map.low;
+    else if (risk.includes('high')) status = map.high;
+    else if (risk.includes('medium')) status = map.medium;
 
     const className =
         'inline-flex items-center justify-center min-w-[165px] gap-[6px] px-[11px] py-[4px] rounded-full text-[11px] font-[700] tracking-[0.02em] whitespace-nowrap border uppercase leading-none ' +
@@ -89,61 +169,16 @@ function RiskBadge(props) {
         status.color;
 
     return (
-
         <span className={className}>
-
-            <span className='w-[7px] h-[7px] rounded-full shrink-0'style={{ background: status.dot }}/>
-
+            <span
+                className='w-[7px] h-[7px] rounded-full shrink-0'
+                style={{ background: status.dot }}
+            />
             {props.risk}
-			
         </span>
     );
 }
 
-
-function CarrierTag(props) {
-
-    const value = (props.value || '').toLowerCase();
-
-    let className =
-        'inline-flex items-center gap-[6px] px-[10px] py-[4px] rounded-full text-[10px] font-[700] tracking-[0.02em] border uppercase leading-none ';
-
-    if (value.includes('broker')) {
-
-        className =
-            className +
-            'bg-[#f5edff] text-[#7c3aed] border-[#ddd6fe]';
-    }
-    else if (value.includes('interstate')) {
-
-        className =
-            className +
-            'bg-[#f1f5f9] text-[#475569] border-[#e2e8f0]';
-    }
-    else if (value.includes('intrastate')) {
-
-        className =
-            className +
-            'bg-[#fff8e8] text-[#c27a07] border-[#fde7a7]';
-    }
-    else {
-
-        className =
-            className +
-            'bg-[#f3f4f6] text-[#6b7280] border-[#e5e7eb]';
-    }
-
-    return (
-
-        <span className={className}>
-
-            <FiberManualRecord className='!text-[8px]' />
-
-            {props.value}
-
-        </span>
-    );
-}
 
 function AuthorityTag(props) {
 
@@ -159,29 +194,19 @@ function AuthorityTag(props) {
 
     if (isActive) {
 
-        className =
-            className +
-            'bg-[#eef4ff] text-[#2563eb] border-[#c7dbff]';
-
+        className += 'bg-[#eef4ff] text-[#2563eb] border-[#c7dbff]';
         iconColor = '!text-[#2563eb]';
     }
     else {
 
-        className =
-            className +
-            'bg-[#fff1f1] text-[#dc2626] border-[#fecaca]';
-
+        className += 'bg-[#fff1f1] text-[#dc2626] border-[#fecaca]';
         iconColor = '!text-[#dc2626]';
     }
 
     return (
-
         <span className={className}>
-
             <FiberManualRecord className={`!text-[8px] ${iconColor}`} />
-
             ACTIVE AUTHORITY
-
         </span>
     );
 }
@@ -195,7 +220,7 @@ function CarrierCard(props) {
     const idFields = [
         { label: 'MC NUMBER', value: carrier.mc_number },
         { label: 'DOT NUMBER', value: carrier.dot_number },
-        { label: 'EIN', value: carrier.ein },
+        { label: 'VIN', value: carrier.vin },
         { label: 'DUNS', value: carrier.duns }
     ];
 
@@ -214,32 +239,24 @@ function CarrierCard(props) {
         }
     ];
 
-    let cardClass = 'bg-white rounded-[14px] px-[22px] py-[18px] mb-[14px] shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-all duration-200 ';
+    let cardClass =
+        'bg-white rounded-[14px] px-[22px] py-[18px] mb-[14px] shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-all duration-200 ';
 
     if (typeof handleClick === 'function') {
-
-        cardClass = cardClass + 'cursor-pointer hover:border-[#93c5fd] hover:shadow-[0_4px_16px_rgba(56,119,218,0.12)]';
+        cardClass += 'cursor-pointer hover:border-[#93c5fd] hover:shadow-[0_4px_16px_rgba(56,119,218,0.12)]';
     }
     else {
-
-        cardClass = cardClass + 'cursor-default';
+        cardClass += 'cursor-default';
     }
 
-
     function handleCardClick() {
-
         if (typeof handleClick === 'function') {
-
             handleClick(carrier);
         }
     }
 
-
     return (
-        <div
-            onClick={handleCardClick}
-            className={cardClass}
-        >
+        <div onClick={handleCardClick} className={cardClass}>
 
             <div className='flex justify-between items-start gap-[28px]'>
 
@@ -250,129 +267,82 @@ function CarrierCard(props) {
                         <div>
 
                             <h3 className='flex items-center mb-[14px] text-[15px] font-[700] text-[#111827] tracking-[-0.01em]'>
-
                                 {carrier.company_name}
-
                             </h3>
 
                             <div className='flex flex-wrap gap-[8px]'>
 
-                                {(carrier.tags || []).map(function (tag, index) {
+                               <CarrierOperationTag value={carrier.carrier_operation} />
 
-                                    return (
-                                        <CarrierTag
-                                            key={index}
-                                            value={tag}
-                                        />
-                                    );
-                                })}
-
-                               <AuthorityTag active={carrier.active_authority} />
+                                <AuthorityTag active={carrier.active_authority} />
 
                             </div>
 
                         </div>
 
-
                         <div className='flex items-start gap-[26px] shrink-0'>
 
                             <div className='text-left'>
-
                                 <div className='text-[9px] font-[700] text-[#9ca3af] uppercase tracking-[0.08em] mb-[4px]'>
-
                                     Mileage
-
                                 </div>
 
                                 <div className='text-[15px] font-[700] text-[#111827]'>
-
                                     {Number(carrier.mileage).toLocaleString()}
-
                                     <span className='text-[11px] font-[400] text-[#6b7280] ml-[3px]'>
-
                                         mi
-
                                     </span>
-
                                 </div>
-
                             </div>
-
 
                             <div className='w-px h-[42px] bg-[#e5e7eb] mt-[2px]' />
 
-
                             <div className='text-left'>
-
                                 <div className='text-[9px] font-[700] text-[#9ca3af] uppercase tracking-[0.08em] mb-[4px]'>
-
                                     Fleet Size
-
                                 </div>
 
                                 <div className='text-[15px] font-[700] text-[#111827]'>
-
                                     {Number(carrier.fleet_size).toLocaleString()}
-
                                     <span className='text-[11px] font-[400] text-[#6b7280] ml-[3px]'>
-
                                         units
-
                                     </span>
-
                                 </div>
-
                             </div>
 
                         </div>
 
                     </div>
 
-
                     <div className='grid grid-cols-4 gap-y-[12px] gap-x-[24px] mb-[18px] px-[14px] py-[16px] rounded-[12px] border border-[#edf0f3] bg-[#fafafa] w-full'>
 
                         {idFields.map(function (field) {
-
                             return (
                                 <div key={field.label}>
-
                                     <div className='text-[9px] font-[700] text-[#9ca3af] uppercase tracking-[0.08em] mb-[4px]'>
-
                                         {field.label}
-
                                     </div>
-
                                     <div className='text-[13px] font-[600] text-[#374151]'>
-
                                         {field.value}
-
                                     </div>
-
                                 </div>
                             );
                         })}
 
                     </div>
 
-
                     <div className='flex flex-wrap gap-[24px] mt-[4px]'>
 
                         {contactItems.map(function (item, index) {
-
                             return (
                                 <span
                                     key={index}
                                     className='flex items-center gap-[5px] text-[12px] text-[#6b7280]'
                                 >
-
                                     <span className='text-[#b0b7c3] flex items-center'>
-
                                         {item.icon}
-
                                     </span>
-
                                     {item.text}
-
                                 </span>
                             );
                         })}
@@ -380,7 +350,6 @@ function CarrierCard(props) {
                     </div>
 
                 </div>
-
 
                 <div className='flex flex-col gap-[20px] items-end mt-4 shrink-0'>
 
@@ -396,9 +365,7 @@ function CarrierCard(props) {
                         type='insurance'
                     />
 
-                    <RiskBadge
-                        risk={carrier.risk_level}
-                    />
+                    <RiskBadge risk={carrier.risk_level} />
 
                 </div>
 
@@ -407,6 +374,5 @@ function CarrierCard(props) {
         </div>
     );
 }
-
 
 export default CarrierCard;

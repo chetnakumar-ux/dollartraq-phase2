@@ -16,7 +16,7 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import Main from 'components/Main';
 import CarrierCard from 'components/blocks/CarrierCards';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import Api from 'api/Api';
 
@@ -56,11 +56,12 @@ function CarrierCardSkeleton() {
     );
 }
 
+
 function CarrierSearch() {
 
     const [accountToken, setAccountToken] = useState(false);
     const [query, setQuery] = useState('');
-    const [sortBy, setSortBy] = useState('Most Relevant');
+    const [sortBy, setSortBy] = useState('sortByNameAsc');
     const [filters] = useState(DEFAULT_FILTERS);
     const [carriers, setCarriers] = useState([]);
     const [total, setTotal] = useState(0);
@@ -70,7 +71,10 @@ function CarrierSearch() {
     const [successMessage] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
+    const [selectedRisk, setSelectedRisk] = useState('');
+    const [authorityVerified, setAuthorityVerified] = useState('');
 	const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
 
     useEffect(function () {
@@ -81,13 +85,30 @@ function CarrierSearch() {
 
         loadFilters(token);
 
+        const q = searchParams.get('q');
+
+        if (q) {
+
+            setQuery(q);
+            runSearch(q, 1, sortBy);
+        }
+
     }, []);
 
 	function handleCarrierClick(carrier) {
 
-    navigate('/carrier/' + carrier.id);
-}
+        navigate('/carriers/' + carrier.row_id);
+    }
 
+    useEffect(function () {
+
+        if (query.trim() !== '') {
+
+            runSearch(query, 1, sortBy);
+
+        }
+        
+    }, [selectedRisk, authorityVerified]);
 
     function loadFilters(accountToken) {
 
@@ -108,14 +129,9 @@ function CarrierSearch() {
         );
     }
 
-    function runSearch(searchText, page) {
+    function runSearch(searchText, page, sortValue) {
 
-        let pageNumber = page;
-
-        if (!pageNumber) {
-
-            pageNumber = 1;
-        }
+        let pageNumber = page || 1;
 
         if (!searchText || searchText.trim() === '') {
 
@@ -127,43 +143,79 @@ function CarrierSearch() {
             return;
         }
 
-        const formData = new FormData();
-
-        formData.append('query', searchText);
-        // formData.append('page', pageNumber);
-
         setLoading(true);
 
+        const params = new URLSearchParams();
+
+        params.append('query', searchText);
+        params.append('sort', sortValue || sortBy);
+        params.append('page', pageNumber);
+        params.append('per_page', 10);
+
+        // Risk Filter
+        if (selectedRisk === 'Low') {
+
+            params.append('risk_low', 'true');
+
+        }
+
+        if (selectedRisk === 'Medium') {
+
+            params.append('risk_medium', 'true');
+
+        }
+
+        if (selectedRisk === 'High') {
+
+            params.append('risk_high', 'true');
+
+        }
+
+        if (authorityVerified === 'Yes') {
+
+            params.append('authority_verified', 'true');
+
+        }
+
+        if (authorityVerified === 'No') {
+
+            params.append('authority_verified', 'false');
+
+        }
+
         fetch(
-            'http://192.168.20.85:8000/api/handle/backend/carrier/search',
+            `${import.meta.env.VITE_ROOT_PROD}/api/carrier/search?${params}`,
             {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     Authorization: `Bearer ${import.meta.env.VITE_BARRIER_TOKEN}`
-                },
-                body: formData
+                }
             }
         )
-            .then(function (response) {
+            .then(function (res) {
 
-                return response.json();
+                return res.json();
+
             })
             .then(function (data) {
 
                 setCarriers(data.data || []);
-                setTotal(Number(data.total_results) || 0);
-                setCurrentPage(data.current_page || 1);
+                setTotal(data.total || (data.data || []).length);
+                setCurrentPage(pageNumber);
                 setLastPage(data.last_page || 1);
-                setLoading(false);
+
             })
-            .catch(function (error) {
+            .catch(function (err) {
 
-                console.log(error);
+                console.log(err);
+
+            })
+            .finally(function () {
 
                 setLoading(false);
+
             });
     }
-
     function handleKeyDown(event) {
 
         if (event.key === 'Enter') {
@@ -199,27 +251,34 @@ function CarrierSearch() {
     }
 
     function handleSortChange(event) {
+        const value = event.target.value;
 
-        setSortBy(event.target.value);
+        setSortBy(value);
+
+        if (query.trim() !== '') {
+            runSearch(query, 1, value);
+        }
     }
-
     function renderSortLabel(selected) {
 
+    const labelMap = {
+            sortByNameAsc: 'Name (A to Z)',
+            sortByNameDesc: 'Name (Z to A)',
+            'Most Relevant': 'Most Relevant'
+        };
+
         return (
-
             <div className='flex items-center gap-2'>
-
-                <span style={{ color: '#111827', fontSize: '13px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' }}>
+                <span style={{ color: '#111827', fontSize: '13px', fontWeight: 700 }}>
                     SORT BY:
                 </span>
 
                 <span style={{ color: '#4E73DF', fontSize: '15px', fontWeight: 600 }}>
-                    {selected}
+                    {labelMap[selected] || selected}
                 </span>
-
             </div>
         );
-    }
+}
 
     return (
 
@@ -273,7 +332,8 @@ function CarrierSearch() {
 
                         <div className='max-w-[1100px] mx-auto'>
 
-                            <div className='flex justify-between items-center mb-10 max-md:flex-col max-md:items-start max-md:gap-4'>
+                           <div className='flex justify-between items-center mb-10 max-md:flex-col max-md:items-start max-md:gap-4'>
+
 
                                 <div className='text-sm text-gray-500'>
 
@@ -294,33 +354,137 @@ function CarrierSearch() {
 
                                 </div>
 
-                                <Select
-                                    value={sortBy}
-                                    onChange={handleSortChange}
-                                    IconComponent={KeyboardArrowDownIcon}
-                                    size='small'
-                                    displayEmpty
-                                    sx={{ minWidth: 260, height: 42, borderRadius: '999px', background: '#EEF3FF', overflow: 'hidden', '& .MuiOutlinedInput-root': { borderRadius: '999px' }, '& .MuiOutlinedInput-notchedOutline': { border: '1px solid #C7D2E9', borderRadius: '999px' }, '&:hover .MuiOutlinedInput-notchedOutline': { border: '1px solid #C7D2E9', borderRadius: '999px' }, '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: '1px solid #C7D2E9', borderRadius: '999px' }, '& .MuiSelect-select': { display: 'flex', alignItems: 'center', gap: '10px', padding: '0 18px !important', height: '42px !important', fontSize: '15px', fontWeight: 600 }, '& .MuiSelect-icon': { color: '#4E73DF', right: 14, fontSize: 22 } }}
-                                    renderValue={renderSortLabel}
-                                >
+                                <div className='flex flex-wrap items-center gap-3'>
 
-                                    <MenuItem value='Most Relevant'>
-                                        Most Relevant
-                                    </MenuItem>
+                                    {/* Risk Dropdown */}
+                                    {/* <div className={`relative inline-flex items-center h-9 rounded-full border px-2.5 min-w-[115px] transition-all duration-200 ${selectedRisk ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'}`}>
 
-                                    {sortOptions.map(function (option) {
+                                        <span className={`text-xs font-bold mr-1.5 uppercase tracking-wider ${selectedRisk ? 'text-blue-500' : 'text-gray-400'}`}>
+                                            Risk:
+                                        </span>
 
-                                        return (
+                                        <select
+                                            value={selectedRisk}
+                                            onChange={(e) => setSelectedRisk(e.target.value)}
+                                            className="bg-transparent outline-none pr-5 text-sm font-semibold appearance-none cursor-pointer z-10  w-[55px]"
+                                        >
+                                            <option value="">All</option>
+                                            <option value="Low">Low</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="High">High</option>
+                                        </select>
 
-                                            <MenuItem key={option.value} value={option.value}>
+                                        {selectedRisk ? (
+                                            <Close
+                                                onClick={() => setSelectedRisk('')}
+                                                className="absolute right-2.5 cursor-pointer text-blue-500 hover:text-blue-700 z-20"
+                                                sx={{ fontSize: 14 }}
+                                            />
+                                        ) : (
+                                            <KeyboardArrowDownIcon
+                                                className="absolute right-2 pointer-events-none text-gray-400"
+                                                sx={{ fontSize: 18 }}
+                                            />
+                                        )}
 
-                                                {option.label}
+                                    </div> */}
 
-                                            </MenuItem>
-                                        );
-                                    })}
+                                    {/* Verified Dropdown */}
+                                    {/* <div className={`relative inline-flex items-center h-10 rounded-full border px-3 transition-all duration-200 ${authorityVerified ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'}`}>
 
-                                </Select>
+                                        <span className={`text-xs font-bold mr-1.5 uppercase tracking-wider ${authorityVerified ? 'text-blue-500' : 'text-gray-400'}`}>
+                                            Verified:
+                                        </span>
+
+                                        <select
+                                            value={authorityVerified}
+                                            onChange={(e) => setAuthorityVerified(e.target.value)}
+                                            className="bg-transparent outline-none pr-5 text-sm font-semibold appearance-none cursor-pointer z-10"
+                                        >
+                                            <option value="">All</option>
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+
+                                        {authorityVerified ? (
+                                            <Close
+                                                onClick={() => setAuthorityVerified('')}
+                                                className="absolute right-2.5 cursor-pointer text-blue-500 hover:text-blue-700 z-20"
+                                                sx={{ fontSize: 14 }}
+                                            />
+                                        ) : (
+                                            <KeyboardArrowDownIcon
+                                                className="absolute right-2 pointer-events-none text-gray-400"
+                                                sx={{ fontSize: 18 }}
+                                            />
+                                        )}
+
+                                    </div> */}
+
+                                    {/* Sort By */}
+                                    <Select
+                                        value={sortBy}
+                                        onChange={handleSortChange}
+                                        IconComponent={KeyboardArrowDownIcon}
+                                        size='small'
+                                        displayEmpty
+                                        sx={{
+                                            minWidth: 260,
+                                            height: 42,
+                                            borderRadius: '999px',
+                                            background: '#EEF3FF',
+                                            overflow: 'hidden',
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '999px'
+                                            },
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                border: '1px solid #C7D2E9',
+                                                borderRadius: '999px'
+                                            },
+                                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                border: '1px solid #C7D2E9'
+                                            },
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                border: '1px solid #C7D2E9'
+                                            },
+                                            '& .MuiSelect-select': {
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '10px',
+                                                padding: '0 18px !important',
+                                                height: '42px !important',
+                                                fontSize: '15px',
+                                                fontWeight: 600
+                                            },
+                                            '& .MuiSelect-icon': {
+                                                color: '#4E73DF',
+                                                right: 14,
+                                                fontSize: 22
+                                            }
+                                        }}
+                                        renderValue={renderSortLabel}
+                                    >
+
+                                        <MenuItem value="sortByNameAsc">
+                                            Name (A - Z)
+                                        </MenuItem>
+
+                                        <MenuItem value="sortByNameDesc">
+                                            Name (Z - A)
+                                        </MenuItem>
+
+                                        {sortOptions.map(function (option) {
+
+                                            return (
+                                                <MenuItem key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </MenuItem>
+                                            );
+                                        })}
+
+                                    </Select>
+
+                                </div>
 
                             </div>
 

@@ -2,150 +2,237 @@ import React from 'react';
 
 function CarrierProfileSection(props) {
 
-    if (props.variant === 'hero') {
+    function renderValue(value) {
 
         return (
+            value !== null &&
+            value !== undefined &&
+            value !== ''
+        )
+            ? value
+            : 'NA';
+    }
+
+    function renderHeroSection() {
+
+        return (
+
             <div className='overflow-hidden rounded-[16px] border border-[#d9e1ee] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.06)]'>
-                <div className='flex items-start justify-between gap-[20px] bg-gradient-to-r from-[#0f57c8] via-[#1a55cf] to-[#1e49ca] px-[36px] py-[28px]'>
+
+                <div className='flex flex-col gap-[24px] bg-gradient-to-r from-[#0E57C0] via-[#1a55cf] to-[#1E40AF] px-[20px] py-[24px] md:px-[28px] md:py-[26px] xl:flex-row xl:items-start xl:justify-between xl:px-[36px] xl:py-[28px]'>
 
                     <div className='min-w-0'>
 
-                        <div className='mb-[10px] text-[11px] font-[700] uppercase tracking-[0.14em] text-white/55'>
-                            {props.subtitle}
+                        <div className='mb-[10px] text-[10px] font-[700] uppercase tracking-[0.14em] text-white/55 sm:text-[11px]'>
+                             DBM: {renderValue(props.subtitle)}
                         </div>
 
-                        <div className='text-[42px] leading-[1.05] font-[800] tracking-[-0.03em] text-white'>
-                            {props.title}
+                        <div className='text-[28px] leading-[1.1] font-[800] tracking-[-0.03em] text-white sm:text-[34px] lg:text-[38px] xl:text-[42px]'>
+                            {renderValue(props.title)}
                         </div>
+
                     </div>
 
-                    <div className='flex items-center gap-[16px] shrink-0'>
-                        
-                        {props.actions &&
-                            props.actions.map(function (action, index) {
-                                const isPrimary = action.variant === 'primary';
+                    <div className='flex w-full flex-col gap-[12px] sm:flex-row sm:flex-wrap xl:w-auto xl:justify-end xl:gap-[16px]'>
 
-                                return (
-                            <button
-                                key={index}
-                                type="button"
-                                onClick={() => action.onClick()}
-                                className={
-                                    isPrimary
-                                        ? 'relative z-10 cursor-pointer h-[52px] min-w-[194px] rounded-[12px] bg-gradient-to-r from-[#37c96b] to-[#1fb854] px-[22px] text-[16px] font-[700] text-white'
-                                        : 'relative z-10 cursor-pointer h-[52px] min-w-[210px] rounded-[12px] border border-[#d5ddeb] bg-white px-[22px] text-[16px] font-[600] text-[#334155]'
-                                }
-                                        >
-                                    <span className="flex items-center justify-center gap-[10px]">
+                        {(props.actions || []).map(function (action, index) {
+
+                            const isPrimary = action.variant === 'primary';
+
+                            return (
+
+                                <button
+                                    key={index}
+                                    type='button'
+                                    onClick={function () {
+
+                                        if (action.onClick) {
+
+                                            action.onClick();
+                                        }
+                                    }}
+                                    className={
+                                        isPrimary
+                                            ? 'relative z-10 h-[48px] w-full cursor-pointer rounded-[12px] bg-gradient-to-r from-[#37c96b] to-[#1fb854] px-[20px] text-[14px] font-[700] text-white sm:min-w-[190px] sm:w-auto sm:text-[15px] xl:h-[52px] xl:min-w-[194px] xl:px-[22px] xl:text-[16px]'
+                                            : 'relative z-10 h-[48px] w-full cursor-pointer rounded-[12px] border border-[#d5ddeb] bg-white px-[20px] text-[14px] font-[600] text-[#334155] sm:min-w-[200px] sm:w-auto sm:text-[15px] xl:h-[52px] xl:min-w-[210px] xl:px-[22px] xl:text-[16px]'
+                                    }
+                                >
+
+                                    <span className='flex items-center justify-center gap-[10px]'>
                                         {action.icon}
                                         {action.label}
                                     </span>
+
                                 </button>
-                             );
-                            })}
+
+                            );
+                        })}
+
                     </div>
+
                 </div>
 
-                <div className='flex items-center justify-between gap-[24px] bg-white px-[28px] py-[32px]'>
-                    <div className='flex items-center gap-[30px] flex-wrap'>
-                        {props.leftItems.map(function (item, index) {
+                <div className='flex flex-col gap-[24px] bg-white px-[20px] py-[24px] md:px-[28px] md:py-[28px] xl:flex-row xl:items-center xl:justify-between xl:gap-[24px] xl:px-[28px] xl:py-[32px]'>
+
+                    <div className='flex flex-wrap items-start gap-y-[22px] xl:items-center xl:gap-[30px]'>
+
+                        {(props.leftItems || []).map(function (item, index) {
+
                             const isStatus = item.label === 'STATUS';
 
                             return (
+
                                 <div
                                     key={index}
                                     className={
                                         index !== props.leftItems.length - 1
-                                            ? 'pr-[30px] border-r border-[#e5eaf2]'
-                                            : ''
+                                            ? 'w-full border-b border-[#e5eaf2] pb-[18px] sm:w-auto sm:border-b-0 sm:border-r sm:pb-0 sm:pr-[24px] xl:pr-[30px]'
+                                            : 'w-full sm:w-auto'
                                     }
                                 >
+
                                     {isStatus ? (
+
                                         <div>
+
                                             <div className='mb-[8px] text-[11px] font-[700] uppercase tracking-[0.12em] text-transparent'>
                                                 .
                                             </div>
 
-                                            <div className='flex h-[40px] items-center gap-[8px] rounded-full border border-[#caecd7] bg-[#ecfbf2] px-[24px] text-[15px] font-[700] uppercase text-[#2f9e55]'>
+                                            <div className='flex h-[40px] w-fit items-center gap-[8px] rounded-full border border-[#caecd7] bg-[#ecfbf2] px-[20px] text-[14px] font-[700] uppercase text-[#2f9e55] xl:px-[24px] xl:text-[15px]'>
+
                                                 <span className='h-[9px] w-[9px] rounded-full bg-[#2ecc71]' />
-                                                {item.value}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div>
-                                            <div className='mb-[6px] text-[11px] font-[700] uppercase tracking-[0.12em] text-[#8b97a8]'>
-                                                {item.label}
+
+                                                {renderValue(item.value)}
+
                                             </div>
 
-                                            <div className='text-[16px] leading-[1.25] font-[500] text-[#111827]'>
-                                                {item.value}
-                                            </div>
                                         </div>
+
+                                    ) : (
+
+                                        <div>
+
+                                            <div className='mb-[6px] text-[10px] font-[700] uppercase tracking-[0.12em] text-[#8b97a8] sm:text-[11px]'>
+                                                {renderValue(item.label)}
+                                            </div>
+
+                                            <div className='text-[14px] leading-[1.4] font-[500] text-[#111827] sm:text-[15px] xl:text-[16px]'>
+                                                {renderValue(item.value)}
+                                            </div>
+
+                                        </div>
+
                                     )}
+
                                 </div>
+
                             );
                         })}
+
                     </div>
 
-                    <div className='flex items-center justify-end gap-[18px] flex-wrap'>
-                        {props.rightItems.map(function (item, index) {
+                    <div className='flex flex-wrap items-center gap-[12px] xl:justify-end xl:gap-[18px]'>
+
+                        {(props.rightItems || []).map(function (item, index) {
+
                             return (
+
                                 <div
                                     key={index}
-                                    className='flex min-w-[134px] items-center gap-[10px] rounded-[6px] border border-[#e4e9f1] bg-[#fbfcfe] px-[14px] py-[11px]'
+                                    className='flex min-w-[120px] flex-1 items-center justify-between gap-[10px] rounded-[6px] border border-[#e4e9f1] bg-[#fbfcfe] px-[12px] py-[10px] sm:flex-none sm:px-[14px] sm:py-[11px] xl:min-w-[134px]'
                                 >
-                                    <div className='text-[12px] font-[700] uppercase tracking-[0.02em] text-[#a3adba]'>
-                                        {item.label}
+
+                                    <div className='text-[11px] font-[700] uppercase tracking-[0.02em] text-[#a3adba]'>
+                                        {renderValue(item.label)}
                                     </div>
 
-                                    <div className='text-[15px] font-[700] text-[#4b5563]'>
-                                        {item.value}
+                                    <div className='text-[14px] font-[700] text-[#4b5563] xl:text-[15px]'>
+                                        {renderValue(item.value)}
                                     </div>
+
                                 </div>
+
                             );
                         })}
+
                     </div>
+
                 </div>
+
             </div>
+
         );
     }
 
-    return (
-        <div className='rounded-[16px] border border-[#d9e1ee] bg-white px-[30px] py-[34px] shadow-[0_2px_8px_rgba(16,24,40,0.05)]'>
-            <div className='mb-[42px] flex items-center gap-[10px]'>
-                {props.titleIcon}
+    function renderDefaultSection() {
 
-                <h3 className='text-[18px] font-[500] text-[#1f2937]'>
-                    {props.title}
-                </h3>
-            </div>
+        return (
 
-            <div className='grid grid-cols-4 gap-x-[56px] gap-y-[28px]'>
-                {props.items.map(function (item, index) {
-                    return (
-                        <div key={index} className="flex items-start gap-[16px]">
-                        <div className="grid h-[54px] w-[54px] shrink-0 place-items-center rounded-[14px] border border-[#edf2f7] bg-[#fbfcff] text-[#185abc]">
-                            {React.cloneElement(item.icon, {
-                            size: 22,
-                            style: { display: "block" },
-                            })}
-                        </div>
+            <div className='rounded-[16px] border border-[#d9e1ee] bg-white px-[18px] py-[22px] shadow-[0_2px_8px_rgba(16,24,40,0.05)] sm:px-[24px] sm:py-[28px] xl:px-[30px] xl:py-[34px]'>
 
-                            <div className='pt-[3px]'>
-                                <div className='mb-[6px] text-[12px] font-[700] uppercase tracking-[0.16em] text-[#6b7280]'>
-                                    {item.label}
+                <div className='mb-[28px] flex items-center gap-[10px] xl:mb-[42px]'>
+
+                    {props.titleIcon}
+
+                    <h3 className='text-[16px] font-[500] text-[#1f2937] sm:text-[17px] xl:text-[18px]'>
+                        {renderValue(props.title)}
+                    </h3>
+
+                </div>
+
+                <div className='grid grid-cols-1 gap-x-[30px] gap-y-[24px] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-[56px] xl:gap-y-[28px]'>
+
+                    {(props.items || []).map(function (item, index) {
+
+                        return (
+
+                            <div key={index} className='flex items-start gap-[14px]'>
+
+                                <div className='grid h-[50px] w-[50px] shrink-0 place-items-center rounded-[14px] border border-[#edf2f7] bg-[#fbfcff] text-[#185abc] xl:h-[54px] xl:w-[54px]'>
+
+                                    {
+                                        item.icon &&
+                                        React.cloneElement(item.icon, {
+                                            size: 22,
+                                            style: {
+                                                display: 'block'
+                                            }
+                                        })
+                                    }
+
                                 </div>
 
-                                <div className='text-[15px] leading-[1.45] font-[500] text-[#111827]'>
-                                    {item.value}
+                                <div className='min-w-0 pt-[3px]'>
+
+                                    <div className='mb-[6px] text-[11px] font-[700] uppercase tracking-[0.16em] text-[#6b7280]'>
+                                        {renderValue(item.label)}
+                                    </div>
+
+                                    <div className='break-words text-[14px] leading-[1.45] font-[500] text-[#111827] xl:text-[15px]'>
+                                        {renderValue(item.value)}
+                                    </div>
+
                                 </div>
+
                             </div>
-                        </div>
-                    );
-                })}
+
+                        );
+                    })}
+
+                </div>
+
             </div>
-        </div>
-    );
+
+        );
+    }
+
+    if (props.variant === 'hero') {
+
+        return renderHeroSection();
+    }
+
+    return renderDefaultSection();
 }
 
 export default CarrierProfileSection;

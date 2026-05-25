@@ -88,7 +88,7 @@ function Overview({ data }) {
                             }}
                         />
                         <div className="absolute text-center ">
-                            <span className="block text-[11px] font-[700] text-[#94a3b8] uppercase tracking-widest mt-12">ISS Index</span>
+                            <span className="block text-[11px] font-[700] text-[#94a3b8] uppercase tracking-widest mt-1">ISS Index</span>
                             <span className="block text-[54px] font-[800] text-[#0f172a] leading-none my-1">{issIndex}</span>
                             <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase" style={{ backgroundColor: bgColor, color: textColor }}>
                                 {riskLevel}

@@ -68,8 +68,6 @@ function FleetDetails({ data }) {
 
         let rows = [...(fleet?.tableData || [])];
 
-        // SEARCH
-
         if (search) {
 
             const keyword = search.toLowerCase();
@@ -81,10 +79,6 @@ function FleetDetails({ data }) {
                 item.model?.toLowerCase().includes(keyword)
             );
         }
-
-        // FILTERS
-
-        // FILTERS
 
         rows = rows.filter((item) => {
 
@@ -98,8 +92,6 @@ function FleetDetails({ data }) {
 
             return powerMatched && trailerMatched;
         });
-
-        // SORT
 
         rows.sort((a, b) => {
 
@@ -136,21 +128,19 @@ function FleetDetails({ data }) {
     return (
         <div className="rounded-[18px] border border-[#d9e1ee] bg-white overflow-hidden shadow-sm">
 
-            {/* HEADER */}
-
             <div className="px-[28px] pt-[26px]">
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mt-2">
 
                     <div className="h-[7px] w-[7px] rounded-full bg-emerald-500" />
 
-                    <h2 className="text-[12px] font-[800] tracking-[1px] text-[#0f172a] uppercase">
+                    <h2 className="text-[14px] font-[800] tracking-[1px] text-[#0f172a] uppercase">
                         Fleet Details
                     </h2>
 
                 </div>
 
-                <p className="mt-3 text-[11px] text-[#7c8fac] leading-[18px] max-w-[900px]">
+                <p className="mt-1 text-[10px] text-[#45484c] leading-[18px] max-w-[900px]">
                     Fleet tractors and trailers identified through observations on the road.
                     Note: If the carrier has no recent observations, equipment may not be shown
                     even if power units are reported.
@@ -215,7 +205,7 @@ function FleetDetails({ data }) {
 
                                 <div className="flex items-end gap-1 mt-[14px]">
 
-                                    <h3 className={`text-[38px] leading-none font-[800] ${theme.value}`}>
+                                    <h3 className={`text-[30px] leading-none font-[800] ${theme.value}`}>
                                         {card.value}
                                     </h3>
 
@@ -240,8 +230,6 @@ function FleetDetails({ data }) {
                 </div>
 
             </div>
-
-            {/* FILTER BAR */}
 
             <div className="mx-[28px] mt-[22px] rounded-[16px] border border-[#d9e1ee] p-[18px]">
 
@@ -276,8 +264,6 @@ function FleetDetails({ data }) {
 
                     </div>
 
-                    {/* SORT */}
-
                     <div className="w-[220px]">
 
                         <p className="text-[9px] font-[800] tracking-[1px] text-[#94a3b8] uppercase mb-[8px]">
@@ -310,11 +296,7 @@ function FleetDetails({ data }) {
 
                 </div>
 
-                {/* FILTER BUTTONS */}
-
                 <div className="mt-[22px] flex gap-[40px]">
-
-                    {/* POWER */}
 
                     <div>
 
@@ -350,8 +332,6 @@ function FleetDetails({ data }) {
                         </div>
 
                     </div>
-
-                    {/* TRAILERS */}
 
                     <div>
 
@@ -392,136 +372,134 @@ function FleetDetails({ data }) {
 
             </div>
 
-            {/* TABLE */}
-  <div className="mx-[28px] mt-[22px] rounded-[16px] border border-[#d9e1ee] p-[18px]">
-            <div className="mt-[18px] overflow-x-auto">
+        <div className="mx-[28px] mt-[22px] rounded-[16px] border border-[#d9e1ee] p-[18px]">
+                    <div className="mt-[18px] overflow-x-auto">
 
-                <table className="w-full min-w-[1200px]">
+                        <table className="w-full min-w-[1200px]">
 
-                    <thead className="bg-[#f8fafc] border-y border-[#e5edf6]">
+                            <thead className="bg-[#f8fafc] border-y border-[#e5edf6]">
 
-                        <tr>
+                                <tr>
 
-                            {[
-                                'Type',
-                                'VIN',
-                                'Plate',
-                                'Class',
-                                'Desc',
-                                'Year',
-                                'Make',
-                                'Model',
-                                'Last Seen'
-                            ].map((head) => (
+                                    {[
+                                        'Type',
+                                        'VIN',
+                                        'Plate',
+                                        'Class',
+                                        'Desc',
+                                        'Year',
+                                        'Make',
+                                        'Model',
+                                        'Last Seen'
+                                    ].map((head) => (
 
-                                <th
-                                    key={head}
-                                    className="px-[18px] py-[14px] text-left text-[9px] font-[800] tracking-[1px] text-[#94a3b8] uppercase whitespace-nowrap"
-                                >
-                                    {head}
-                                </th>
+                                        <th
+                                            key={head}
+                                            className="px-[18px] py-[14px] text-left text-[9px] font-[800] tracking-[1px] text-[#94a3b8] uppercase whitespace-nowrap"
+                                        >
+                                            {head}
+                                        </th>
 
-                            ))}
+                                    ))}
 
-                        </tr>
+                                </tr>
 
-                    </thead>
+                            </thead>
 
-                    <tbody>
+                            <tbody>
 
-                        {paginatedData?.map((row, index) => (
+                                {paginatedData?.map((row, index) => (
 
-                            <tr
-                                key={index}
-                                className="border-b border-[#eef2f7] hover:bg-[#fafcff]"
-                            >
+                                    <tr
+                                        key={index}
+                                        className="border-b border-[#eef2f7] hover:bg-[#fafcff]"
+                                    >
 
-                                <td className="px-[18px] py-[14px] text-[11px] text-[#475569] whitespace-nowrap">
-                                    {row.type}
-                                </td>
+                                        <td className="px-[18px] py-[14px] text-[11px] text-[#475569] whitespace-nowrap">
+                                            {row.type}
+                                        </td>
 
-                                <td className="px-[18px] py-[14px] text-[11px] font-[700] text-[#2563eb] whitespace-nowrap">
-                                    {row.vin}
-                                </td>
+                                        <td className="px-[18px] py-[14px] text-[11px] font-[700] text-[#2563eb] whitespace-nowrap">
+                                            {row.vin}
+                                        </td>
 
-                                <td className="px-[18px] py-[14px] text-[11px] text-[#64748b] whitespace-nowrap">
-                                    {row.plate}
-                                </td>
+                                        <td className="px-[18px] py-[14px] text-[11px] text-[#64748b] whitespace-nowrap">
+                                            {row.plate}
+                                        </td>
 
-                                <td className="px-[18px] py-[14px] text-[11px] text-[#111827] whitespace-nowrap">
-                                    {row.class}
-                                </td>
+                                        <td className="px-[18px] py-[14px] text-[11px] text-[#111827] whitespace-nowrap">
+                                            {row.class}
+                                        </td>
 
-                                <td className="px-[18px] py-[14px] text-[11px] text-[#475569] whitespace-nowrap">
-                                    {row.desc}
-                                </td>
+                                        <td className="px-[18px] py-[14px] text-[11px] text-[#475569] whitespace-nowrap">
+                                            {row.desc}
+                                        </td>
 
-                                <td className="px-[18px] py-[14px] text-[11px] text-[#64748b] whitespace-nowrap">
-                                    {row.year}
-                                </td>
+                                        <td className="px-[18px] py-[14px] text-[11px] text-[#64748b] whitespace-nowrap">
+                                            {row.year}
+                                        </td>
 
-                                <td className="px-[18px] py-[14px] text-[11px] text-[#475569] whitespace-nowrap">
-                                    {row.make}
-                                </td>
+                                        <td className="px-[18px] py-[14px] text-[11px] text-[#475569] whitespace-nowrap">
+                                            {row.make}
+                                        </td>
 
-                                <td className="px-[18px] py-[14px] text-[11px] text-[#475569] whitespace-nowrap">
-                                    {row.model}
-                                </td>
+                                        <td className="px-[18px] py-[14px] text-[11px] text-[#475569] whitespace-nowrap">
+                                            {row.model}
+                                        </td>
 
-                                <td className="px-[18px] py-[14px] text-[11px] text-[#94a3b8] whitespace-nowrap">
-                                    {row.lastSeen}
-                                </td>
+                                        <td className="px-[18px] py-[14px] text-[11px] text-[#94a3b8] whitespace-nowrap">
+                                            {row.lastSeen}
+                                        </td>
 
-                            </tr>
+                                    </tr>
 
-                        ))}
+                                ))}
 
-                    </tbody>
+                            </tbody>
 
-                </table>
+                        </table>
 
-            </div>
+                    </div>
 
-            {/* FOOTER */}
 
-            <div className="flex items-center justify-end gap-[18px] px-[28px] py-[18px]">
+                    <div className="flex items-center justify-end gap-[18px] px-[28px] py-[18px]">
 
-                <button
-                    disabled={page === 1}
-                    onClick={() => setPage((prev) => prev - 1)}
-                    className={`${page === 1
-                        ? 'opacity-40 cursor-not-allowed'
-                        : ''
-                        }`}
-                >
-                    <ChevronLeft sx={{ fontSize: 18 }} />
-                </button>
+                        <button
+                            disabled={page === 1}
+                            onClick={() => setPage((prev) => prev - 1)}
+                            className={`${page === 1
+                                ? 'opacity-40 cursor-not-allowed'
+                                : ''
+                                }`}
+                        >
+                            <ChevronLeft sx={{ fontSize: 18 }} />
+                        </button>
 
-                <span className="text-[11px] font-[700] text-[#64748b]">
-                    {page}
-                </span>
+                        <span className="text-[11px] font-[700] text-[#64748b]">
+                            {page}
+                        </span>
 
-                <span className="text-[11px] text-[#94a3b8]">
-                    /
-                </span>
+                        <span className="text-[11px] text-[#94a3b8]">
+                            /
+                        </span>
 
-                <span className="text-[11px] text-[#94a3b8]">
-                    {totalPages || 1}
-                </span>
+                        <span className="text-[11px] text-[#94a3b8]">
+                            {totalPages || 1}
+                        </span>
 
-                <button
-                    disabled={page === totalPages || totalPages === 0}
-                    onClick={() => setPage((prev) => prev + 1)}
-                    className={`${page === totalPages || totalPages === 0
-                        ? 'opacity-40 cursor-not-allowed'
-                        : ''
-                        }`}
-                >
-                    <ChevronRight sx={{ fontSize: 18 }} />
-                </button>
+                        <button
+                            disabled={page === totalPages || totalPages === 0}
+                            onClick={() => setPage((prev) => prev + 1)}
+                            className={`${page === totalPages || totalPages === 0
+                                ? 'opacity-40 cursor-not-allowed'
+                                : ''
+                                }`}
+                        >
+                            <ChevronRight sx={{ fontSize: 18 }} />
+                        </button>
 
-            </div>
-</div>
+                    </div>
+        </div>
         </div>
     );
 }

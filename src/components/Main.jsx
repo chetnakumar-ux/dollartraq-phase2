@@ -22,8 +22,6 @@ import Btn from './Btn';
 import AppHeader from './AppHeader';
 import AppFooter from './AppFooter';
 
-import logo from 'assets/images/logo-white.webp?v=3';
-
 import Api from 'api/Api';
 
 import menu from '../modules.json';
@@ -103,51 +101,8 @@ class Main extends Component {
         }
     }
 
-    handleDrawerToggle = () => {
-        this.setState({ mobileOpen: !this.state.mobileOpen });
-    };     
-
     render () {
-        const drawerWidth = 220;
 
-        const sidebarContent = (
-            <div className='main-menu-wrapper'>
-
-                <div className='main-menu-block'>
-                    <Box className='align-center' sx={{marginBottom:1, paddingTop: '10px'}}>
-                        <Link to="/dashboard" className="logo">
-                            <img src={logo} style={{width: 160}} alt="logo" />
-                        </Link>
-                    </Box>
-
-                    <ul className='primary-menu'>
-                        {this.renderMenu()}
-                    </ul>
-                </div>
-
-                <div className='menu-sub-block'>
-                    <span className='fs-13 c-w'>Version: <strong>1.1</strong></span>
-                </div>
-                {/* <div className={`submenu-wrapper ${this.state.show_sub_menu ? 'show' : ''} ${this.state.sub_menu_shown ? 'shown' : ''}`} onClick={() => {
-
-                    this.setState({sub_menu_shown: false}, () => {
-                                                        
-                        window.setTimeout(() => {
-                            
-                            this.setState({active_menu_item: '', submenu: [], show_sub_menu: false})
-                        }, 400)
-                    });
-                }}>
-
-                    <div className='submenu'>
-
-                        {this.renderSubmenu()}
-                    </div>
-                </div> */}                
-
-            </div>
-        );        
-        
         return (
 
             <div>
@@ -178,115 +133,85 @@ class Main extends Component {
                     </>
                 }
 
-                <Drawer
-                    variant="temporary"
-                    open={this.state.mobileOpen}
-                    onClose={this.handleDrawerToggle}
-                    ModalProps={{ keepMounted: true }}
-                    sx={{
-                        display: { xs: 'block', sm: 'none' },
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, backgroundColor: '#3877da' },
-                    }}
-                >
-                    {sidebarContent}
-                </Drawer>                
-
-                <Container maxWidth={false} disableGutters={true} className='primary-container-wrapper-block'>
+                <Container maxWidth={false} disableGutters={true}>
                     
-                    <Grid container spacing={0} className={"main-container-wrapper-block"} alignItems="stretch" direction="row" justifyContent="flex-start">
-                    
-                        {/* backgroundColor: 'rgba(56, 119, 218, 1)' */}
-                        <Grid size={3} sx={{zIndex: 99, flexBasis: {lg: '220px'}, maxWidth: {lg: '200px', margin: 0},display: { xs: 'none', sm: 'block' }}} className="nav-container">
-
-                            <Paper elevation={0} square={true} sx={{padding: 0, position:'relative', backgroundColor:'transparent'}}>
-
-                                {sidebarContent}
-
-                            </Paper>
-                        </Grid>
+                    <AppHeader
+                        success_message={this.props.success_message}
+                        error_message={this.props.error_message}
+                        active_link={this.props.active_link}
+                        page={this.props.page}
+                    />
                             
-                        <Grid item xs={12} size={9} className="main-col" sx={{flex: 1,  paddingLeft: 0, '@media (min-width:600px)': {paddingLeft: this.props.full_width ? 0 : 4, }, backgroundColor:'#fff'}}>
+                    <Box className="w-full bg-[#F6F7F0] " /*sx={{backgroundColor:'#f6f7f0'}}*/>
 
-                            <Paper elevation={0} square={true} sx={{height: '100vh', overflow: 'auto', backgroundColor:'transparent'}}>
-                            
-                                <AppHeader
-                                    onMenuClick={this.handleDrawerToggle}
-                                    success_message={this.props.success_message}
-                                    error_message={this.props.error_message}
-                                    active_link={this.props.active_link}
-                                    page={this.props.page}
-                                />
+                        <Box id="main_container" className="container min-h-screen">
+                        
+                            {this.props.title || this.props.title_action
+                                ?
 
-                                <Box id="main_container" className={`main-container ${this.props.full_width ? 'full-width' : ''}`}>
-                                
-                                    {this.props.title || this.props.title_action
-                                        ?
+                                    <div className="main-title-block">
+                                        {this.props.title &&
 
-                                            <div className="main-title-block">
-                                                {this.props.title &&
+                                            <h1 className='justify-center'>
 
-                                                    <h1 className='justify-center'>
+                                                {this.props.crumbs &&
+                                                
+                                                    this.props.crumbs.map((_crumb, crumb_index) => {
 
-                                                        {this.props.crumbs &&
-                                                        
-                                                            this.props.crumbs.map((_crumb, crumb_index) => {
+                                                        return (
+                                                            <Link className='justify-center' key={`crumb_${crumb_index}`} to={_crumb.link}>
+                                                                <strong className='gr-5 fw-semibold'>{_crumb.label}</strong>
 
-                                                                return (
-                                                                    <Link className='justify-center' key={`crumb_${crumb_index}`} to={_crumb.link}>
-                                                                        <strong className='gr-5 fw-semibold'>{_crumb.label}</strong>
-
-                                                                        <Icon style={{paddingTop: 5}}>chevron_right</Icon>
-                                                                    </Link>
-                                                                )
-                                                            })
-                                                        }
-
-                                                        {this.props.title}
-                                                    </h1>
+                                                                <Icon style={{paddingTop: 5}}>chevron_right</Icon>
+                                                            </Link>
+                                                        )
+                                                    })
                                                 }
 
-                                                {this.renderTitleButtons()}
-                                            </div>
-                                        :
-                                            null
-                                    }
+                                                {this.props.title}
+                                            </h1>
+                                        }
 
-                                    <div className="main-container-wrapper">
-
-                                        {this.props.children}
+                                        {this.renderTitleButtons()}
                                     </div>
-                                </Box>
+                                :
+                                    null
+                            }
 
-                                <Snackbar
-                                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                                    open={this.state.flash_success_message !== '' ? true : false}
-                                    autoHideDuration={5000}
-                                    key={"success_message"}
-                                    onClose={() => {
+                            <div>
 
-                                        this.setState({flash_success_message: ''})
-                                    }}
-                                >
-                                    <Alert elevation={6} variant="filled" severity="success">{this.state.flash_success_message}</Alert>
-                                </Snackbar>
+                                {this.props.children}
+                            </div>
+                        </Box>
 
-                                <Snackbar
-                                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                                    open={this.state.flash_error_message !== '' ? true : false}
-                                    autoHideDuration={5000}
-                                    key={"error_message"}
-                                    onClose={() => {
+                        <Snackbar
+                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            open={this.state.flash_success_message !== '' ? true : false}
+                            autoHideDuration={5000}
+                            key={"success_message"}
+                            onClose={() => {
 
-                                        this.setState({flash_error_message: ''})
-                                    }}
-                                >
-                                    <Alert elevation={6} variant="filled" severity="error">{this.state.flash_error_message}</Alert>
-                                </Snackbar>
+                                this.setState({flash_success_message: ''})
+                            }}
+                        >
+                            <Alert elevation={6} variant="filled" severity="success">{this.state.flash_success_message}</Alert>
+                        </Snackbar>
 
-                                <AppFooter />
-                            </Paper>
-                        </Grid>
-                    </Grid>
+                        <Snackbar
+                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            open={this.state.flash_error_message !== '' ? true : false}
+                            autoHideDuration={5000}
+                            key={"error_message"}
+                            onClose={() => {
+
+                                this.setState({flash_error_message: ''})
+                            }}
+                        >
+                            <Alert elevation={6} variant="filled" severity="error">{this.state.flash_error_message}</Alert>
+                        </Snackbar>
+                    </Box>
+
+                    <AppFooter />
                 </Container>
             </div>
         )
@@ -322,205 +247,6 @@ class Main extends Component {
         }else{
 
             return title_action
-        }
-    }
-
-    renderMenu = () => {
-
-        let menu_links = [];
-
-        menu.forEach((_row) => {
-
-            if(_row.hasOwnProperty('type') && _row.type === 'divider'){
-
-                menu_links.push(<Divider key={_row.key} />)
-
-            }else if(_row.hasOwnProperty('link')){
-
-                menu_links.push(
-                    <li key={_row.key} className={`${_row.key === this.props.active_page ? 'current' : ''}`}>
-                        <Link to={`/${_row.link}`} onClick={() => { if(this.state.mobileOpen) this.handleDrawerToggle(); }}>
-                            <div className='icon'>
-                                <Icon>{_row.icon}</Icon>
-                            </div>
-                            
-                            <span>{_row.label}</span>
-                        </Link>
-                    </li>
-                )
-            }else{
-
-                menu_links.push(
-                    <li
-                        className={`has-childs ${_row.key === this.props.active_page ? '' : ''}`}
-                        key={_row.key}
-                        onClick={(e) => {
-
-                        //     if(this.state.active_menu_item === ''){
-                            
-                        //         this.setState({show_sub_menu: true, sub_menu_shown: true, active_menu_item: _row.key}, () => {
-
-                        //             window.setTimeout(() => {
-
-                        //                 this.setState({submenu: _row.childs})
-                        //             }, 200)
-                        //         })
-                        //     }else{
-
-                        //         if(this.state.active_menu_item === _row.key){
-
-                        //             this.setState({sub_menu_shown: false}, () => {
-                                        
-                        //                 window.setTimeout(() => {
-                                            
-                        //                     this.setState({active_menu_item: '', submenu: [], show_sub_menu: false})
-                        //                 }, 400)
-                        //             });
-                        //         }else{
-
-                        //             this.setState({submenu: _row.childs, active_menu_item: _row.key})
-                        //         }
-                        //     }
-
-                            let clist = e.currentTarget.classList;
-
-                            if(clist.contains('hovered')){
-
-                                clist.remove('hovered')
-                                e.currentTarget.className = clist;
-                            }else{
-
-                                e.currentTarget.className += ' hovered'
-                            }
-                            
-                            if(this.state.active_menu_item === ''){
-                            
-                                this.setState({show_sub_menu: true, sub_menu_shown: true, active_menu_item: _row.key}, () => {
-
-                                    window.setTimeout(() => {
-
-                                        this.setState({submenu: _row.childs})
-                                    }, 200)
-                                })
-                            }else{
-
-                                if(this.state.active_menu_item === _row.key){
-
-                                    this.setState({show_sub_menu: false}, () => {
-                                        
-                                        window.setTimeout(() => {
-                                            
-                                            this.setState({active_menu_item: '', sub_menu_shown: false, submenu: []})
-                                        }, 400)
-                                    });
-                                }else{
-
-                                    this.setState({submenu: _row.childs, active_menu_item: _row.key})
-                                }
-                            }
-                        }}
-                    >
-                        <div className='label'>
-
-                            <div>
-                                <div className='icon'>
-                                    <Icon>{_row.icon}</Icon>
-                                </div>
-                                <span>{_row.label}</span>
-                            </div>
-
-                            <div className={`end-icon`} style={{transform:this.state.active_menu_item === _row.key || this.props.active_page === _row.key ? 'rotate(90deg)' : 'rotate(0deg)', transition:'.2s all ease-in-out'}}>
-                                <Icon>chevron_right</Icon>
-                            </div>
-                        </div>
-
-                        {_row.hasOwnProperty('childs') &&
-                        
-                            <div className={`submenu ${this.state.active_menu_item === _row.key || this.props.active_page === _row.key ? 'shown' : 'hidden'}`}>
-                                <ul>
-                                    {_row.childs.map((_child_menu, index) => {
-
-                                        return (
-                                            <li key={_child_menu.key}>
-                                                <Link to={`/${_child_menu.link}`} onClick={() => {
-
-                                                    this.setState({show_sub_menu: false}, () => {
-                                                                                        
-                                                        window.setTimeout(() => {
-                                                            
-                                                            this.setState({active_menu_item: '', sub_menu_shown: false, submenu: []})
-                                                        }, 400)
-                                                    });
-                                                }}>
-                                                    - {_child_menu.title}
-                                                </Link>
-                                            </li>
-                                        )
-                                    })}
-                                </ul>
-                            </div>
-                        }
-                    </li>
-                )
-            }
-        })
-
-        return menu_links;
-    }
-
-    renderSubmenu = () => {
-
-        let submenu = this.state.submenu;
-
-        if(submenu.length > 0){
-
-            let submenu_html = submenu.map((_submenu, index) => {
-
-                if(_submenu.hasOwnProperty('type') && _submenu.type === 'divider'){
-
-                    return <li key={_submenu.key}><Divider /></li>
-                }
-
-                if(_submenu.hasOwnProperty('childs')){
-
-                    return (
-                        <ul>
-                            {
-                                _submenu.childs.map((_child_menu, index) => {
-
-                                    return (
-                                        <li key={_child_menu.key}>
-                                            <Link to={`/${_child_menu.link}`} onClick={() => {
-
-                                                this.setState({show_sub_menu: false}, () => {
-                                                                                    
-                                                    window.setTimeout(() => {
-                                                        
-                                                        this.setState({active_menu_item: '', sub_menu_shown: false, submenu: []})
-                                                    }, 400)
-                                                });
-                                            }}>
-                                                {_child_menu.label}
-                                            </Link>
-                                        </li>
-                                    )
-                                })
-                            }
-                        </ul>
-                    )
-                }else{
-                
-                    return (
-                        <li key={_submenu.key}>
-                            <Link to={`/${_submenu.link}`}>
-                                {_submenu.label}
-                            </Link>
-                        </li>
-                    )
-                }
-            })
-
-            return <ul>{submenu_html}</ul>
         }
     }
 

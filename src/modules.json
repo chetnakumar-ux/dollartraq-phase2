@@ -1,17 +1,15 @@
 [
-    {"key": "dashboard", "label": "Dashboard", "icon": "dns", "link": "dashboard",
-        "permissions": [
-            {"key": "permissions_dashboard", "title": "View Dashboard", "link": "dashboard"}
+    {
+        "key": "track_shipment_menu", "label": "Track Shipment",
+        "childs": [
+            {"key": "track_shipment", "label": "Track Shipment", "icon": "route", "link": "track-shipment"},
+            {"key": "control_tower", "label": "Control Tower", "icon": "cell_tower", "link": "control-tower"},
+            {"key": "load_search", "label": "Load Search", "icon": "find_replace", "link": "load-search"},
+            {"key": "action_centre", "label": "Action Centre", "icon": "bolt", "link": "action-centre"},
+            {"key": "subscription", "label": "Subscriptions", "icon": "currency_exchange", "link": "subscriptions"}
         ]
     },
-    {"key": "track_shipment", "label": "Track Shipment", "icon": "route", "link": "track-shipment"},
-    {"key": "control_tower", "label": "Control Tower", "icon": "cell_tower", "link": "control-tower"},
-    {"key": "load_search", "label": "Load Search", "icon": "find_replace", "link": "load-search"},
-    {"key": "action_centre", "label": "Action Centre", "icon": "bolt", "link": "action-centre"},
-    {"key": "subscription", "label": "Subscriptions", "icon": "currency_exchange", "link": "subscriptions"},
+    {"key": "pricing", "label": "Pricing", "icon": "search", "link": "pricing"},
     {"key": "carriers", "label": "Carriers", "icon": "local_shipping", "link": "carriers"},
-    {"key": "search", "label": "Search", "icon": "search", "link": "search"},
     {"key": "users", "label": "Users", "icon": "group", "link": "users"}
-
-
 ]
