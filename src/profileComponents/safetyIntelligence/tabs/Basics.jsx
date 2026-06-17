@@ -126,7 +126,6 @@ function Basics({ data }) {
 
 	const basics = data || {};
 
-	/* ───────────────── VIOLATION DATA ───────────────── */
 
 	const violationData =
 		basics?.violation_details || [];
@@ -166,7 +165,6 @@ function Basics({ data }) {
 
 	}, [searchTerm, violationData]);
 
-	/* ───────────────── TREND DATA ───────────────── */
 
 	const filteredTrendData =
 		useMemo(function () {
@@ -186,8 +184,6 @@ function Basics({ data }) {
 			return trendData.slice(-months);
 
 		}, [selectedRange, basics]);
-
-	/* ───────────────── PAGINATION ───────────────── */
 
 	const totalPages = Math.ceil(
 		filteredLogs.length / itemsPerPage
@@ -209,8 +205,6 @@ function Basics({ data }) {
 	return (
 
 		<div className='space-y-6 bg-[#f8fafc] p-6'>
-
-			{/* HEADER */}
 
 			<div className='flex items-center justify-between'>
 
@@ -345,8 +339,6 @@ function Basics({ data }) {
 
 			</div>
 
-			{/* WARNING */}
-
 			<div className='flex items-center justify-between rounded-2xl border border-[#fecaca] bg-[#fff1f2] px-6 py-4'>
 
 				<div className='flex items-center gap-3 text-[13px] font-extrabold text-[#991b1b]'>
@@ -370,13 +362,7 @@ function Basics({ data }) {
 
 			</div>
 
-			{/* CHART + RECENT */}
-
 			<div className='grid grid-cols-12 gap-6'>
-
-				{/* CHART */}
-
-				{/* CHART */}
 
 				<div className='col-span-8 flex flex-col rounded-[24px] border border-[#e2e8f0] bg-white p-8 shadow-sm'>
 
@@ -426,8 +412,6 @@ function Basics({ data }) {
 
 					</div>
 
-					{/* API DATA */}
-
 					{(() => {
 
 						const smsMeasures =
@@ -448,18 +432,14 @@ function Basics({ data }) {
 
 							<>
 
-								{/* CHART */}
-
 								<div className='h-[360px] w-full'>
 
 									<ResponsiveContainer width='100%' height='100%'>
 										{(() => {
 											const inspections = basics?.inspections || [];
 
-											// Month sequence aligned identically with the screenshot (Nov -> Oct)
 											const monthNames = ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
 
-											/* DEFAULT MONTH DATA */
 											const monthMap = {};
 											monthNames.forEach(function (m) {
 												monthMap[m] = {
@@ -484,10 +464,8 @@ function Basics({ data }) {
 												}
 											});
 
-											// Map order based directly on the visual month timeline sequence
 											const chartData = monthNames.map(m => monthMap[m]);
 
-											// Custom dot component to replicate the white-filled circular markers in the screenshot
 											const CustomDot = (props) => {
 												const { cx, cy, stroke } = props;
 												if (!cx || !cy) return null;
@@ -509,20 +487,18 @@ function Basics({ data }) {
 													}}
 												>
 													<defs>
-														{/* Soft Blue Gradient for Unsafe Driving */}
+														
 														<linearGradient id='unsafeGradient' x1='0' y1='0' x2='0' y2='1'>
 															<stop offset='0%' stopColor='#2563eb' stopOpacity={0.12} />
 															<stop offset='100%' stopColor='#2563eb' stopOpacity={0.00} />
 														</linearGradient>
-
-														{/* Faint background Gradient for Maintenance trend line */}
+														
 														<linearGradient id='maintGradient' x1='0' y1='0' x2='0' y2='1'>
 															<stop offset='0%' stopColor='#94a3b8' stopOpacity={0.04} />
 															<stop offset='100%' stopColor='#94a3b8' stopOpacity={0.00} />
 														</linearGradient>
 													</defs>
 
-													{/* Clean, solid horizontal grid lines matching the visual style */}
 													<CartesianGrid
 														vertical={false}
 														stroke='#f1f5f9'
@@ -536,7 +512,6 @@ function Basics({ data }) {
 														dy={12}
 													/>
 
-													{/* Y-Axis configuration left with standard numbers without explicit domain or ticks */}
 													<YAxis
 														axisLine={false}
 														tickLine={false}
@@ -546,7 +521,6 @@ function Basics({ data }) {
 
 													<Tooltip />
 
-													{/* Dataset 1: Unsafe Driving (Solid blue line with custom ring dots) */}
 													{activeLines.unsafe && (
 														<Area
 															type='monotone'
@@ -559,7 +533,6 @@ function Basics({ data }) {
 														/>
 													)}
 
-													{/* Dataset 2: Maintenance Trend (Dashed gray line with custom ring dots) */}
 													{activeLines.maint && (
 														<Area
 															type='monotone'
@@ -579,11 +552,7 @@ function Basics({ data }) {
 
 								</div>
 
-								{/* BOTTOM LEGEND */}
-
 								<div className='mt-6 flex items-center justify-center gap-8 border-t border-slate-100 pt-6'>
-
-									{/* UNSAFE */}
 
 									<button
 										onClick={function () {
@@ -653,8 +622,6 @@ function Basics({ data }) {
 
 									</button>
 
-									{/* CRASH */}
-
 									<div className='flex items-center gap-3 opacity-40'>
 
 										<div className='h-4 w-4 rounded-full bg-slate-200' />
@@ -676,10 +643,6 @@ function Basics({ data }) {
 					})()}
 
 				</div>
-
-				{/* RECENT VIOLATIONS */}
-
-			{/* RECENT VIOLATIONS */}
 
                 <div className='col-span-4 flex flex-col rounded-[24px] border border-[#e2e8f0] bg-white p-6 shadow-sm'>
 

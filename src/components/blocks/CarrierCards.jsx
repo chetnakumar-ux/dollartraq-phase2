@@ -12,43 +12,54 @@ import {
 function StatusBadge(props) {
 
     const isActive = props.active;
-    const label = props.label;
     const type = props.type;
 
     let icon = null;
+    let label = props.label;
 
     let className =
         'inline-flex items-center justify-center min-w-[165px] gap-[5px] px-[10px] py-[4px] rounded-full text-[11px] font-[700] tracking-[0.02em] whitespace-nowrap border leading-none uppercase ';
 
-    if (isActive === true) {
+    if (type === 'authority') {
 
-        if (type === 'insurance') {
+        if (isActive) {
 
             icon = <Verified className='!text-[13px] !text-[#15924c]' />;
+            label = 'AUTHORITY VERIFIED';
 
-            className = className + 'bg-[#edfdf3] border-[#b7ebc6] text-[#15924c]';
+            className += 'bg-[#edfdf3] border-[#b7ebc6] text-[#15924c]';
         }
         else {
 
-            icon = <Verified className='!text-[13px] !text-[#2563eb]' />;
+            icon = <GppMaybe className='!text-[13px] !text-[#dc2626]' />;
+            label = 'AUTHORITY UNVERIFIED';
 
-            className = className + 'bg-[#eef4ff] border-[#c7dbff] text-[#2563eb]';
+            className += 'bg-[#fff1f1] border-[#fecaca] text-[#dc2626]';
         }
     }
-    else {
+    else if (type === 'insurance') {
 
-        icon = <GppMaybe className='!text-[13px] !text-[#dc2626]' />;
+        if (isActive) {
 
-        className = className + 'bg-[#fff1f1] border-[#fecaca] text-[#dc2626]';
+            icon = <Verified className='!text-[13px] !text-[#15924c]' />;
+
+            className += 'bg-[#edfdf3] border-[#b7ebc6] text-[#15924c]';
+        }
+        else {
+
+            icon = <GppMaybe className='!text-[13px] !text-[#dc2626]' />;
+
+            className += 'bg-[#fff1f1] border-[#fecaca] text-[#dc2626]';
+        }
     }
 
     return (
         <span className={className}>
-            {icon}{label}
+            {icon}
+            {label}
         </span>
     );
 }
-
 
 function CarrierOperationTag(props) {
 
@@ -179,43 +190,44 @@ function RiskBadge(props) {
     );
 }
 
-
 function AuthorityTag(props) {
 
-    const isActive =
-        props.active === true ||
-        props.active === 1 ||
-        props.active === '1';
+    const status = (props.active || '').toString().toUpperCase();
+
+    const isActive = status === 'A';
 
     let className =
         'inline-flex items-center gap-[6px] px-[11px] py-[4px] rounded-full text-[10px] font-[700] tracking-[0.02em] leading-none border uppercase ';
 
-    let iconColor = '!text-[#2563eb]';
+    let label = 'INACTIVE AUTHORITY';
 
     if (isActive) {
 
-        className += 'bg-[#eef4ff] text-[#2563eb] border-[#c7dbff]';
-        iconColor = '!text-[#2563eb]';
+        className += 'bg-[#edfdf3] text-[#15924c] border-[#b7ebc6]';
+        label = 'ACTIVE AUTHORITY';
     }
     else {
 
         className += 'bg-[#fff1f1] text-[#dc2626] border-[#fecaca]';
-        iconColor = '!text-[#dc2626]';
     }
 
     return (
         <span className={className}>
-            <FiberManualRecord className={`!text-[8px] ${iconColor}`} />
-            ACTIVE AUTHORITY
+            <FiberManualRecord
+                className={`!text-[8px] ${
+                    isActive ? '!text-[#15924c]' : '!text-[#dc2626]'
+                }`}
+            />
+            {label}
         </span>
     );
 }
-
-
 function CarrierCard(props) {
 
     const carrier = props.carrier;
     const handleClick = props.onClick;
+    const showRemove = props.showRemove;
+    const onRemove = props.onRemove;
 
     const idFields = [
         { label: 'MC NUMBER', value: carrier.mc_number },
@@ -254,9 +266,48 @@ function CarrierCard(props) {
             handleClick(carrier);
         }
     }
+    
 
     return (
-        <div onClick={handleCardClick} className={cardClass}>
+                <div
+                    onClick={handleCardClick}
+                    className={`${cardClass} relative group`}
+                >
+                    
+          
+            {showRemove && (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onRemove?.(carrier.row_id);
+                    }}
+                    title="Remove from shortlist"
+                    className="
+                        absolute -top-[12px] -right-[12px]
+                        flex items-center justify-center
+                        w-[30px] h-[30px]
+                        rounded-full
+                        bg-white
+                        border border-gray-200
+                        text-red-500
+                        shadow-md
+
+                        opacity-0
+                        scale-90
+                        group-hover:opacity-100
+                        group-hover:scale-100
+
+                        hover:bg-red-100
+                        hover:border-red-300
+                        hover:text-red-600
+
+                        transition-all duration-200 ease-out
+                        z-20
+                    "
+                >
+                    ✕
+                </button>
+            )}
 
             <div className='flex justify-between items-start gap-[28px]'>
 
@@ -303,7 +354,7 @@ function CarrierCard(props) {
                                 </div>
 
                                 <div className='text-[15px] font-[700] text-[#111827]'>
-                                    {Number(carrier.fleet_size).toLocaleString()}
+                                    {carrier.fleet_size}
                                     <span className='text-[11px] font-[400] text-[#6b7280] ml-[3px]'>
                                         units
                                     </span>

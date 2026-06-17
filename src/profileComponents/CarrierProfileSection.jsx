@@ -18,12 +18,8 @@ function CarrierProfileSection(props) {
         return (
 
             <div className='overflow-hidden rounded-[16px] border border-[#d9e1ee] bg-white shadow-[0_2px_8px_rgba(16,24,40,0.06)]'>
-<<<<<<< HEAD
 
                 <div className='flex flex-col gap-[24px] bg-gradient-to-r from-[#0E57C0] via-[#1a55cf] to-[#1E40AF] px-[20px] py-[24px] md:px-[28px] md:py-[26px] xl:flex-row xl:items-start xl:justify-between xl:px-[36px] xl:py-[28px]'>
-=======
-                <div className='flex items-start justify-between gap-[20px] bg-gradient-to-r from-[#0E57C0] via-[#1a55cf] to-[#1E40AF] px-[36px] py-[28px]'>
->>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
 
                     <div className='min-w-0'>
 
@@ -31,7 +27,7 @@ function CarrierProfileSection(props) {
                              DBM: {renderValue(props.subtitle)}
                         </div>
 
-                        <div className='text-[28px] leading-[1.1] font-[800] tracking-[-0.03em] text-white sm:text-[34px] lg:text-[38px] xl:text-[42px]'>
+                       <div className='text-[28px] leading-[1.1] font-[800] tracking-[-0.03em] text-white sm:text-[34px] lg:text-[38px] xl:text-[42px] break-words whitespace-normal'>
                             {renderValue(props.title)}
                         </div>
 
@@ -44,29 +40,44 @@ function CarrierProfileSection(props) {
                             const isPrimary = action.variant === 'primary';
 
                             return (
-
                                 <button
-                                    key={index}
-                                    type='button'
-                                    onClick={function () {
-
-                                        if (action.onClick) {
-
+                                    key={action.label}
+                                    type="button"
+                                    disabled={action?.disabled}
+                                    onClick={() => {
+                                        if (!action?.disabled && action?.onClick) {
                                             action.onClick();
                                         }
                                     }}
                                     className={
-                                        isPrimary
-                                            ? 'relative z-10 h-[48px] w-full cursor-pointer rounded-[12px] bg-gradient-to-r from-[#37c96b] to-[#1fb854] px-[20px] text-[14px] font-[700] text-white sm:min-w-[190px] sm:w-auto sm:text-[15px] xl:h-[52px] xl:min-w-[194px] xl:px-[22px] xl:text-[16px]'
-                                            : 'relative z-10 h-[48px] w-full cursor-pointer rounded-[12px] border border-[#d5ddeb] bg-white px-[20px] text-[14px] font-[600] text-[#334155] sm:min-w-[200px] sm:w-auto sm:text-[15px] xl:h-[52px] xl:min-w-[210px] xl:px-[22px] xl:text-[16px]'
+                                        (
+                                            isPrimary
+                                                ? 'relative z-10 h-[48px] w-full rounded-[12px] bg-gradient-to-r from-[#37c96b] to-[#1fb854] px-[20px] text-[14px] font-[700] text-white'
+                                                : 'relative z-10 h-[48px] w-full rounded-[12px] border border-[#d5ddeb] bg-white px-[20px] text-[14px] font-[600] text-[#334155]'
+                                        ) +
+                                        ' sm:min-w-[190px] sm:w-auto sm:text-[15px] xl:h-[52px] xl:px-[22px] xl:text-[16px]' +
+                                        (action?.disabled
+                                            ? ' cursor-not-allowed opacity-60 grayscale'
+                                            : ' cursor-pointer hover:opacity-90 transition-all')
                                     }
                                 >
-
-                                    <span className='flex items-center justify-center gap-[10px]'>
-                                        {action.icon}
-                                        {action.label}
+                                    <span className="flex items-center justify-center gap-[10px]">
+                                        {action?.loading ? (
+                                        <span
+                                    className={
+                                        'h-[16px] w-[16px] animate-spin rounded-full border-2 ' +
+                                        (
+                                            isPrimary
+                                                ? 'border-white/40 border-t-white'
+                                                : 'border-[#94a3b8]/40 border-t-[#334155]'
+                                        )
+                                    }
+                                />
+                                        ) : (
+                                            action?.icon
+                                        )}
+                                        {action?.label}
                                     </span>
-
                                 </button>
 
                             );

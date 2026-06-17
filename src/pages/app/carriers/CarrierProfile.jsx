@@ -1,29 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-<<<<<<< HEAD
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import CarrierProfileSection from '@/profileComponents/CarrierProfileSection';
 import RiskFactorCard from '@/profileComponents/RiskFactorCard';
-=======
-import CarrierProfileSection from '@/profileComponents/CarrierProfileSection';
-import CarrierProfileApi from 'api/CarrierProfileApi';
-import RiskFactorCard from '@/profileComponents/RiskFactorCard';
-
-import SafetyPerformance from '@/profileComponents/SafetyPerformance';
-import FleetSummary from '@/profileComponents/FleetSummary';
-import InsuranceCard from '@/profileComponents/InsuranceCard';
-import HighFrequencyLanes from '@/profileComponents/HighFrequencyLanes';
-import OperationalObservations from '@/profileComponents/OperationalObservations';
-import SafetyIntelligenceConsole from '@/profileComponents/safetyIntelligence/SafetyIntelligenceConsole';
-import FleetDetails from '@/profileComponents/FleetDetails';
-import LoadHistory from '@/profileComponents/LoadHistory';
-import CompanySnapshot from '@/profileComponents/CompanySnapShot';
-
-import CompanyAssociationsView from '@/profileComponents/CompanyAssociationsView';
-// import EquipmentInsightsView from '@/profileComponents/EquipmentInsightsView';
-// import IndustryBenchmarksView from '@/profileComponents/IndustryBenchmarksView';
-// import ContactHistoryView from '@/profileComponents/ContactHistoryView';
->>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
 
 import SafetyPerformance from '@/profileComponents/SafetyPerformance';
 import FleetSummary from '@/profileComponents/FleetSummary';
@@ -48,7 +27,6 @@ import Language from '@mui/icons-material/Language';
 
 import Main from '@/components/Main';
 
-// Replaced CircularProgress with Skeleton
 import Skeleton from '@mui/material/Skeleton';
 
 import {Add,Bolt,CheckCircle,WarningAmber,LocalShipping,Groups,History,InfoOutlined,Timeline,Assessment} from '@mui/icons-material';
@@ -56,6 +34,12 @@ import {Add,Bolt,CheckCircle,WarningAmber,LocalShipping,Groups,History,InfoOutli
 function CarrierProfile() {
 
     const { row_id } = useParams();
+
+    const navigate = useNavigate();
+
+    const [successMessage, setSuccessMessage] = useState('');
+
+   const [errorMessage, setErrorMessage] = useState('');
 
     const [carrier, setCarrier] = useState(null);
 
@@ -66,6 +50,10 @@ function CarrierProfile() {
     const [activeTab, setActiveTab] = useState('RISK FACTORS');
 
     const [activeSidebar, setActiveSidebar] = useState('RISK FACTORS');
+
+    const [shortlisting, setShortlisting] = useState(false);
+
+    const [isShortlisted, setIsShortlisted] = useState(false);
 
     const informationTabs = [
         'COMPANY ASSOCIATIONS',
@@ -87,7 +75,6 @@ function CarrierProfile() {
         'COMPANY SNAPSHOT': useRef(null)
     };
 
-    // ───────────────── API CALL ─────────────────
 
     useEffect(function () {
 
@@ -107,7 +94,7 @@ function CarrierProfile() {
 
         fetch(
 
-            `${import.meta.env.VITE_ROOT_PROD}/api/carrier/detail/${row_id}`,
+            `http://192.168.20.43:8000/api/carrier/detail/${row_id}`,
 
             {
                 method: 'POST',
@@ -161,7 +148,44 @@ function CarrierProfile() {
 
                 }
 
-                setCarrier(carrierData);
+    setCarrier(carrierData);
+
+    fetch(
+        `${import.meta.env.VITE_ROOT_PROD}/app/profile/carriers/shortlisted/list`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${import.meta.env.VITE_BARRIER_TOKEN}`,
+                'X-ACCOUNT-TOKEN': import.meta.env.VITE_ACCOUNT_TOKEN
+            },
+            body: JSON.stringify({
+                account_token: import.meta.env.VITE_ACCOUNT_TOKEN
+            })
+        }
+    )
+    .then(res => res.json())
+
+    .then(shortlistData => {
+
+        const records = shortlistData?.records || [];
+
+        const alreadyShortlisted = records.some(function (item) {
+
+            return (
+                item?.carrier_id?.toString() === row_id?.toString()
+            );
+
+        });
+
+        setIsShortlisted(alreadyShortlisted);
+
+    })
+    .catch(function (err) {
+
+        console.log('Shortlist status check failed', err);
+
+    });
 
             })
 
@@ -172,10 +196,7 @@ function CarrierProfile() {
                     err.message
                 );
 
-                setError(
-                    err.message ||
-                    'Failed to load carrier profile.'
-                );
+                setError(err.message ||'Failed to load carrier profile.');
 
             })
 
@@ -187,7 +208,83 @@ function CarrierProfile() {
 
     }, [row_id]);
 
-    // ───────────────── SIDEBAR ACTIVE SECTION ─────────────────
+    function addToPreferred() {
+
+        if (!row_id) return;
+
+        setShortlisting(true);
+
+        setSuccessMessage('');
+        setErrorMessage('');
+
+        fetch(
+            `${import.meta.env.VITE_ROOT_PROD}/app/profile/carriers/shortlisted/save`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${import.meta.env.VITE_BARRIER_TOKEN}`
+                },
+                body: JSON.stringify({
+                    carrier_id: row_id
+                })
+            }
+        )
+
+            .then(function (res) {
+
+                if (!res.ok) {
+
+                    throw new Error('Failed to shortlist');
+
+                }
+
+                return res.json();
+
+            })
+
+            .then(function (data) {
+
+                console.log('Shortlist response:', data);
+
+                setIsShortlisted(true);
+
+                setSuccessMessage(
+                    data?.message ||
+                    'Carrier added to preferred successfully.'
+                );
+
+                setErrorMessage('');
+
+            })
+
+            .catch(function (err) {
+
+                console.error('Shortlist error:', err);
+
+                setErrorMessage(
+                    err?.message ||
+                    'Failed to add carrier to preferred.'
+                );
+
+                setSuccessMessage('');
+
+            })
+
+            .finally(function () {
+
+                setShortlisting(false);
+                setTimeout(function () {
+
+                    setSuccessMessage('');
+                    setErrorMessage('');
+
+                }, 4000);
+
+
+            });
+
+    }
 
     useEffect(function () {
 
@@ -241,8 +338,6 @@ function CarrierProfile() {
         };
 
     }, [carrier, activeTab]);
-
-    // ───────────────── SCROLL FUNCTIONS ─────────────────
 
     const executeScroll = function (label) {
 
@@ -322,8 +417,6 @@ function CarrierProfile() {
         executeScroll(label);
 
     };
-
-    // ───────────────── LOADING SKELETON ─────────────────
 
     if (loading) {
 
@@ -481,8 +574,6 @@ function CarrierProfile() {
 
     }
 
-    // ───────────────── ERROR ─────────────────
-
     if (error || !carrier) {
 
         return (
@@ -587,18 +678,15 @@ function CarrierProfile() {
         'INDUSTRY BENCHMARKS',
         'CONTACT HISTORY'
     ];
+   
 
     return (
-<<<<<<< HEAD
 
 
-        <Main active_page="carrier_profile" page="carrier_profile">
+       <Main active_page="carrier_profile" page="carrier_profile" error_message={errorMessage} success_message={successMessage}>
 
         <div className='min-h-screen bg-[#F6F7F0] p-[14px] sm:p-[20px] xl:p-[32px]'>
 
-=======
-        <div className='min-h-screen bg-[#F6F7F0] p-[32px]'>
->>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
             <div className='mx-auto max-w-[1600px]'>
 
             <CarrierProfileSection
@@ -608,23 +696,41 @@ function CarrierProfile() {
                 leftItems={[
                     {
                         label: 'STATUS',
-                        value: carrier.status || 'NA',
+                        value: (
+                            <span
+                                className={`inline-flex items-center px-[10px] py-[4px] rounded-full text-[15px] font-[700] animate-pulse ${
+                                    carrier.computed?.status_code?.toLowerCase() === 'active'
+                                        ? 'bg-[#edfdf3] text-[#15924c]'
+                                        : 'bg-[#fff1f1] text-[#dc2626]'
+                                }`}
+                            >
+                                {carrier.computed?.status_code || 'NA'}
+                            </span>
+                        ),
                         icon: (
-                            <CheckCircle className='!text-[15px]' />
+                            <CheckCircle
+                                className={`!text-[15px] ${
+                                    carrier.computed?.status_code?.toLowerCase() === 'active'
+                                        ? '!text-[#15924c]'
+                                        : '!text-[#dc2626]'
+                                }`}
+                            />
                         )
                     },
                     {
                         label: 'YEARS ACTIVE',
-                        value: carrier.years_active || 'NA'
+                        value: carrier.computed?.dot_age
+                            ? `${carrier.computed.dot_age} yrs`
+                            : 'NA'
                     }
                 ]}
                 rightItems={[
-            {
-                label: 'MC#',
-                value:
-                    carrier?.authority?.docket_number ||
-                    'NA'
-            },
+                    {
+                        label: 'MC#',
+                        value:
+                            carrier?.authority?.docket_number ||
+                            'NA'
+                    },
                     {
                         label: 'DOT#',
                         value: carrier.dot_number || 'NA'
@@ -638,22 +744,29 @@ function CarrierProfile() {
                         value: carrier.duns || 'NA'
                     }
                 ]}
-                actions={[
-                    {
+            actions={[
+                !isShortlisted
+                    ? {
                         label: 'Add to Preferred',
-                        icon: (
-                            <Add className='!text-[18px]' />
-                        ),
-                        variant: 'secondary'
-                    },
-                    {
-                        label: 'Connect',
-                        icon: (
-                            <Bolt className='!text-[18px]' />
-                        ),
-                        variant: 'primary'
+                        icon: <Add />,
+                        variant: 'secondary',
+                        onClick: addToPreferred,
+                        disabled: shortlisting,
+                        loading: shortlisting
                     }
-                ]}
+                    : {
+                        label: 'Pay Now',
+                        icon: <CheckCircle />,
+                        variant: 'primary',
+                        onClick: () => navigate('/payment'),
+                    },
+
+                {
+                    label: 'Connect',
+                    icon: <Bolt className='!text-[18px]' />,
+                    variant: isShortlisted ? 'secondary' : 'primary'
+                }
+            ]}
             />
 
             <div className='mt-[24px]'>
@@ -699,7 +812,7 @@ function CarrierProfile() {
                             label: 'WEB PRESENCE',
                             value:
                                 carrier.website ||
-                                carrier.web_presence ||
+                                carrier.computed?.web_presence ||
                                 'NA',
                             icon: <Language />
                         }
@@ -729,7 +842,9 @@ function CarrierProfile() {
                         />
 
                         <HighFrequencyLanes
-                            lanes={carrier.lanes || []}
+                            lanes={
+                                carrier?.computed?.preferred_lanes
+                            }
                         />
 
                     </div>
@@ -782,7 +897,6 @@ function CarrierProfile() {
 
                     </aside>
 
-<<<<<<< HEAD
                     <main className='min-w-0 flex-1 space-y-[24px] xl:space-y-[32px]'>
 
                         <div className='overflow-hidden rounded-[16px] border border-[#d9e1ee] bg-white shadow-sm'>
@@ -827,36 +941,11 @@ function CarrierProfile() {
 
                                     </div>
 
-=======
-                    <main className='flex-1 min-w-0 space-y-[32px]'>
-                        
-                        <div className='rounded-[16px] border border-[#d9e1ee] bg-white overflow-hidden shadow-sm'>
-                            <div className='sticky top-[0px] z-10 border-b border-[#d9e1ee] bg-[#EBF5FF] px-[62px]'>
-                                <div className='flex gap-[65px]'> 
-                                    {tabs.map((tab) => (
-                                        <button
-                                            key={tab}
-                                            onClick={() => setActiveTab(tab)}
-                                            className={`relative py-[20px] text-[11px] font-[700] tracking-[1px] uppercase transition-all ${
-                                                activeTab === tab ? '' : 'text-[#7c8fac] hover:text-[#111827]'
-                                            }`}
-                                        >
-                                            {tab}
-                                            {activeTab === tab && (
-                                                <div className='absolute bottom-0 left-[15%] h-[3px] w-[70%] rounded-t-[4px] bg-[#1c5dbe]' />
-                                            )}
-                                        </button>
-                                    ))}
->>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
                                 </div>
 
                             </div>
 
-<<<<<<< HEAD
                             <div className='bg-[#fbfcfe] p-[16px] sm:p-[24px] xl:p-[32px]'>
-=======
-                            <div className='p-[32px] bg-[#fbfcfe]'>
->>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
 
                                 {activeTab === 'RISK FACTORS' && (
 
@@ -891,7 +980,6 @@ function CarrierProfile() {
                                 )}
 
                                 {activeTab === 'COMPANY ASSOCIATIONS' && (
-<<<<<<< HEAD
 
                                     <div
                                         ref={sectionRefs['COMPANY ASSOCIATIONS']}
@@ -958,46 +1046,6 @@ function CarrierProfile() {
 
                                 )}
 
-=======
-                                    <div
-                                        ref={sectionRefs['INFORMATION']}
-                                        data-section="INFORMATION"
-                                        className='space-y-[32px]'
-                                    >
-                                        <CompanyAssociationsView
-                                            data={carrier?.companyAssociations || []}
-                                        />
-                                    </div>
-                                )}          
-
-                                {activeTab === 'EQUIPMENT INSIGHTS' && (
-                                    <div ref={sectionRefs['INFORMATION']} data-section="INFORMATION" className='space-y-[32px]'>
-                                        <div className='p-[20px] border border-dashed border-[#d9e1ee] rounded-[12px]'>
-                                            <h3 className='text-[14px] font-bold text-[#1656b8] mb-4'>EQUIPMENT INSIGHTS</h3>
-
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* 4. INDUSTRY BENCHMARKS TAB */}
-                                {activeTab === 'INDUSTRY BENCHMARKS' && (
-                                    <div ref={sectionRefs['INFORMATION']} data-section="INFORMATION" className='space-y-[32px]'>
-                                        <div className='p-[20px] border border-dashed border-[#d9e1ee] rounded-[12px]'>
-                                            <h3 className='text-[14px] font-bold text-[#1656b8] mb-4'>INDUSTRY BENCHMARKS</h3>
-
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeTab === 'CONTACT HISTORY' && (
-                                    <div ref={sectionRefs['INFORMATION']} data-section="INFORMATION" className='space-y-[32px]'>
-                                        <div className='p-[20px] border border-dashed border-[#d9e1ee] rounded-[12px]'>
-                                            <h3 className='text-[14px] font-bold text-[#1656b8] mb-4'>CONTACT HISTORY</h3>
-
-                                        </div>
-                                    </div>
-                                )}
->>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
                             </div>
 
                         </div>
@@ -1008,7 +1056,7 @@ function CarrierProfile() {
                         >
 
                             <OperationalObservations
-                                data={carrier.observations || {}}
+                                data={carrier}
                             />
 
                         </section>
@@ -1031,14 +1079,13 @@ function CarrierProfile() {
                         >
 
                             <FleetDetails
-                                data={carrier.fleet || {}}
+                                data={carrier}
                             />
 
                         </section>
 
                         <section
                             ref={sectionRefs['LOAD HISTORY']}
-<<<<<<< HEAD
                             data-section='LOAD HISTORY'
                         >
 
@@ -1060,18 +1107,6 @@ function CarrierProfile() {
                                data={carrier}
                             />
 
-=======
-                            data-section="LOAD HISTORY"
-                        >
-                            <LoadHistory data={carrier?.loadHistory} />
-                        </section>
-
-                        <section 
-                            ref={sectionRefs['COMPANY SNAPSHOT']} 
-                            data-section="COMPANY SNAPSHOT"
-                        >
-                             <CompanySnapshot data={carrier?.companySnapshot} />
->>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
                         </section>
 
                     </main>
@@ -1081,7 +1116,9 @@ function CarrierProfile() {
             </div>
 
         </div>
-</Main>
+
+       </Main>
+
     );
 }
 

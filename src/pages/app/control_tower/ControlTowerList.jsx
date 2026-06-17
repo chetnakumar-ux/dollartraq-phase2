@@ -9,7 +9,7 @@ import Btn from 'components/Btn';
 
 import Api from 'api/Api';
 
-import Edit from '@mui/icons-material/Edit';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 class ControlTowerList extends Component {
 
@@ -41,6 +41,7 @@ class ControlTowerList extends Component {
         if(account_token){
             
             this.setState({account_token: account_token})
+
             this.init(account_token)
         }
     }
@@ -62,6 +63,7 @@ class ControlTowerList extends Component {
             <Main
                 active_page="control_tower"
                 title="Action Centre"
+                subtitle="Enter carrier details to activate live telemetry and predictive delivery windows."
                 page="control_tower_list"
                 
                 error_message={this.state.error_message}
@@ -90,8 +92,8 @@ class ControlTowerList extends Component {
                         active_row={this.state.active_row}
 
                         columns={[
-                            {name: 'Shipment Number', column: 'shipment_number', sortable: true},
-                            {name: 'Carrier', column: 'shippment_carrier', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.shipment_carriers},
+                           { name: 'Shipment Number', column: 'shipment_number', sortable: true, renderer: (row) => ( <span className="text-[#003178] font-bold">{row.shipment_number}</span> ) },
+                          {name: 'Carrier', column: 'shippment_carrier', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.shipment_carriers, renderer: (row, n, row_data) => <span className="font-bold">{row_data}</span>},
                             {name: 'Method', column: 'tracking_method', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.tracking_methods},
                             {name: 'Country Code', column: 'tracking_cc', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.country_codes},
                             {name: 'Tracking Start At', column: 'tracking_start_at', sortable: true},
@@ -105,9 +107,19 @@ class ControlTowerList extends Component {
 
                                 <div className="hoverable-action">
                                     <div className="align-start">
-
-                                        <Btn to={`/shipment/${row.row_id}`} size="small" color="primary" startIcon={<Edit style={{fontSize: 15}} />}>
-                                            View
+                                        <Btn
+                                        to={`/shipment/${row.row_id}`}
+                                        size="small"
+                                        variant="text"
+                                        disableRipple
+                                        sx={{
+                                            color: '#1e40af',fontSize: '13px',fontWeight: 600,padding: '8px 10px',
+                                        '& .MuiButton-endIcon': {marginLeft: '15px',},
+                                        }}
+                                        endIcon={<ArrowForwardIcon sx={{fontSize: '12px',transform: 'scale(0.75, 0.9)', }}
+                                        />}>
+                                            
+                                        View
                                         </Btn>
                                     </div>
                                 </div>

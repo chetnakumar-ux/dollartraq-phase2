@@ -15,7 +15,6 @@ import {
     Search,
     ChevronLeft,
     ChevronRight,
-    FiberManualRecord,
     LocationOnOutlined,
 } from "@mui/icons-material";
 
@@ -31,34 +30,46 @@ function Crashes({ data }) {
     const [hazmatOnly, setHazmatOnly] = useState(false);
     const [page, setPage] = useState(1);
 
-    /* ================= CHART DATA ================= */
 
     const chartData =
         crashes?.chartTabs?.[activeRange] || [];
 
-    /* ================= FILTER TABLE ================= */
 
     const filteredRows = useMemo(() => {
 
-        let rows = crashes?.tableData || [];
+        let rows = crashes?.crash_details || [];
 
-        if (search) {
-            rows = rows.filter(item =>
-                item.region?.toLowerCase().includes(search.toLowerCase()) ||
-                item.refId?.toLowerCase().includes(search.toLowerCase()) ||
-                item.description?.toLowerCase().includes(search.toLowerCase())
-            );
-        }
+if (search) {
+
+    rows = rows.filter(item =>
+
+        item.location
+            ?.toLowerCase()
+            .includes(search.toLowerCase())
+
+        ||
+
+        item.crash_event_seq_id_desc
+            ?.toLowerCase()
+            .includes(search.toLowerCase())
+
+        ||
+
+        item.report_date
+            ?.toLowerCase()
+            .includes(search.toLowerCase())
+    );
+}
 
         if (severityFilter !== 'ALL') {
             rows = rows.filter(
                 item =>
-                    item.severity.toUpperCase() === severityFilter
+                    item.severity?.toUpperCase() === severityFilter
             );
         }
 
         if (hazmatOnly) {
-            rows = rows.filter(item => item.hazmat);
+            rows = rows.filter(item => item.hazmat === 'Y');
         }
 
         return rows;
@@ -71,8 +82,6 @@ function Crashes({ data }) {
         (page - 1) * ITEMS_PER_PAGE,
         page * ITEMS_PER_PAGE
     );
-
-    /* ================= CARD UI ================= */
 
     const getCardStyles = type => {
 
@@ -136,61 +145,63 @@ function Crashes({ data }) {
     return (
         <div className="px-[26px] py-[26px] bg-white">
 
-            {/* ================= SUMMARY CARDS ================= */}
-
             <div className="grid grid-cols-4 gap-5 mb-9">
 
-                {crashes?.summaryCards?.map(card => {
+                {!crashes?.summaryCards || crashes.summaryCards.length === 0 ? (
+                    <div className="col-span-4 bg-white border border-[#e7edf5] rounded-[20px] py-10 text-center text-[13px] font-[500] text-[#64748b]">
+                        No summary snapshot data available.
+                    </div>
+                ) : (
+                    crashes.summaryCards.map(card => {
 
-                    const styles = getCardStyles(card.type);
+                        const styles = getCardStyles(card.type);
 
-                    return (
-                        <div
-                            key={card.id}
-                            className="bg-white border border-[#e7edf5] rounded-[20px] px-7 py-6"
-                        >
+                        return (
+                            <div
+                                key={card.id}
+                                className="bg-white border border-[#e7edf5] rounded-[20px] px-7 py-6"
+                            >
 
-                            <div className="flex items-start justify-between">
+                                <div className="flex items-start justify-between">
 
-                                <div>
-                                    <p className="text-[10px] tracking-[1.3px] font-[800] text-[#64748b] uppercase">
-                                        {card.title}
-                                    </p>
+                                    <div>
+                                        <p className="text-[10px] tracking-[1.3px] font-[800] text-[#64748b] uppercase">
+                                            {card.title}
+                                        </p>
 
-                                    <div className="flex items-end gap-2 mt-2">
+                                        <div className="flex items-end gap-2 mt-2">
 
-                                        <h2 className="text-[30px]  mb-5 mt-5 leading-none font-[800] text-[#0f172a]">
-                                            {card.value}
-                                        </h2>
+                                            <h2 className="text-[30px] mb-5 mt-5 leading-none font-[800] text-[#0f172a]">
+                                                {card.value}
+                                            </h2>
 
-                                        {card.badge && (
-                                            <span className={`h-[22px] px-2 rounded-full flex items-center text-[10px] font-[800] ${styles.badge}`}>
-                                                {card.badge}
-                                            </span>
-                                        )}
+                                            {card.badge && (
+                                                <span className={`h-[22px] px-2 rounded-full flex items-center text-[10px] font-[800] ${styles.badge}`}>
+                                                    {card.badge}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="mt-5 h-[3px] rounded-full overflow-hidden bg-[#e2e8f0]">
-                                <div className={`h-full w-[58%] ${styles.line}`} />
-                            </div>
+                                <div className="mt-5 h-[3px] rounded-full overflow-hidden bg-[#e2e8f0]">
+                                    <div className={`h-full w-[58%] ${styles.line}`} />
+                                </div>
 
-                            <div className="mt-4 flex items-center justify-between">
-                                <span className="text-[10px] font-[700] text-[#94a3b8] uppercase">
-                                    {card.footer}
-                                </span>
+                                <div className="mt-4 flex items-center justify-between">
+                                    <span className="text-[10px] font-[700] text-[#94a3b8] uppercase">
+                                        {card.footer}
+                                    </span>
 
-                                <span className={`text-[10px] font-[800] ${styles.footer}`}>
-                                    {card.footerValue}
-                                </span>
+                                    <span className={`text-[10px] font-[800] ${styles.footer}`}>
+                                        {card.footerValue}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })
+                )}
             </div>
-
-            {/* ================= CHART ================= */}
 
             <div className="bg-white border border-[#e7edf5] rounded-[22px] px-7 py-7 mb-8">
 
@@ -236,7 +247,7 @@ function Crashes({ data }) {
 
                         {/* TABS */}
 
-                        <div className="flex items-center  border border-[#e2e8f0] rounded-[14px] p-1">
+                        <div className="flex items-center border border-[#e2e8f0] rounded-[14px] p-1">
 
                             {['12M', 'YTD', 'ALL'].map(tab => (
                                 <button
@@ -348,11 +359,8 @@ function Crashes({ data }) {
                 </div>
             </div>
 
-            {/* ================= FILTER BAR ================= */}
 
             <div className="flex items-center justify-between mb-5">
-
-                {/* SEARCH */}
 
                 <div className="relative w-[420px] mb-4">
 
@@ -371,8 +379,6 @@ function Crashes({ data }) {
                         className="w-full h-[46px] rounded-[15px] border border-[#e2e8f0] bg-white pl-12 pr-4 text-[13px] outline-none"
                     />
                 </div>
-
-                {/* FILTERS */}
 
                 <div className="flex items-center gap-3">
 
@@ -419,8 +425,6 @@ function Crashes({ data }) {
                 </div>
             </div>
 
-            {/* ================= TABLE ================= */}
-
             <div className="bg-white border border-[#e7edf5] rounded-[22px] overflow-hidden">
 
                 <table className="w-full">
@@ -454,70 +458,84 @@ function Crashes({ data }) {
 
                     <tbody>
 
-                        {rows.map((row, index) => (
-
-                            <tr
-                                key={index}
-                                className="border-t border-[#f1f5f9]"
-                            >
-
-                                <td className="px-6 py-5 text-[13px] font-[700] text-[#0f172a]">
-                                    {row.date}
+                        {rows.length === 0 ? (
+                            <tr>
+                                <td
+                                    colSpan={5}
+                                    className="px-6 py-12 text-center text-[13px] font-[500] text-[#64748b] bg-white"
+                                >
+                                    No crash records found matching the criteria.
                                 </td>
-
-                                <td className="px-6 py-5">
-
-                                    <span className={`px-3 py-1 rounded-full text-[10px] font-[800] uppercase ${getSeverityStyles(row.severity)}`}>
-                                        {row.severity}
-                                    </span>
-
-                                </td>
-
-                                <td className="px-6 py-5 text-[13px] text-[#334155] max-w-[320px]">
-                                    {row.description}
-                                </td>
-
-                                <td className="px-6 py-5">
-
-                                    <div className="flex items-center gap-1 text-[12px] text-[#64748b]">
-
-                                        <LocationOnOutlined
-                                            sx={{
-                                                fontSize: 15,
-                                                color: '#10b981',
-                                            }}
-                                        />
-
-                                        {row.region}
-                                    </div>
-
-                                </td>
-
-                                <td className="px-6 py-5 text-right">
-
-                                    <button className="h-[32px] px-4 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-[800] hover:bg-emerald-100 transition-all">
-                                        VIEW
-                                    </button>
-
-                                </td>
-
                             </tr>
-                        ))}
+                        ) : (
+                            rows.map((row, index) => (
+
+                                <tr
+                                    key={index}
+                                    className="border-t border-[#f1f5f9]"
+                                >
+
+                                    <td className="px-6 py-5 text-[13px] font-[700] text-[#0f172a]">
+                                       {row.report_date || 'N/A'}
+                                    </td>
+
+                                    <td className="px-6 py-5">
+
+                                        <span className={`px-3 py-1 rounded-full text-[10px] font-[800] uppercase ${getSeverityStyles(row.severity)}`}>
+                                            {row.severity || 'N/A'}
+                                        </span>
+
+                                    </td>
+
+                                    <td className="px-6 py-5 text-[13px] text-[#334155] max-w-[320px]">
+                                        {row.crash_event_seq_id_desc || 'N/A'}
+                                    </td>
+
+                                    <td className="px-6 py-5">
+
+                                        <div className="flex items-center gap-1 text-[12px] text-[#64748b]">
+
+                                            <LocationOnOutlined
+                                                sx={{
+                                                    fontSize: 15,
+                                                    color: '#10b981',
+                                                }}
+                                            />
+
+                                            {row.location || 'N/A'}
+                                        </div>
+
+                                    </td>
+
+                                    <td className="px-6 py-5 text-right">
+
+                                        <button className="h-[32px] px-4 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-[800] hover:bg-emerald-100 transition-all">
+                                            VIEW
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+                            ))
+                        )}
 
                     </tbody>
                 </table>
 
-                {/* ================= FOOTER ================= */}
 
                 <div className="flex items-center justify-between px-6 py-4 border-t border-[#eef2f7]">
 
                     <p className="text-[11px] text-[#94a3b8]">
-
-                        Showing {(page - 1) * ITEMS_PER_PAGE + 1}
-                        –
-                        {Math.min(page * ITEMS_PER_PAGE, filteredRows.length)}
-                        {' '}of {filteredRows.length} incidents
-
+                        {filteredRows.length === 0 ? (
+                            "Showing 0–0 of 0 incidents"
+                        ) : (
+                            <>
+                                Showing {(page - 1) * ITEMS_PER_PAGE + 1}
+                                –
+                                {Math.min(page * ITEMS_PER_PAGE, filteredRows.length)}
+                                {' '}of {filteredRows.length} incidents
+                            </>
+                        )}
                     </p>
 
                     <div className="flex items-center gap-2">
@@ -527,15 +545,15 @@ function Crashes({ data }) {
                             onClick={() => setPage(prev => prev - 1)}
                             className="h-[32px] w-[32px] rounded-full border border-[#e2e8f0] flex items-center justify-center disabled:opacity-40"
                         >
-                            <ChevronLeft sx={{ fontSize: 18, mt: 0.5 }} />
+                            <ChevronLeft sx={{ fontSize: 18 }} />
                         </button>
 
                         <button
-                            disabled={page === totalPages}
+                            disabled={page === totalPages || totalPages === 0}
                             onClick={() => setPage(prev => prev + 1)}
                             className="h-[32px] w-[32px] rounded-full border border-[#e2e8f0] flex items-center justify-center disabled:opacity-40"
                         >
-                            <ChevronRight sx={{ fontSize: 18, mt: 0.5 }} />
+                            <ChevronRight sx={{ fontSize: 18}} />
                         </button>
 
                     </div>

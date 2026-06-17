@@ -5,6 +5,9 @@ import { ThemeProvider, createTheme, StyledEngineProvider } from '@mui/material/
 import {BrowserRouter, Route, Routes as Switch} from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
 import WdFormRouter from 'pages/app/WdFormRouter';
 
 import NoPage from 'pages/app/NoPage';
@@ -37,6 +40,10 @@ import CarrierSearch from 'pages/app/carriers/CarrierSearch';
 import CarrierProfile from 'pages/app/carriers/CarrierProfile';
 
 import PricingPage from 'pages/app/pricing/PricingPage';
+
+import CarrierQuestions from 'pages/app/carrier-questions/CarrierQuestion';
+
+import CarrierConnect from 'pages/app/connect/CarrierConnect';
 
 
 function App(){
@@ -256,14 +263,14 @@ function App(){
 
                             fontSize: 14,
                             transform: 'translate(0px, -18px) scale(1)',
-                            color: 'rgba(0,0,0,.9)'
+                           color: '#94A3B8'
                         }),
 
                         ...(ownerState.size === 'medium' && {
 
                             fontSize: 14,
                             transform: 'translate(0px, -20px) scale(1)',
-                            color: 'rgba(0,0,0,.9)'
+                            color: '#94A3B8'
                         }),
                     }),
                 }
@@ -323,15 +330,73 @@ function App(){
                         borderRadius: '20px'
                     }
                 }
+            },
+            MuiChip: {
+                styleOverrides: {
+                    root: ({ ownerState }) => ({
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        padding: '16px 14px', 
+                        borderRadius: '50px',
+                        borderWidth: '1px',
+                        borderStyle: 'solid',
+                        textTransform: 'none', 
+
+                        ...(ownerState.color === 'error' && {
+                            backgroundColor: '#fff1f1', 
+                            borderColor: '#fcdede',    
+                            color: '#b82c2c',          
+                        }),
+
+                        ...(ownerState.color === 'success' && {
+                            backgroundColor: '#f0fbf7', 
+                            borderColor: '#d2f3e8',    
+                            color: '#117b5d',          
+                        }),
+
+                        ...(ownerState.color === 'primary' && {
+                            backgroundColor: '#f0f4f9', 
+                            borderColor: '#d9e2ec',    
+                            color: '#0b3c75',          
+                        }),
+
+                        ...(ownerState.color === 'secondary' && {
+                            backgroundColor: '#f5f3ff', 
+                            borderColor: '#e5e1fa',    
+                            color: '#553c9a',          
+                        }),
+                        
+                        ...(ownerState.color === 'warning' && {
+                            backgroundColor: '#fff9f2',
+                            borderColor: '#ffeacc',
+                            color: '#b76200',
+                        })
+                    })
+                }
             }
         }
     })
+
+    function ScrollHandler() {
+
+    const location = useLocation();
+
+    useEffect(() => {
+
+        window.scrollTo(0, 0);
+
+    }, [location.pathname]);
+
+    return null;
+}
 
     return (
         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <BrowserRouter basename={'/'}>
+
+                  <ScrollHandler />
 
                     <Switch>
                 
@@ -374,6 +439,10 @@ function App(){
                         <Route exact={true} path='/profile/carriers/shortlisted' element={<ShortlistedCarriers />}/>
 
                         <Route exact={true} path='/pricing' element={<PricingPage />} />
+
+                        <Route exact={true} path='/carrier-questions' element={<CarrierQuestions />} />
+
+                        <Route exact={true} path='/connected' element={<CarrierConnect />} /> 
 
                         <Route exact={true} path='/edit' element={<WdFormRouter />}>
                             <Route path=':main_route' element={<WdFormRouter />}>

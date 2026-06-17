@@ -40,8 +40,10 @@ function SafetyPerformance(props) {
         },
         {
             label: 'VEHICLE OOS',
-            value: smsMeasures.vehicle_oos_insp_total,
-            unit: props.data.vehicle_oos_unit,
+            value:
+                props.data?.computed?.inspections_vehicle_out_of_service_pct != null
+                    ? `${props.data.computed.inspections_vehicle_out_of_service_pct}%`
+                    : 'NA',
             icon: <LocalShippingOutlined />,
             iconBg: 'bg-[#f3f6fb]',
             iconColor: 'text-[#64748b]'

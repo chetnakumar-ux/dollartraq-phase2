@@ -28,31 +28,25 @@ function FleetSummary(props) {
     const equipmentList = [
         {
             type: 'Observed Units',
-            quantity: props.data.powers_unit,
-            status:
-                props.data.powers_unit
-                    ? 'ACTIVE'
-                    : 'NA',
+            quantity: props.data?.computed?.observed_units || 0,
+            status: props.data?.computed?.observed_units_status || 'NA',
             statusVariant:
-                props.data.powers_unit
+                props.data?.computed?.observed_units_status?.toLowerCase() === 'tracked'
                     ? 'success'
                     : 'default'
         },
         {
             type: 'Observed Trailers',
-            quantity: props.data.trailers,
-            status:
-                props.data.trailers
-                    ? 'ACTIVE'
-                    : 'NA',
+            quantity: props.data?.computed?.observed_trailers || 0,
+            status: props.data?.computed?.observed_trailers_status || 'NA',
             statusVariant:
-                props.data.trailers
+                props.data?.computed?.observed_trailers_status?.toLowerCase() === 'tracked'
                     ? 'success'
                     : 'default'
         },
         {
             type: 'Mileage',
-            quantity: props.data.mcs150_mileage,
+            quantity: props.data?.mcs150_mileage || 0,
             status:
                 props.data.mcs150_mileage_year
                     ? props.data.mcs150_mileage_year
@@ -79,7 +73,7 @@ function FleetSummary(props) {
         },
         {
             label: 'TRAILERS',
-            value: props.data.trailers,
+            value: props.data?.carrier_detail?.owntrail,
             icon: <EngineeringOutlined />,
             color: 'bg-[#f0fdf4] text-[#16a34a]'
         }

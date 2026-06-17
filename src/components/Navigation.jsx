@@ -45,133 +45,138 @@ class Navigation extends Component {
 
     renderMenu = () => {
 
-        let menu_links = [];
+            let menu_links = [];
 
-        menu.forEach((_row) => {
+            menu.forEach((_row) => {
 
-            if(_row.hasOwnProperty('type') && _row.type === 'divider'){
+                if(_row.hasOwnProperty('type') && _row.type === 'divider'){
 
-                menu_links.push(<Divider key={_row.key} />)
+                    menu_links.push(<Divider key={_row.key} />)
 
-            }else if(_row.hasOwnProperty('link')){
+                }else if(_row.hasOwnProperty('link')){
 
-                menu_links.push(
-                    <li key={_row.key} className={`${_row.key === this.props.active_page ? 'current' : ''}`}>
-                        
-                        <Link to={`/${_row.link}`}>
+                    const isActive = _row.key === this.props.active_page;
 
-                            <Button className='!rounded-sm !hover:bg-red-400' size="small">
+                    menu_links.push(
+                        <li key={_row.key}>
                             
-                                {/* <div className='icon'>
-                                    <Icon>{_row.icon}</Icon>
-                                </div> */}
-                                
-                                <span className='uppercase text-[10px] font-semibold text-gray-600'>{_row.label}</span>
+                            <Link to={`/${_row.link}`}>
+
+                                <Button 
+                                    className={`!rounded-sm !hover:bg-blue-100 ${isActive ? '!bg-blue-100' : ''}`} 
+                                    size="small"
+                                >
+                                    
+                                    {/* <div className='icon'>
+                                        <Icon>{_row.icon}</Icon>
+                                    </div> */}
+                                    
+                                    <span className='uppercase text-[10px] font-semibold text-gray-600'>{_row.label}</span>
+                                </Button>
+                            </Link>
+                        </li>
+                    )
+                }else{
+
+                    menu_links.push(
+                        <li
+                            key={_row.key}
+                            onMouseLeave={() => {
+                                this.closeTimers[_row.key] = setTimeout(() => this.removeMenuItem(_row), 150);
+                            }}
+                        >
+                            <Button
+                                className={`!rounded-sm !hover:bg-blue-100 ${this.state.menu_items.hasOwnProperty(_row.key) ? '!bg-blue-100' : ''}`}
+                                size="small"
+                                onClick={(e) => {
+
+                                    this.updateSubmenu(_row, e)
+                                }}
+                                // onMouseEnter={(e) => {
+
+                                //     clearTimeout(this.closeTimers[_row.key]);
+                                //     this.openMenuItem(_row, e);
+                                // }}
+                            >
+                                <span className='uppercase text-[10px] font-semibold'>{_row.label}</span>
+                                <KeyboardArrowDown className='text-sm text-gray-400' fontSize='small' />
                             </Button>
-                        </Link>
-                    </li>
-                )
-            }else{
 
-                menu_links.push(
-                    <li
-                        key={_row.key}
-                        onMouseLeave={() => {
-                            this.closeTimers[_row.key] = setTimeout(() => this.removeMenuItem(_row), 150);
-                        }}
-                    >
-                        <Button
-                            className={`!rounded-sm ${this.state.menu_items.hasOwnProperty(_row.key) ? '!bg-blue-100' : ''}`}
-                            size="small"
-                            onClick={(e) => {
+                            <Menu
+                                anchorEl={this.state.menu_items.hasOwnProperty(_row.key) ? this.state.menu_items[_row.key] : null}
+                                open={this.state.menu_items.hasOwnProperty(_row.key) ? true : false}
+                                onClose={() => {
 
-                                this.updateSubmenu(_row, e)
-                            }}
-                            // onMouseEnter={(e) => {
+                                    this.removeMenuItem(_row)
+                                }}
+                                onClick={() => {
 
-                            //     clearTimeout(this.closeTimers[_row.key]);
-                            //     this.openMenuItem(_row, e);
-                            // }}
-                        >
-                            <span className='uppercase text-[10px] font-semibold'>{_row.label}</span>
-                            <KeyboardArrowDown className='text-sm text-gray-400' fontSize='small' />
-                        </Button>
-
-                        <Menu
-                            anchorEl={this.state.menu_items.hasOwnProperty(_row.key) ? this.state.menu_items[_row.key] : null}
-                            open={this.state.menu_items.hasOwnProperty(_row.key) ? true : false}
-                            onClose={() => {
-
-                                this.removeMenuItem(_row)
-                            }}
-                            onClick={() => {
-
-                            }}
-                            transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-                            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-                            slotProps={{
-                                backdrop: {
-                                    invisible: true,
-                                },
-                                list: {
-                                    sx: {
-                                        backgroundColor: '#fff'
+                                }}
+                                transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+                                anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                                slotProps={{
+                                    backdrop: {
+                                        invisible: true,
                                     },
-                                },
-                                paper: {
-                                    elevation: 0,
-                                    borderRadius: 10,
-                                    sx: {
-                                        backgroundColor: '#fff',
-                                        overflow: 'visible',
-                                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.1))',
-                                        borderRadius:3,
-                                        padding: 1,
-                                        width: 300,
-                                        mt: 1.5,
-                                        '& .MuiAvatar-root': {
-                                            width: 32,
-                                            height: 32,
-                                            ml: -0.5,
-                                            mr: 1,
-                                        },
-                                        '&::before': {
-                                            content: '""',
-                                            display: 'block',
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 20,
-                                            width: 10,
-                                            height: 10,
-                                            bgcolor: '#fff',
-                                            transform: 'translateY(-50%) rotate(45deg)',
-                                            zIndex: 0,
+                                    list: {
+                                        sx: {
+                                            backgroundColor: '#fff'
                                         },
                                     },
-                                },
-                            }}
-                        >
+                                    paper: {
+                                        elevation: 0,
+                                        borderRadius: 10,
+                                        sx: {
+                                            backgroundColor: '#fff',
+                                            overflow: 'visible',
+                                            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.1))',
+                                            borderRadius:3,
+                                            padding: 1,
+                                            width: 300,
+                                            mt: 1.5,
+                                            '& .MuiAvatar-root': {
+                                                width: 32,
+                                                height: 32,
+                                                ml: -0.5,
+                                                mr: 1,
+                                            },
+                                            '&::before': {
+                                                content: '""',
+                                                display: 'block',
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 20,
+                                                width: 10,
+                                                height: 10,
+                                                bgcolor: '#fff',
+                                                transform: 'translateY(-50%) rotate(45deg)',
+                                                zIndex: 0,
+                                            },
+                                        },
+                                    },
+                                }}
+                            >
 
-                            {_row.childs.map((_child) => {
+                                {_row.childs.map((_child) => {
 
-                                return (
-                                    <MenuItem component={Link} key={_child.key} to={`/${_child.link}`}>
-                                        <ListItemIcon>
-                                            <Icon fontSize='small' className="text-gray-400">{_child.icon}</Icon>
-                                        </ListItemIcon>
-                                        
-                                        <span>{_child.label}</span>
-                                    </MenuItem>
-                                )
-                            })}
-                        </Menu>
-                    </li>
-                )
-            }
-        })
+                                    return (
+                                        <MenuItem component={Link} key={_child.key} to={`/${_child.link}`}>
+                                            <ListItemIcon>
+                                                <Icon fontSize='small' className="text-gray-400">{_child.icon}</Icon>
+                                            </ListItemIcon>
+                                            
+                                            <span>{_child.label}</span>
+                                        </MenuItem>
+                                    )
+                                })}
+                            </Menu>
+                        </li>
+                    )
+                }
+            })
 
-        return menu_links;
-    }
+            return menu_links;
+        }
 
     renderSubmenu = () => {
 

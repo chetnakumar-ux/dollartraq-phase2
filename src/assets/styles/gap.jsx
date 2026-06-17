@@ -45,7 +45,7 @@ import EditableCell from './EditableCell';
 import Api from 'api/Api';
 
 const CELL_RESET = {
-    padding: '20px 20px',
+    padding: '26px 20px',
     borderBottom: '1px solid #f1f5f9',
     fontSize: '13px',
     fontFamily: 'inherit',
@@ -54,7 +54,7 @@ const CELL_RESET = {
 };
 
 const HEAD_CELL = {
-    padding: '20px 20px',
+    padding: '26px 20px',
     backgroundColor: 'transparent',
     color: '#434652B2',
     fontWeight: 600,
@@ -125,23 +125,34 @@ class DataTable extends Component {
     componentDidMount = () => {
 
         if(this.getTableIndex('page')){
+
             let page = this.getTableIndex('page');
+
             this.setState({page: page});
         }
 
         if(this.getTableIndex('per_page')){
+
             let per_page = this.getTableIndex('per_page');
+
             this.setState({per_page: per_page});
         }
 
         if(this.getTableIndex('search') !== false){
+
             let search_values = {};
+
             let _search = this.getTableIndex('search');
+
             _search = JSON.parse(_search);
+
             if(Object.keys(_search).length > 0){
+
                 for(let _s in _search){
+
                     search_values[_s] = _search[_s]['keyword']
                 }
+
                 this.setState({search_values: search_values, search: _search});
             }
         }
@@ -152,33 +163,42 @@ class DataTable extends Component {
         var paging = this.props.paging;
 
         if(this.props.index && paging.hasOwnProperty(this.props.index)){
+
             if(paging[this.props.index].hasOwnProperty('page')){
+
                 page = paging[this.props.index]['page'];
                 this.setState({page: page});
             }
+
             if(paging[this.props.index].hasOwnProperty('per_page')){
+
                 per_page = paging[this.props.index]['per_page'];
                 this.setState({per_page: per_page});
             }
         }
 
         if(this.props.per_page){
+
             this.setState({per_page: this.props.per_page})
         }
 
         let applied_tabbed_filters = this.tabbedFilters()
+
         let active_tab = applied_tabbed_filters.default_active_tab;
 
         if(active_tab.hasOwnProperty('default')){
+        
             if(active_tab.default === ''){
+
                 this.setState({active_tab: '**'})
             }else{
+
                 this.setState({active_tab: active_tab.default})
             }
         }
 
         if(this.props.default_sort_by){
-            
+
             this.setState({column_sort_by: this.props.default_sort_by});
 
             if(this.props.sort_by_dir && (this.props.sort_by_dir === 'asc' || this.props.sort_by_dir === 'desc')){
@@ -191,18 +211,16 @@ class DataTable extends Component {
             var that = this;
 
             window.setTimeout(() => {
-
+                
                 that.loadData(that.state.page, that.props.account_token, false, true);
 
             }, 500);
-
-
+            
         }else{
 
             this.setState({applied_tabbed_filters: applied_tabbed_filters.applied_tabbed_filters}, () => {
 
                 this.loadData(this.state.page, this.props.account_token, false, true);
-
             })
         }
     }
@@ -211,17 +229,23 @@ class DataTable extends Component {
 
         if(
             this.props.do_reload
-            && this.props.do_reload !== prevProps.do_reload
-            && this.props.do_reload === true
+            &&
+            this.props.do_reload !== prevProps.do_reload
+            &&
+            this.props.do_reload === true
         ){
+
             this.loadData(this.state.page, this.props.account_token, false, false);
         }
 
         if(
             this.props.close_bulk_action
-            && this.props.close_bulk_action !== prevProps.close_bulk_action
-            && this.props.close_bulk_action === true
+            &&
+            this.props.close_bulk_action !== prevProps.close_bulk_action
+            &&
+            this.props.close_bulk_action === true
         ){
+
             this.setState({bulk_action: false, select_all: false, main_checked: false})
             this.props.onBulkActionClose();
             this.unCheckAll();
@@ -232,10 +256,15 @@ class DataTable extends Component {
 
         clearTimeout(this.search_interval);
 
+        // Reset page to 0 so the next DataTable with this index always opens on page 1
         if (this.props.index) {
+
             this.setTableIndex('page', 0);
+
             var paging = this.props.paging;
+
             if (paging.hasOwnProperty(this.props.index)) {
+
                 paging[this.props.index]['page'] = 0;
                 this.props.Paging(paging);
             }
@@ -247,17 +276,26 @@ class DataTable extends Component {
         var paging = this.props.paging;
         
         if(this.props.index){
+
             if(!paging.hasOwnProperty(this.props.index)){
+
                 paging[this.props.index] = {};
             }
+            
             if(_props.hasOwnProperty('page')){
+            
                 paging[this.props.index]['page'] = _props.page;
+
                 this.setTableIndex('page', _props.page)
             }
+
             if(_props.hasOwnProperty('per_page')){
+            
                 paging[this.props.index]['per_page'] = _props.per_page;
+
                 this.setTableIndex('per_page', _props.per_page)
             }
+            
             this.props.Paging(paging);
         }
     }
@@ -265,34 +303,29 @@ class DataTable extends Component {
     bulkActionTitle = () => {
 
         if(this.state.selected_bulk_action){
+
             const _action = this.props.bulk_actions.find(a => a.key === this.state.selected_bulk_action);
+            
             if(_action){
+
                 return _action.title;
             }
         }
 
         if(this.state.select_all){
+
             return <span>Bulk Actions <span className="opacity-60">({this.state.total_records} selected)</span></span>
         }else{
+        
             return this.state.checked_rows.length > 0 ? <span>Bulk Actions <span className="opacity-60">({this.state.checked_rows.length} selected)</span></span> : "Bulk Actions";
         }
-    }
-
-    hasTabbedFilterTabs = () => {
-        const tf = this.props.tabbed_filters;
-        return !!(
-            tf &&
-            tf.hasOwnProperty('filters') &&
-            tf.filters.length > 0 &&
-            tf.hasOwnProperty('type') &&
-            tf.type === 'tabs'
-        );
     }
 
     tabbedFilters = () => {
 
         let applied_tabbed_filters = [];
         let default_active_tab = {};
+
         let tabbed_filters = this.props.tabbed_filters;
 
         if(tabbed_filters && tabbed_filters.hasOwnProperty('filters')){
@@ -300,9 +333,8 @@ class DataTable extends Component {
             tabbed_filters.filters.map((_tabbed_filters) => {
 
                 if(_tabbed_filters.hasOwnProperty('default') && _tabbed_filters.default !== ''){
-                    
-                    default_active_tab['tab'] = _tabbed_filters.key
 
+                    default_active_tab['tab'] = _tabbed_filters.key
                     default_active_tab['default'] = _tabbed_filters.default;
 
                     applied_tabbed_filters.push({key: _tabbed_filters.key, value: _tabbed_filters.default})
@@ -321,185 +353,72 @@ class DataTable extends Component {
 
             if(tabbed_filters.hasOwnProperty('type') && tabbed_filters.type === 'tabs'){
 
-                const { page, per_page, total_records } = this.state;
-                const from = total_records === 0 ? 0 : page * per_page + 1;
-                const to = Math.min((page + 1) * per_page, total_records);
-                const hasPrev = page > 0;
-                const hasNext = (page + 1) * per_page < total_records;
-
                 return (
-                    <div className="flex items-center justify-between mb-5">
+                    <div className="flex flex-wrap gap-1 mb-6 bg-[#edf2f7]/60 p-1.5 rounded-2xl w-max">
+                        {tabbed_filters.filters.map((_tabbed_filter, index) => {
 
-                        <div className="flex flex-wrap gap-1 bg-[#edf2f7]/60 p-1.5 rounded-2xl w-max">
+                            let _options = [];
 
-                            {tabbed_filters.filters.map((_tabbed_filter, index) => {
+                            if(_tabbed_filter.hasOwnProperty('hide_all') && _tabbed_filter.hide_all === true){
 
-                                let _options = [];
+                            }else{
 
-                                if(_tabbed_filter.hasOwnProperty('hide_all') && _tabbed_filter.hide_all === true){
+                                _options.push({key: '**', value: 'All Shipment'})
+                            }
 
-                                }else{
+                            if(_tabbed_filter.hasOwnProperty('options') && _tabbed_filter.options.length > 0){
 
-                                    _options.push({key: '**', value: 'All Shipment'})
-                                }
+                                _options = [..._options, ..._tabbed_filter.options];
+                            }
 
-                                if(_tabbed_filter.hasOwnProperty('options') && _tabbed_filter.options.length > 0){
-                                    _options = [..._options, ..._tabbed_filter.options];
-                                }
+                            return _options.map((_option, _index) => {
 
-                                return _options.map((_option, _index) => {
+                                const active = this.state.active_tab === _option.key;
 
-                                    const active = this.state.active_tab === _option.key;
+                                return (
+                                    <button
+                                        key={`tabbed_filter_tab_option_${_index}_${index}`}
+                                        onClick={() => {
 
-                                    return (
-                                        <button
-                                            key={`tabbed_filter_tab_option_${_index}_${index}`}
-                                            onClick={() => {
+                                            let applied_tabbed_filters = this.state.applied_tabbed_filters;
 
-                                                let applied_tabbed_filters = this.state.applied_tabbed_filters;
+                                            this.setState({active_tab: _option.key})
 
-                                                this.setState({active_tab: _option.key})
+                                            if(this.props.activeTab){
 
-                                                if(this.props.activeTab){
-                                                    this.props.activeTab(_option.key)
+                                                this.props.activeTab(_option.key)
+                                            }
+
+                                            const _applied = applied_tabbed_filters.findIndex(row => row.key === tabbed_filters.filters[0]['key']);
+
+                                            if(_applied > -1){
+
+                                                applied_tabbed_filters[_applied]['value'] = _option.key
+                                            }else{
+
+                                                applied_tabbed_filters.push({key: tabbed_filters.filters[0]['key'], value: _option.key})
+                                            }
+
+                                            this.setState({applied_tabbed_filters: applied_tabbed_filters}, () => {
+
+                                                if(this.props.onTabClick){
+
+                                                    this.props.onTabClick(_option.key)
                                                 }
 
-                                                const _applied = applied_tabbed_filters.findIndex(row => row.key === tabbed_filters.filters[0]['key']);
-
-                                                if(_applied > -1){
-
-                                                    applied_tabbed_filters[_applied]['value'] = _option.key
-
-                                                }else{
-
-                                                    applied_tabbed_filters.push({key: tabbed_filters.filters[0]['key'], value: _option.key})
-                                                }
-
-                                                this.setState({applied_tabbed_filters: applied_tabbed_filters}, () => {
-
-                                                    if(this.props.onTabClick){
-
-                                                        this.props.onTabClick(_option.key)
-                                                    }
-
-                                                    this.loadData(0, this.props.account_token, true);
-                                                })
-                                            }}
-                                            className={`px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${active
-                                                ? 'bg-white text-[#013178] shadow-sm'
-                                                : 'text-[#424752] hover:text-[#0f2942]'
-                                            }`}
-                                        >
-                                            {_option.value}
-                                        </button>
-                                    )
-                                })
-                            })}
-                        </div>
-
-                        <div className="flex items-center gap-3">
-
-                            <div className="flex items-center gap-3 bg-white border border-[#edf2f7] rounded-xl px-5 py-3">
-
-                                <div className="p-2 bg-[#edf2f7] rounded-lg text-[#2563eb] flex items-center justify-center">
-
-                                    <FormatListBulletedIcon sx={{ fontSize: 16 }} />
-                                </div>
-
-                                <div className="leading-tight">
-
-                                    <p className="text-[10px] font-normal text-[#45464D99] uppercase tracking-wider mb-1">Total Records</p>
-
-                                    <p className="font-semibold text-[#1e293b]">{total_records} Active</p>
-                                </div>
-
-                            </div>
-
-                            <div className="flex items-center gap-4 bg-white px-4 py-2 rounded-xl border border-[#edf2f7] shadow-sm">
-
-                                {this.renderToolbarActions()}
-
-                                <div className="flex items-center gap-2 border-r border-[#edf2f7] pr-4">
-
-                                    <span className="text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider">Display:</span>
-
-                                    <div className="relative">
-
-                                        <select
-                                            value={this.state.per_page}
-                                            onChange={(e) => {
-                                                const val = parseInt(e.target.value);
-                                                this.setState({ per_page: val, page: 0 }, () => {
-                                                    this.updatePage({ page: 0, per_page: val });
-                                                    this.loadData(0, this.props.account_token, true);
-                                                });
-                                            }}
-                                            className="appearance-none rounded-lg pl-4 pr-5 py-1 text-xs font-bold text-[#475569] cursor-pointer focus:outline-none hover:border-[#cbd5e1]"
-                                        >
-                                            {[10, 20, 50, 100].map(n => (
-                                                <option key={n} value={n}>{n}</option>
-                                            ))}
-                                        </select>
-
-                                        <svg className="pointer-events-none absolute right-2 mt-0.5 top-1/2 -translate-y-1/2" width="10" height="10" viewBox="0 0 10 10" fill="none">
-
-                                            <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                <span className="text-xs font-semibold whitespace-nowrap">
-
-                                    <span className="text-[#64748b]">{from}–{to}</span>
-
-                                    <span className="text-[#cbd5e1] ml-1">of {total_records}</span>
-
-                                </span>
-
-                                <div className="flex items-center gap-1">
-
-                                    <button
-                                        disabled={!hasPrev}
-                                        onClick={() => {
-                                            const p = page - 1;
-                                            this.setState({ page: p }, () => {
-                                                this.updatePage({ page: p });
-                                                this.loadData(p, this.props.account_token, true);
-                                            });
+                                                this.loadData(0, this.props.account_token, true);
+                                            })
                                         }}
-                                        className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors ${hasPrev ? 'text-[#64748b] hover:bg-[#f8fafc] bg-white' : 'text-[#cbd5e1] cursor-not-allowed'}`}
+                                        className={`px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${active
+                                            ? 'bg-white text-[#013178] shadow-sm'
+                                            : 'text-[#424752] hover:text-[#0f2942]'
+                                        }`}
                                     >
-
-                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-
-                                            <path d="M8.5 10.5L5 7L8.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-
-                                        </svg>
+                                        {_option.value}
                                     </button>
-                                    <button
-                                        disabled={!hasNext}
-                                        onClick={() => {
-                                            const p = page + 1;
-                                            this.setState({ page: p }, () => {
-                                                this.updatePage({ page: p });
-                                                this.loadData(p, this.props.account_token, true);
-                                            });
-                                        }}
-                                        className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors ${hasNext ? 'text-[#64748b] hover:bg-[#f8fafc] bg-white' : 'text-[#cbd5e1] cursor-not-allowed'}`}
-                                    >
-                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-
-                                            <path d="M5.5 3.5L9 7L5.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-
-                                        </svg>
-                                    </button>
-                                    
-                                </div>
-
-                            </div>
-                        </div>
-
+                                )
+                            })
+                        })}
                     </div>
                 )
             }
@@ -509,22 +428,23 @@ class DataTable extends Component {
             tabbed_filters.filters.map((_tabbed_filter, index) => {
 
                 let _filter_options = [];
+
                 let _options = [];
 
                 if(_tabbed_filter.hasOwnProperty('options') && _tabbed_filter.options.length > 0){
+
                     _options = [..._options, ..._tabbed_filter.options];
                 }
 
                 _options.map((_option, _index) => {
+
                     _filter_options.push(
                         <Chip
                             key={`tabbed_filter_option_${_index}_${index}_${_tabbed_filter.key}`}
                             size="small"
                             label={
                                 <div className="flex items-center gap-1">
-
                                     <span className="text-[11px] font-semibold">{_option.value}</span>
-
                                     {this.inAppliedTabbedFilters(_tabbed_filter.key, _option.key) === 'primary' && (
                                         <span className="ml-1 w-3.5 h-3.5 rounded-full p-0.5 bg-black/20 flex items-center justify-center">
                                             <Close style={{ fontSize: 12 }} />
@@ -549,12 +469,10 @@ class DataTable extends Component {
 
                                             applied_tabbed_filters.splice(_applied, 1);
                                         }
-
                                     }else{
 
                                         applied_tabbed_filters[_applied]['value'].push(_option.key)
                                     }
-
                                 }else{
 
                                     applied_tabbed_filters.push({key: _tabbed_filter.key, value: [_option.key]})
@@ -570,6 +488,7 @@ class DataTable extends Component {
                 })
 
                 filters.push(
+
                     <ul key={`tabbed_filter_${index}_${_tabbed_filter.key}`} className="mb-4 list-none p-0">
 
                         <li className="flex items-center gap-2">
@@ -577,7 +496,7 @@ class DataTable extends Component {
                             <strong className="text-xs font-bold text-[#475569]">{_tabbed_filter.label}</strong>
 
                             <Stack direction="row" spacing={1}>{_filter_options}</Stack>
-
+                            
                             {this.tabbedFilterClearButton(_tabbed_filter.key)}
                         </li>
                     </ul>
@@ -595,6 +514,7 @@ class DataTable extends Component {
         const _applied = applied_tabbed_filters.findIndex(row => row.key === key);
 
         if(_applied > -1){
+
             return (
                 <Btn
                     className="ml-2"
@@ -602,8 +522,11 @@ class DataTable extends Component {
                     type="button"
                     icon={true}
                     onClick={() => {
+
                         applied_tabbed_filters.splice(_applied, 1);
+
                         this.setState({applied_tabbed_filters: applied_tabbed_filters}, () => {
+
                             this.loadData(0, this.props.account_token, true);
                         })
                     }}
@@ -619,10 +542,11 @@ class DataTable extends Component {
     inAppliedTabbedFilters = (filter_key, option_key) => {
 
         let applied_tabbed_filters = this.state.applied_tabbed_filters;
-        
+
         const _applied = applied_tabbed_filters.find(row => row.key === filter_key);
 
         if(_applied && _applied.value.indexOf(option_key) > -1){
+
             return 'primary'
         }
 
@@ -634,14 +558,15 @@ class DataTable extends Component {
         if(!this.props.toolbar_actions) return null;
 
         return this.props.toolbar_actions.map((_ta, idx) => {
+
             let props = {};
+
             if(_ta.startIcon) props.startIcon = _ta.startIcon;
             if(_ta.endIcon) props.endIcon = _ta.endIcon;
             if(_ta.to) props.to = _ta.to;
             if(_ta.onClick) props.onClick = _ta.onClick;
 
             return (
-
                 <Btn {...props} key={`ta_${idx}`} color="primary" variant="outlined" size="small" className="ml-2">
                     {_ta.label}
                 </Btn>
@@ -656,9 +581,6 @@ class DataTable extends Component {
         const hasPrev = page > 0;
         const hasNext = (page + 1) * per_page < total_records;
 
-
-        const tabsActive = this.hasTabbedFilterTabs();
-
         return (
             <div>
 
@@ -666,13 +588,12 @@ class DataTable extends Component {
 
                 {this.props.beforeUpperToolbar}
 
-                {!this.props.hide_upper_toolbar && !tabsActive && (
+                {!this.props.hide_upper_toolbar && (
 
                     <div className="flex items-center justify-between mb-5">
                         <div className="flex items-center gap-3">
                             {this.props.bulk_actions && (
                                 <>
-
                                     <Button
                                         disabled={this.state.checked_rows_data.length === 0}
                                         variant="outlined"
@@ -682,7 +603,6 @@ class DataTable extends Component {
                                     >
                                         {this.bulkActionTitle()}
                                     </Button>
-
                                     <Menu
                                         id="bulk-actions"
                                         anchorEl={this.state.bulk_action}
@@ -696,7 +616,6 @@ class DataTable extends Component {
                                     >
                                         {this.props.bulk_actions}
                                     </Menu>
-
                                 </>
                             )}
 
@@ -760,18 +679,14 @@ class DataTable extends Component {
                             <div className="flex items-center gap-3 bg-white border border-[#edf2f7] rounded-xl px-5 py-3">
 
                                 <div className="p-2 bg-[#edf2f7] rounded-lg text-[#2563eb] flex items-center justify-center">
-
                                     <FormatListBulletedIcon sx={{ fontSize: 16 }} />
-
                                 </div>
 
                                 <div className="leading-tight">
-
                                     <p className="text-[10px] font-normal text-[#45464D99] uppercase tracking-wider mb-1">Total Records</p>
-
                                     <p className="font-semibold text-[#1e293b]">{total_records} Active</p>
-
                                 </div>
+
                             </div>
                         </div>
 
@@ -784,7 +699,6 @@ class DataTable extends Component {
                                 <span className="text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider">Display:</span>
 
                                 <div className="relative">
-
                                     <select
                                         value={this.state.per_page}
                                         onChange={(e) => {
@@ -800,6 +714,7 @@ class DataTable extends Component {
                                             <option key={n} value={n}>{n}</option>
                                         ))}
                                     </select>
+
                                     <svg className="pointer-events-none absolute right-2 mt-0.5 top-1/2 -translate-y-1/2" width="10" height="10" viewBox="0 0 10 10" fill="none">
                                         <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
@@ -827,11 +742,10 @@ class DataTable extends Component {
                                     className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors ${hasPrev ? 'text-[#64748b] hover:bg-[#f8fafc] bg-white' : 'text-[#cbd5e1] cursor-not-allowed'}`}
                                 >
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-
                                         <path d="M8.5 10.5L5 7L8.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-
                                     </svg>
                                 </button>
+
                                 <button
                                     disabled={!hasNext}
                                     onClick={() => {
@@ -844,9 +758,7 @@ class DataTable extends Component {
                                     className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors ${hasNext ? 'text-[#64748b] hover:bg-[#f8fafc] bg-white' : 'text-[#cbd5e1] cursor-not-allowed'}`}
                                 >
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-
                                         <path d="M5.5 3.5L9 7L5.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-
                                     </svg>
                                 </button>
                             </div>
@@ -872,6 +784,7 @@ class DataTable extends Component {
                         >
                             <Clear sx={{ fontSize: 14 }} /> Clear
                         </button>
+
                     </div>
                 )}
 
@@ -901,7 +814,6 @@ class DataTable extends Component {
                                 <TableBody className="bg-transparent">
                                     {!this.props.hide_search_bar && !this.state.hide_search && this.renderSearchRow()}
                                     {this.state.no_data ? this.noData() : this.renderData()}
-
                                 </TableBody>
 
                             </Table>
@@ -921,22 +833,17 @@ class DataTable extends Component {
                                         }}
                                         className={`w-8 h-8 rounded-xl border flex items-center justify-center ${hasPrev ? 'border-slate-200 bg-white text-slate-400 hover:bg-slate-50' : 'border-slate-100 bg-slate-50 text-slate-200 cursor-not-allowed'}`}
                                     >
+
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-
                                             <path d="M14 6L8 12L14 18" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-
                                         </svg>
                                     </button>
 
                                     <div className="flex items-center gap-2">
-
                                         <span className="text-[10px] font-[700] text-slate-900">{page + 1}</span>
-
                                         <span className="text-[10px] font-[600] text-slate-300">/</span>
-
                                         <span className="text-[10px] font-[700] text-slate-400">{Math.ceil(total_records / per_page) || 1}</span>
                                     </div>
-
                                     <button
                                         disabled={!hasNext}
                                         onClick={() => {
@@ -949,9 +856,7 @@ class DataTable extends Component {
                                         className={`w-8 h-8 rounded-xl border flex items-center justify-center ${hasNext ? 'border-slate-200 bg-white text-slate-400 hover:bg-slate-50' : 'border-slate-100 bg-slate-50 text-slate-200 cursor-not-allowed'}`}
                                     >
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-
                                             <path d="M10 6L16 12L10 18" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-
                                         </svg>
                                     </button>
                                 </div>
@@ -965,9 +870,7 @@ class DataTable extends Component {
                                 style={{ top: 60, height: 'calc(100% - 60px)', backgroundColor: 'rgba(255,255,255,0.6)' }}
                             >
                                 <div className="mt-8 flex flex-col items-center gap-2">
-
                                     <CircularProgress size={36} sx={{ color: '#0f2942' }} />
-
                                     <strong className="text-xs text-[#0f2942]">Loading</strong>
                                 </div>
                             </div>
@@ -984,7 +887,6 @@ class DataTable extends Component {
                     PaperProps={{ sx: { borderRadius: 3, boxShadow: '0 10px 40px rgba(0,0,0,.12)' } }}
                 >
                     <div className="w-[360px] p-5">
-
                         {this.renderDateRangeView()}
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
                             <DateCalendar
@@ -1011,7 +913,6 @@ class DataTable extends Component {
     renderDateRangeView = () => {
 
         if (this.state.range_start !== false) {
-
             return (
                 <div className="flex items-center justify-between mb-3">
                     <span className="text-sm text-gray-700">
@@ -1039,11 +940,8 @@ class DataTable extends Component {
     minDate = () => {
 
         if (this.state.range_init) { 
-
             const d = new Date(); 
-
             d.setFullYear(d.getFullYear() - 5); 
-
             return d; 
         }
 
@@ -1053,15 +951,10 @@ class DataTable extends Component {
     noData = () => {
 
         return (
-
             <TableRow>
-
                 <TableCell colSpan={(this.props.columns.length) + 1} sx={{ ...CELL_RESET, textAlign: 'center', py: 8 }}>
-
                     <NoData size="small" message={this.props.label ? this.props.label + ' not found!' : 'Records not found!'} />
-
                 </TableCell>
-
             </TableRow>
         )
     }
@@ -1096,8 +989,8 @@ class DataTable extends Component {
                     if (col.selectable) return <TableCell key={`search_sel_${idx}`} sx={{ padding: '1px 1px', borderBottom: 'none' }} />;
                     
                     return (
-                        <TableCell key={`search_${idx}`} sx={{ padding: '0px 0px', borderBottom: 'none' }} align={col.align ?? 'left'}>
 
+                        <TableCell key={`search_${idx}`} sx={{ padding: '0px 0px', borderBottom: 'none' }} align={col.align ?? 'left'}>
                             {col.searchable && (
                                 <div className="relative w-full max-w-[200px]">
                                     <input
@@ -1113,7 +1006,6 @@ class DataTable extends Component {
                                     />
 
                                     {this.state.search_values?.[col.column] && (
-
                                         <button
                                             onClick={() => {
                                                 const search_values = { ...this.state.search_values, [col.column]: '' };
@@ -1222,16 +1114,14 @@ class DataTable extends Component {
             });
 
             return (
-                        <TableRow
-                            key={`row_${n}`}
-                            className="group transition-all duration-150"
-                            sx={{
-                                '& td': { ...CELL_RESET },
-                                '&:hover td': {
-                                    backgroundColor: '#f8fafc',
-                                },
-                            }}
-                        >
+                
+                <TableRow
+                    key={`row_${n}`}
+                    className="group transition-all duration-150 hover:bg-[#f8fafc]"
+                    sx={{
+                        '& td': { ...CELL_RESET },
+                    }}
+                >
                     {cols}
 
                     <TableCell sx={{ ...CELL_RESET, textAlign: 'right', width: 120 }}>
@@ -1249,11 +1139,8 @@ class DataTable extends Component {
                                         </Link>
                                         <Link to={`/${this.props.view_url}/${_row[this.props.row_id]}`}>
                                             <button className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-[#e2e8f0] text-[#64748b] hover:border-[#3b82f6] hover:text-[#3b82f6] shadow-sm transition-all">
-
                                                 <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
-
                                                     <path d="M4.5 10.5L8 7L4.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-
                                                 </svg>
                                             </button>
                                         </Link>
@@ -1272,23 +1159,14 @@ class DataTable extends Component {
         const _row_id = column.row_id ?? this.props.row_id;
 
         if (this.props.updateData) {
-
             const data = [...this.props.data];
-
             const i = data.findIndex(r => r[_row_id] === row_data[_row_id]);
-
             data[i] = row_data;
-
             this.props.updateData({ records: data });
-
         } else {
-
             const data = [...this.state.data];
-
             const i = data.findIndex(r => r[_row_id] === row_data[_row_id]);
-
             data[i] = row_data;
-
             this.setState({ data });
         }
     }
@@ -1299,7 +1177,9 @@ class DataTable extends Component {
             <div className="w-full bg-white border border-[#edf2f7] rounded-2xl p-4 space-y-3 mt-4">
 
                 {Array.from({ length: 6 }, (_, i) => (
+
                     <Skeleton key={i} animation="wave" variant="rectangular" width="100%" height={48} rx={6} sx={{ borderRadius: 1.5 }} />
+                    
                 ))}
             </div>
         )
@@ -1314,9 +1194,7 @@ class DataTable extends Component {
         return data.map((_row, index) => {
             return (
                 <Grid item xs={12} key={`list_component_item_${index}`}>
-
                     {this.props.list_component(_row, index)}
-
                 </Grid>
             )
         });

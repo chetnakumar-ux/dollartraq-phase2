@@ -13,6 +13,8 @@ import Api from 'api/Api';
 
 import Main from 'components/Main';
 
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+
 import ActionCentreChat from './ActionCentreChat';
 import LayoutHelper from 'helpers/LayoutHelper'
 
@@ -60,6 +62,7 @@ class ActionCentre extends Component {
                 page="action_centre"
                 active_page="action_centre"
                 title="Action Centre"
+                subtitle="Enter carrier details to activate live telemetry and predictive delivery windows."
                 error_message={this.state.error_message}
                 success_message={this.state.success_message}
             >
@@ -77,11 +80,13 @@ class ActionCentre extends Component {
                     }}
 
                     columns={[
-                        {name: 'Shipment Number', column: 'shipment_number', sortable: true},
-                        {name: 'Shippping Carrier', column: 'shippment_carrier', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.shipments_carriers, renderer: (row) => {
-
-                            return row.carrier_title
-                        }},
+                        {
+                                name: 'Shipment Number',column: 'shipment_number',sortable: true,
+                                renderer: (row) => (
+                                    <span className="text-[#003178] font-bold">{row.shipment_number}</span>
+                                )
+                            },
+                       {name: 'Shippping Carrier', column: 'shippment_carrier', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.shipments_carriers, renderer: (row) => <span className="font-bold">{row.carrier_title}</span>},
                         {name: 'Load Number', column: 'update_type', sortable: true},
                         {name: 'Action', column: 'row_id', sortable: false, hide_search: true, width: 160, renderer: (row) => {
 
@@ -101,7 +106,7 @@ class ActionCentre extends Component {
 
                             return row.tracking_method_title
                         }},
-                        {name: 'Contact', column: 'tracking_full_number', sortable: false},
+                        {name: 'Contact', column: 'tracking_full_number', sortable: false, renderer: (row) => <span className="font-bold">{row.tracking_full_number}</span>},
                         {name: 'Accepted By Driver', column: 'driver', sortable: false, hide_search: true, renderer:(row) => {
 
                             if(row.shipment_driver != ''){
@@ -119,24 +124,67 @@ class ActionCentre extends Component {
 
                         return (
 
-                            <div className="hoverable-action">
-                                <div className="align-start">
+                        <div className="hoverable-action">
+                        <div className="align-start">
 
-                                    <Btn to={`/shipment/${row.shipment_row_id}`} size="small" color="primary" startIcon={<Edit style={{fontSize: 15}} />}>
-                                        View
-                                    </Btn>
+                            <Btn
+                            to={`/shipment/${row.shipment_row_id}`}
+                            size="small"
+                            variant="text"
+                            disableRipple
+                            sx={{
+                                color: '#1e40af',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                padding: '8px 10px',
+                                '& .MuiButton-endIcon': {
+                                marginLeft: '15px',
+                                },
+                            }}
+                            endIcon={
+                                <ArrowForwardIcon
+                                sx={{
+                                    fontSize: '12px',
+                                    transform: 'scale(0.75, 0.9)',
+                                }}
+                                />
+                            }
+                            >
+                            View
+                            </Btn>
 
-                                    {row.shipment_driver !== '' &&
-                                    
-                                        <Btn size="small" color="primary" startIcon={<Chat style={{fontSize: 15}} />} onClick={() => {
+                            {row.shipment_driver !== '' && (
+                            <Btn
+                                size="small"
+                                variant="text"
+                                disableRipple
+                                sx={{
+                                color: '#1e40af',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                padding: '8px 10px',
+                                '& .MuiButton-endIcon': {
+                                    marginLeft: '15px',
+                                },
+                                }}
+                                endIcon={
+                                <Chat
+                                    sx={{
+                                    fontSize: '14px',
+                                    transform: 'scale(0.9)',
+                                    }}
+                                />
+                                }
+                                onClick={() => {
+                                this.setState({ init_chat: row });
+                                }}
+                            >
+                                Chat
+                            </Btn>
+                            )}
 
-                                            this.setState({init_chat: row})
-                                        }}>
-                                            Chat
-                                        </Btn>
-                                    }
-                                </div>
-                            </div>
+                        </div>
+                        </div>
                         )
                     }}
 

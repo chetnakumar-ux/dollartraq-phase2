@@ -29,11 +29,6 @@ input:focus-visible{outline:none;}
 .login-header{padding:35px 20px 0 20px; display:flex; align-items:center; justify-content:center; border-radius:15px 15px 0 0;}
 .login-body{padding:20px 70px 70px 70px; border-radius:0 0 15px 15px;}
 
-.has-hoverable-action:hover .hoverable-action{opacity:1}
-.hoverable-action{opacity:0; transition:.2s all ease-in-out}
-
-.hoverable{transition:.2s all ease-in-out;}
-.hoverable:hover{background-color:rgba(0, 0, 0, .02);}
 
 .capitalize{text-transform:capitalize;}
 .lowercase{text-transform:lowercase;}
@@ -133,8 +128,9 @@ input:focus-visible{outline:none;}
 .form-header-block{padding:15px 20px 15px 20px; flex:1; background-color:rgba(255, 255, 255, .8);}
 .form-header h1{margin:0; font-size:16px; font-weight:bold; color:rgba(0, 0, 0, .8)}
 .form-header .subtitle{text-transform:uppercase; color:#6a82fb; font-size:12px;}
-.form-body{background-color:rgba(42, 129, 225, .1);}
-.form-bottom{border-top:1px solid rgba(0, 0, 0, .15); padding:20px 20px; display:flex; align-items:center; justify-content:space-between;}
+.form-body{background-color:rgba(159, 180, 203, 0.1);} 
+ /* this is to be commented  */
+.form-bottom{padding:20px 20px; display:flex; align-items:center; justify-content:space-between;}
 
 .form-drawer.medium .MuiDrawer-paper{width:50%;}
 .form-drawer.small .MuiDrawer-paper{width:34%;}
@@ -159,7 +155,7 @@ input:focus-visible{outline:none;}
 
 .form-drawer .MuiBackdrop-root{backdrop-filter:blur(5px); background-color:rgba(0, 0, 0, .3);}
 
-.form-wrapper.full .form-bottom{position:fixed; bottom:0; right:0; background-color:#fff; z-index:99;}
+.form-wrapper.full .form-bottom{position:relative; bottom:auto; right:auto; background-color:#fff; z-index:99;}
 
 .form-body-wrapper{padding:40px 60px 70px 60px; height:100%;}
 .form-body-wrapper h4.title{margin:0 0 20px 0; font-size:15px; color:rgba(0, 0, 0, .7)}
@@ -248,9 +244,6 @@ input:focus-visible{outline:none;}
 .upload-panel.lg span{font-size:12px; color:rgba(0, 0, 0, .4)}
 
 .uploaded-item{padding:6px; border:1px solid rgba(0,0,0,.2); border-radius:3px; position:relative}
-
-.hoverable{cursor:pointer; padding:5px; transition:.2s all ease-in-out}
-.hoverable:hover{background-color:rgba(0, 0, 0, .05);}
 
 .image-items-grid{display:flex; justify-content:space-evenly; align-items:stretch; list-style-type:none; padding:0; margin:0; border:1px solid rgba(0, 0, 0, .4); background-color:#fff;}
 .image-items-grid > li{border-right:1px solid rgba(0, 0, 0, .4); flex:1;}
@@ -396,3 +389,4 @@ input:focus-visible{outline:none;}
 
 .side-list a span{margin-left:10px;}
 .side-list a .MuiSvgIcon-root{font-size:15px;}
+

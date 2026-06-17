@@ -34,6 +34,7 @@ import Btn from 'components/Btn';
 
 import ArrowBackIosNew from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Done from '@mui/icons-material/Done';
 import DoneAll from '@mui/icons-material/DoneAll';
 import WarningOutlined from '@mui/icons-material/WarningOutlined';
@@ -154,10 +155,11 @@ class WdFormBlock extends Component {
 
                 input_data[_field_item.name] = _field_item.hasOwnProperty('value') ? _field_item.value : '';
 
-            }else if(_field_item.type === 'multiselect' || _field_item.type === 'checkbox'){
-
-                input_data[_field_item.name] = _field_item.hasOwnProperty('value') ? _field_item.value : [];
-            
+            } else if(_field_item.type === 'multiselect' || _field_item.type === 'checkbox'){
+                
+                let _default = _field_item.hasOwnProperty('value') ? _field_item.value : [];
+                input_data[_field_item.name] = Array.isArray(_default) ? _default : [];
+                
             }else if(_field_item.type === 'editor' || _field_item.type === 'image' || _field_item.type === 'file'){
 
                 input_data[_field_item.name] = _field_item.hasOwnProperty('value') ? _field_item.value : '';
@@ -445,74 +447,99 @@ class WdFormBlock extends Component {
                                         null
                                     :
                                 
-                                        <div className='form-bottom' style={
-                                            {width: 
-                                                (
-                                                    (this.props.size && (this.props.size === 'small' || this.props.size === 'medium'))
-                                                    ||
-                                                    (this.props.type && this.props.type === 'chlld_form')
-                                                    ||
-                                                    (this.props.drawer)
-                                                )
-                                                    ?
-                                                        'auto'
-                                                    :
-                                                        `${this.state.footer_width - 8}px`
-                                            }
-                                        }>
+                                        <div className='form-bottom' style={{
+                                        width: (
+                                            (this.props.size && (this.props.size === 'small' || this.props.size === 'medium'))
+                                            ||
+                                            (this.props.type && this.props.type === 'chlld_form')
+                                            ||
+                                            (this.props.drawer)
+                                        ) ? 'auto' : '100%',
+                                        justifyContent: 'flex-start',
+                                        position: 'relative',
+                                        bottom: 'auto',
+                                        right: 'auto',
+                                    }}>
 
-                                            <div>
-                                                <Btn color="primary" size="small" startIcon={<ArrowBackIosNew />} confirm={this.props.is_view ? false : true} confirm_message="All the entered data will be lost. Do you want to go back?" onClick={() => {
+                                        <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
 
+                                            <Btn
+                                                color="primary"
+                                                variant="outlined"
+                                                confirm={this.props.is_view ? false : true}
+                                                confirm_message="All the entered data will be lost. Do you want to go back?"
+                                                style={{
+                                                    borderRadius: '50px',
+                                                    border: '1px solid rgba(0,0,0,.2)',
+                                                    color: 'rgba(0,0,0,.7)',
+                                                    background: '#fff',
+                                                    padding: '10px 28px',
+                                                    fontSize: 13,
+                                                    fontWeight: 600,
+                                                    boxShadow: 'none',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.05em',
+                                                }}
+                                                onClick={() => {
                                                     if(this.props.onBack){
-
                                                         this.setState({open_drawer: false})
                                                         this.props.onBack()
                                                     }
-
                                                     if(this.props.back_url){
-
                                                         this.setState({redirect: this.props.back_url})
                                                     }
-                                                }}>
-                                                    {this.props.back_label ? this.props.back_label : 'Back'}
-                                                </Btn>
-                                            </div>
-                                            <div>
+                                                }}
+                                            >
+                                                {this.props.back_label ? this.props.back_label : 'Back'}
+                                            </Btn>
 
-                                                {this.props.is_view
-                                                    ?
-                                                        <Btn startIcon={<Edit />} size="small" color="secondary" variant="outlined" to={`/edit/${this.props.edit_url}/${this.state.row_id}`}>Edit</Btn>
-                                                    :
-                                                        <div>
+                                            {this.props.is_view
+                                                ?
+                                                    <Btn
+                                                        startIcon={<Edit />}
+                                                        color="secondary"
+                                                        variant="outlined"
+                                                        style={{
+                                                            borderRadius: '50px',
+                                                            padding: '10px 28px',
+                                                            fontSize: 13,
+                                                            fontWeight: 600,
+                                                            textTransform: 'uppercase',
+                                                            letterSpacing: '0.05em',
+                                                        }}
+                                                        to={`/edit/${this.props.edit_url}/${this.state.row_id}`}
+                                                    >
+                                                        Edit
+                                                    </Btn>
+                                                :
+                                                    <Btn
+                                                        loading={this.state.submitting}
+                                                        position="before"
+                                                        color="secondary"
+                                                        variant="contained"
+                                                        endIcon={<ArrowForwardIcon style={{fontSize: 20}} />}
+                                                        style={{
+                                                            borderRadius: '50px',
+                                                            background: '#3877DA',
+                                                            color: '#fff',
+                                                            padding: '10px 32px',
+                                                            fontSize: 13,
+                                                            fontWeight: 600,
+                                                            boxShadow: 'none',
+                                                            textTransform: 'uppercase',
+                                                            letterSpacing: '0.05em',
+                                                        }}
+                                                        onClick={() => {
+                                                            this.handleSubmit(true)
+                                                        }}
+                                                    >
+                                                        {this.state.row_id ? 'Update' : (this.props.submit_label ? this.props.submit_label : 'Submit')}
+                                                    </Btn>
+                                            }
 
-                                                            {/* {
-                                                                (this.props.hide_continue)
-                                                                ||
-                                                                (this.props.size && (this.props.size === 'small' || this.props.size === 'medium' || this.props.size === 'fluid'))
-                                                                ||
-                                                                (this.props.type && this.props.type === 'chlld_form')
-                                                                ?
-                                                                    null
-                                                                :
-                                                                    <Btn type="button" loading={this.state.submitting} position="before" color="secondary" variant="contained" size="small" endIcon={<ArrowForwardIos />} onClick={() => {
-
-                                                                        this.handleSubmit(false)
-                                                                    }}>
-                                                                        {this.state.row_id ? 'Update & Continue Edit' : (this.props.submit_label ? this.props.submit_label : 'Save & Continue Edit')}
-                                                                    </Btn>
-                                                            } */}
-                                                        
-                                                            <Btn className="ml-10" loading={this.state.submitting} position="before" color="secondary" variant="contained" size="small" endIcon={<ArrowForwardIos />} onClick={() => {
-
-                                                                this.handleSubmit(true)
-                                                            }}>
-                                                                {this.state.row_id ? 'Update' : (this.props.submit_label ? this.props.submit_label : 'Submit')}
-                                                            </Btn>
-                                                        </div>
-                                                }
-                                            </div>
                                         </div>
+
+                                    </div>
                                 }
                             </>
                     }
@@ -696,6 +723,7 @@ class WdFormBlock extends Component {
                                         }
 
                                         this.handleSubmit(_tab_key)
+
                                     }}>{this.state.row_id ? 'Update' : (this.props.submit_label ? this.props.submit_label : 'Submit')}</Btn>
                                 </div>
                             </Grid>
@@ -1010,6 +1038,7 @@ class WdFormBlock extends Component {
                         <div className='align-end'>
                             
                             <FormControl fullWidth className='wd-form-select' error={this.state.input_errors.hasOwnProperty(field.name) ? true : false}>
+                                
                                 <InputLabel>{field.label}</InputLabel>
                                 
                                 <Select
@@ -1219,6 +1248,7 @@ class WdFormBlock extends Component {
                 return (
                     <>
                         <LocalizationProvider dateAdapter={AdapterMoment}>
+
                             <DatePicker
                                 {..._props}
                                 label={field.label}
@@ -1393,6 +1423,7 @@ class WdFormBlock extends Component {
                                 field.options.map((_option, index) => {
                             
                                     return (
+                                        
                                         <FormControlLabel key={`checkbox_${field.key}_${index}`} control={<Checkbox size="small" checked={this.state.input_data.hasOwnProperty(field.name) ? this.state.input_data[field.name].indexOf(_option.key) > -1 ? true : false : false} onChange={(e) =>{
 
                                             let input_data = this.state.input_data;
@@ -2213,9 +2244,26 @@ class WdFormBlock extends Component {
                     }
 
                     if(_row_data.hasOwnProperty(f)){
-                    
+                    let _field = fields.find(row => row.name === f);
+                    if(_field && (_field.type === 'multiselect' || _field.type === 'checkbox')){
+                        let _val = _row_data[f];
+                        if(Array.isArray(_val)){
+                            input_data[f] = _val;
+                        } else if(typeof _val === 'string' && _val !== ''){
+                        
+                            try {
+                                let parsed = JSON.parse(_val);
+                                input_data[f] = Array.isArray(parsed) ? parsed : [parsed];
+                            } catch(e) {
+                                input_data[f] = _val.split(',').map(v => v.trim()).filter(Boolean);
+                            }
+                        } else {
+                            input_data[f] = [];
+                        }
+                    } else {
                         input_data[f] = _row_data[f];
                     }
+                }
                 }
 
                 that.setState({input_data: input_data, form_data: _row_data, files_data: files_data})

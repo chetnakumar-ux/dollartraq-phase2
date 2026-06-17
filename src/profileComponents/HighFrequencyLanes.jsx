@@ -1,12 +1,7 @@
 import React from 'react';
 
-import {
-    Route
-} from '@mui/icons-material';
-
-import {
-    LinearProgress
-} from '@mui/material';
+import { Route } from '@mui/icons-material';
+import { LinearProgress } from '@mui/material';
 
 function HighFrequencyLanes(props) {
 
@@ -14,92 +9,76 @@ function HighFrequencyLanes(props) {
         ? props.lanes
         : [];
 
-if (lanes.length === 0) {
+    if (lanes.length === 0) {
+        return (
+            <div className='rounded-[16px] border border-[#d9e1ee] bg-white p-[18px] shadow-[0_2px_8px_rgba(16,24,40,0.05)] sm:p-[24px] xl:p-[30px]'>
 
-    return (
+                <div className='mb-[24px] flex items-center gap-[10px] xl:mb-[30px]'>
+                    <Route className='!text-[22px] text-[#185abc]' />
+                    <h3 className='text-[16px] font-[500] text-[#1f2937] sm:text-[17px] xl:text-[18px]'>
+                        High Frequency Lanes
+                    </h3>
+                </div>
 
-        <div className='rounded-[16px] border border-[#d9e1ee] bg-white p-[18px] shadow-[0_2px_8px_rgba(16,24,40,0.05)] sm:p-[24px] xl:p-[30px]'>
-
-            <div className='mb-[24px] flex items-center gap-[10px] xl:mb-[30px]'>
-
-                <Route className='!text-[22px] text-[#185abc]' />
-
-                <h3 className='text-[16px] font-[500] text-[#1f2937] sm:text-[17px] xl:text-[18px]'>
-
-                    High Frequency Lanes
-
-                </h3>
-
-            </div>
-<<<<<<< HEAD
-=======
-            <div className="space-y-[32px]">
->>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
-
-            <div className='flex items-center justify-center py-[40px]'>
-
-                <p className='text-[13px] font-[500] text-[#94a3b8]'>
-
-                    No lane data available
-
-                </p>
+                <div className='flex items-center justify-center py-[40px]'>
+                    <p className='text-[13px] font-[500] text-[#94a3b8]'>
+                        No lane data available
+                    </p>
+                </div>
 
             </div>
-
-        </div>
-
-    );
-}
+        );
+    }
 
     return (
-
         <div className='rounded-[16px] border border-[#d9e1ee] bg-white p-[18px] shadow-[0_2px_8px_rgba(16,24,40,0.05)] sm:p-[24px] xl:p-[30px]'>
 
+            {/* Header */}
             <div className='mb-[24px] flex items-center gap-[10px] xl:mb-[30px]'>
-
                 <Route className='!text-[22px] text-[#185abc]' />
-
                 <h3 className='text-[16px] font-[500] text-[#1f2937] sm:text-[17px] xl:text-[18px]'>
                     High Frequency Lanes
                 </h3>
-
             </div>
 
-            <div className='space-y-[20px] xl:space-y-[24px]'>
+            {/* List */}
+            <div className='space-y-[18px]'>
 
-                {lanes.map(function (lane, index) {
+                {lanes.map((lane, index) => {
 
-                    const lanePercentage =
-                        lane?.percentage ?? 0;
+                    const percentage = Number(lane?.percentage || 0);
+
+                    // if API has route, use it; otherwise fallback
+                    const route = lane?.route || `${lane?.state || '--'}`;
 
                     return (
+                        <div key={index}>
 
-                        <div
-                            key={lane?.id || index}
-                            className='flex items-start gap-[12px] xl:gap-[16px]'
-                        >
+                            {/* TOP ROW */}
+                            <div className='flex items-center justify-between gap-[12px]'>
 
-                            <span className='pt-[2px] text-[11px] font-[700] text-[#cbd5e1] xl:text-[12px]'>
-                                {lane?.id ?? '--'}
-                            </span>
-
-                            <div className='min-w-0 flex-1'>
-
-                                <div className='mb-[9px] flex items-center justify-between gap-[12px]'>
-
-                                    <span className='truncate text-[13px] font-[600] text-[#334155] xl:text-[14px]'>
-                                        {lane?.route ?? 'N/A'}
-                                    </span>
-
-                                    <span className='shrink-0 text-[11px] font-[700] text-[#94a3b8] xl:text-[12px]'>
-                                        {lanePercentage}%
-                                    </span>
-
+                                {/* index badge */}
+                                <div className='min-w-[34px] h-[34px] flex items-center justify-center rounded-[8px] bg-[#f1f5f9] text-[12px] font-[700] text-[#334155]'>
+                                    {String(index + 1).padStart(2, '0')}
                                 </div>
 
+                                {/* route */}
+                                <div className='flex-1 text-[13px] font-[600] text-[#334155] truncate'>
+                                    {route}
+                                </div>
+
+                                {/* percentage */}
+                                <div className='text-[12px] font-[700] text-[#64748b]'>
+                                    {percentage}%
+                                </div>
+
+                            </div>
+
+                            {/* PROGRESS BAR */}
+                            <div className='mt-[8px] ml-[44px]'>
                                 <LinearProgress
                                     variant='determinate'
-                                    value={lanePercentage}
+                                    value={percentage}
                                     sx={{
                                         height: 6,
                                         borderRadius: 3,
@@ -110,7 +89,6 @@ if (lanes.length === 0) {
                                         }
                                     }}
                                 />
-
                             </div>
 
                         </div>
@@ -118,7 +96,6 @@ if (lanes.length === 0) {
                 })}
 
             </div>
-
         </div>
     );
 }

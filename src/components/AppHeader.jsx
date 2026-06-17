@@ -36,6 +36,8 @@ import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import Password from '@mui/icons-material/Password';
 import Checklist from '@mui/icons-material/Checklist';
 
+import PowerSettingsNew from '@mui/icons-material/PowerSettingsNew';
+
 import logo from 'assets/images/logo.webp?v=3';
 
 import Time from './Time';
@@ -83,13 +85,8 @@ class AppHeader extends Component {
 
     componentDidMount = () => {
 
-<<<<<<< HEAD
         let account_token = localStorage.getItem(import.meta.env.VITE_ACCOUNT_TOKEN);
         let user = localStorage.getItem(import.meta.env.VITE_ACCOUNT_USER);
-=======
-    let account_token = localStorage.getItem(import.meta.env.VITE_ACCOUNT_TOKEN);
-    let user = localStorage.getItem(import.meta.env.VITE_ACCOUNT_USER);
->>>>>>> 90cbeaccc7fb5961de2175a0f15efb5de09470c6
         
         if(user && account_token){
             
@@ -123,14 +120,18 @@ class AppHeader extends Component {
             }
         }else{
 
-            if(this.props.active_link){
-            
-                if(this.props.active_link != '/' && this.props.active_link != 'forgot-password' && this.props.active_link != 'reset-password'){
-                    
-                    window.location.href = Api.server_url + 'logout';
-                }
-            }
-        }
+    const publicPages = [
+        'carrier_search',
+        'carrier_profile'
+    ];
+
+    if(
+        this.props.page &&
+        !publicPages.includes(this.props.page)
+    ){
+        window.location.href = Api.server_url + 'logout';
+    }
+}
     }
 
     renderChilds = (menu_item) => {
@@ -239,15 +240,16 @@ class AppHeader extends Component {
                                         </span>
                                     </Button>
 
-                                    {/* <Link className="ml-20" to="/logout" style={{ display: 'flex', alignItems: 'center' }}>
+                                    <Link to="/logout" style={{ display: 'flex', alignItems: 'center' }}>
                                         <IconButton
                                             edge="end"
                                             color="inherit"
                                             className="header-logout"
                                         >
+                                            
                                             <PowerSettingsNew />
                                         </IconButton>
-                                    </Link> */}
+                                    </Link>
                                 </div>
                             </Toolbar>
 
@@ -536,9 +538,9 @@ class AppHeader extends Component {
 }
 
 const mapStateToProps = state => {
-	return {
+    return {
         user: state.user.user
-	}
+    }
 }
 
 export default connect(mapStateToProps, { User })(AppHeader);

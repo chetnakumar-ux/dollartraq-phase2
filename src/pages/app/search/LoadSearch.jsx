@@ -12,158 +12,195 @@ import Btn from 'components/Btn';
 import Api from 'api/Api';
 
 import Edit from '@mui/icons-material/Edit';
+
 import TrackChanges from '@mui/icons-material/TrackChanges';
+
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+
 
 class LoadSearch extends Component {
 
-    constructor(props) {
-        super();
-        this.state = {
+	constructor(props) {
+		super();
+		this.state = {
 
-            account_token: false,
-            user: false,
+			account_token: false,
+			user: false,
 
-            redirect: false,
+			redirect: false,
 
-            logged_in: false,
+			logged_in: false,
 
-            error_message: '',
-            success_message: '',
+			error_message: '',
+			success_message: '',
 
-            shipment_carriers: [],
-            tracking_methods: [],
-            country_codes: [],
-            timezones: [],
-            status: [],
-            status_colors: []
-        }
-    }
+			shipment_carriers: [],
+			tracking_methods: [],
+			country_codes: [],
+			timezones: [],
+			status: [],
+			status_colors: []
+		}
+	}
 
-    componentDidMount = () => {
-        
-        var account_token = localStorage.getItem(import.meta.env.VITE_ACCOUNT_TOKEN);
-        
-        if(account_token){
-            
-            this.setState({account_token: account_token})
-            this.init(account_token)
-        }
-    }
+	componentDidMount = () => {
 
-    render(){
+		var account_token = localStorage.getItem(import.meta.env.VITE_ACCOUNT_TOKEN);
 
-        if(this.state.redirect !== false){
+		if (account_token) {
 
-            return <Navigate to={this.state.redirect} />
-        }
+			this.setState({ account_token: account_token })
+			this.init(account_token)
+		}
+	}
 
-        return (
+	render() {
 
-            <Main
-                active_page="load_search"
-                
-                page="load_search_list"
-                
-                error_message={this.state.error_message}
-                success_message={this.state.success_message}
+		if (this.state.redirect !== false) {
 
-                title="Load Search"
-            >
-                
-                <>
+			return <Navigate to={this.state.redirect} />
+		}
 
-                    <DataTable
-                        index="track_shipment"
-                        label="Track Shipment"
+		return (
 
-                        active_row={this.state.active_row}
+			<Main
+				active_page="load_search"
 
-                        tabbed_filters={{
-                            filters: [
-                                {key: 'shipments.status', label: 'Status', options: this.state.status, default: ''}
-                            ],
-                            type: 'tabs'
-                        }}
+				page="load_search_list"
 
-                        columns={[
-                            {name: 'Shipment Number', column: 'shipment_number', sortable: true},
-                            {name: 'Carrier', column: 'shippment_carrier', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.shipment_carriers},
-                            {name: 'Method', column: 'tracking_method', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.tracking_methods},
-                            {name: 'Country Code', column: 'tracking_cc', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.country_codes},
-                            {name: 'Tracking Start At', column: 'tracking_start_at', sortable: true},
-                            {name: 'Timezone', column: 'tracking_timezone', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.timezones},
-                            {name: 'Accepted By Driver', column: 'driver', sortable: false, hide_search: true, renderer:(row) => {
+				error_message={this.state.error_message}
+				success_message={this.state.success_message}
 
-                                if(row.driver != ''){
+				title="Load Search"
+				subtitle="Monitor and manage all active shipment lifecycles with real-time driver authorization and status tracking."
+			>
+				<>
 
-                                    return <Chip label="Yes" variant="contained" size="small" color="success" />
-                                }else{
+					<DataTable
+						index="track_shipment"
+						label="Track Shipment"
 
-                                    return <Chip label="No" variant="contained" size="small" color="warning" />
-                                }
-                            }},
-                            {name: 'Status', column: 'status', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.status, chip_colors: this.state.status_colors},
-                        ]}
+						active_row={this.state.active_row}
 
-                        row_actions={(row, row_index) => {
+						tabbed_filters={{
+							filters: [
+								{ key: 'shipments.status', label: 'Status', options: this.state.status, default: '' }
+							],
+							type: 'tabs'
+						}}
 
-                            return (
+						columns={[
+							 {
+                                name: 'Shipment Number',column: 'shipment_number',sortable: true,
+                                renderer: (row) => (
+                                    <span className="text-[#003178] font-bold">{row.shipment_number}</span>
+                                )
+                            },
+							{name: 'Carrier', column: 'shippment_carrier', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.shipment_carriers, renderer: (row, n, row_data) => <span className="font-bold">{row_data}</span>},
+							{ name: 'Method', column: 'tracking_method', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.tracking_methods },
+							{ name: 'Country Code', column: 'tracking_cc', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.country_codes },
+							{ name: 'Tracking Start At', column: 'tracking_start_at', sortable: true },
+							{ name: 'Timezone', column: 'tracking_timezone', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.timezones },
+							{
+								name: 'Accepted By Driver', column: 'driver', sortable: false, hide_search: true, renderer: (row) => {
 
-                                <div className="hoverable-action">
-                                    <div className="align-start">
+									if (row.driver != '') {
 
-                                        {row.status != '4' &&
+										return <Chip label="Yes" variant="contained" size="small" color="success" />
+									} else {
 
-                                            <Btn to={`/track-shipment/shipment-summary/${row.row_id}`} size="small" color="primary" startIcon={<Edit style={{fontSize: 15}} />}>
-                                                Edit
-                                            </Btn>
-                                        }
+										return <Chip label="No" variant="contained" size="small" color="warning" />
+									}
+								}
+							},
+							{ name: 'Status', column: 'status', sortable: true, search_type: 'match', search_input: 'dropdown', search_data: this.state.status, chip_colors: this.state.status_colors },
+						]}
 
-                                        {row.status == '4' &&
-                                        
-                                            <Btn to={`/shipment/${row.row_id}`} size="small" color="primary" startIcon={<TrackChanges style={{fontSize: 15}} />}>
-                                                View
-                                            </Btn>
-                                        }
-                                    </div>
-                                </div>
-                            )
-                        }}
+						row_actions={(row, row_index) => {
 
-                        default_sort_by="added_on"
+							return (
 
-                        api_url="app/shipment/load_search"
+								<div className="hoverable-action">
 
-                        account_token={this.state.account_token}
-                        
-                        row_id="row_id"
-                    />
-                </>
-            </Main>
-        )
-    }
+									<div className="align-start">
+										{String(row.status) !== '4' ? (
 
-    init = (account_token) => {
+											<Btn
+												to={`/track-shipment/shipment-summary/${row.row_id}`}
+												size="small"
+												variant="text"
+												disableRipple
+												sx={{
+													color: '#1e40af',fontSize: '13px',fontWeight: 600,padding: '8px 10px',
+													'& .MuiButton-endIcon': {
+														marginLeft: '15px',
+													},
+												}}
+												endIcon={
+													<ArrowForwardIcon sx={{fontSize: '12px',transform: 'scale(0.75, 0.9)',}}/>
+												}
+											>
+												Edit
+											</Btn>
+										) : (
 
-        const formData = new FormData();
-        formData.append('account_token', account_token);
+											<Btn
+												to={`/shipment/${row.row_id}`}
+												size="small"
+												variant="text"
+												disableRipple
+												sx={{
+													color: '#1e40af',fontSize: '13px',fontWeight: 600,padding: '8px 10px',
+													'& .MuiButton-endIcon': {
+														marginLeft: '15px',
+													},
+												}}
+												endIcon={
+													<TrackChanges sx={{fontSize: '12px',transform: 'scale(0.75, 0.9)',}}/>
+												}
+											>
+												View
+											</Btn>
+										)}
+									</div>
+								</div>
+							)
+						}}
 
-        var self = this;
-        Api.post('app/shipment/listing/init', formData, function(data){
+						default_sort_by="added_on"
 
-            if(data.status){
+						api_url="app/shipment/load_search"
 
-                self.setState({
-                    shipment_carriers: data.shipment_carriers,
-                    tracking_methods: data.tracking_methods,
-                    country_codes: data.country_codes,
-                    timezones: data.timezones,
-                    status: data.status,
-                    status_colors: data.status_colors
-                });
-            }
-        });
-    }
+						account_token={this.state.account_token}
+
+						row_id="row_id"
+					/>
+				</>
+			</Main>
+		)
+	}
+
+	init = (account_token) => {
+
+		const formData = new FormData();
+		formData.append('account_token', account_token);
+
+		var self = this;
+		Api.post('app/shipment/listing/init', formData, function (data) {
+
+			if (data.status) {
+
+				self.setState({
+					shipment_carriers: data.shipment_carriers,
+					tracking_methods: data.tracking_methods,
+					country_codes: data.country_codes,
+					timezones: data.timezones,
+					status: data.status,
+					status_colors: data.status_colors
+				});
+			}
+		});
+	}
 }
 
 export default LoadSearch;
