@@ -167,7 +167,7 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
             formData.append('last_name', data.last_name);
             formData.append('email', data.email);
             formData.append('contact', data.contact);
-            formData.append('roles', JSON.stringify(data.roles.map((role) => role.key)));
+            formData.append('roles', data.roles.map((role) => role.key).join(','));
 
             Api.post('app/users/invite', formData, (res) => {
 
@@ -721,6 +721,7 @@ class UsersList extends Component {
                     }}
                 />
 
+                {/* ---------------- Invite User (real <form>, react-hook-form, no WdForm) ---------------- */}
                 <InviteUserForm
                     open={this.state.invite_user}
                     onClose={() => this.setState({ invite_user: false })}
@@ -731,6 +732,7 @@ class UsersList extends Component {
 
                         this.setState({ invite_user: false, success_message: 'Invitation sent successfully.' });
 
+                        // give the success message a moment on screen before the table refreshes
                         setTimeout(() => {
                             this.setState({ do_reload: true });
                         }, 1500);
