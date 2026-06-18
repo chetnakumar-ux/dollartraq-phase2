@@ -239,15 +239,15 @@ function CarrierCard(props) {
     const contactItems = [
         {
             icon: <LocationOn className='!text-[15px]' />,
-            text: carrier.address
+            text: carrier.address || '-'
         },
         {
             icon: <Phone className='!text-[15px]' />,
-            text: carrier.phone
+            text: carrier.phone || '-'
         },
         {
             icon: <Email className='!text-[15px]' />,
-            text: carrier.email
+            text: carrier.email || '-'
         }
     ];
 
@@ -318,7 +318,7 @@ function CarrierCard(props) {
                         <div>
 
                             <h3 className='flex items-center mb-[14px] text-[15px] font-[700] text-[#111827] tracking-[-0.01em]'>
-                                {carrier.company_name}
+                                {carrier.company_name || '-'}
                             </h3>
 
                             <div className='flex flex-wrap gap-[8px]'>
@@ -339,7 +339,7 @@ function CarrierCard(props) {
                                 </div>
 
                                 <div className='text-[15px] font-[700] text-[#111827]'>
-                                    {Number(carrier.mileage).toLocaleString()}
+                                    {carrier.mileage ? Number(carrier.mileage).toLocaleString() : '-'}
                                     <span className='text-[11px] font-[400] text-[#6b7280] ml-[3px]'>
                                         mi
                                     </span>
@@ -354,7 +354,7 @@ function CarrierCard(props) {
                                 </div>
 
                                 <div className='text-[15px] font-[700] text-[#111827]'>
-                                    {carrier.fleet_size}
+                                    {carrier.fleet_size || '-'}
                                     <span className='text-[11px] font-[400] text-[#6b7280] ml-[3px]'>
                                         units
                                     </span>
@@ -374,7 +374,7 @@ function CarrierCard(props) {
                                         {field.label}
                                     </div>
                                     <div className='text-[13px] font-[600] text-[#374151]'>
-                                        {field.value}
+                                        {field.value || '-'}
                                     </div>
                                 </div>
                             );

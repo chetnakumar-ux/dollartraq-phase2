@@ -37,6 +37,7 @@
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-easy-sort": "^1.8.0",
+    "react-hook-form": "^7.79.0",
     "react-lines-ellipsis": "^0.16.1",
     "react-redux": "^9.2.0",
     "react-router": "^7.14.2",

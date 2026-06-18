@@ -268,20 +268,23 @@ function OperationalObservations({ data }) {
             <div className='relative border-t border-[#d9e1ee]'>
                 <div className='overflow-hidden'>
                     {isLoaded ? (
-                        <GoogleMap
-                            mapContainerStyle={containerStyle}
-                            onLoad={handleMapLoad}
-                            options={{
-                            gestureHandling: 'cooperative'
-                        }}
-                        >
+                       <GoogleMap
+    mapContainerStyle={containerStyle}
+    onLoad={handleMapLoad}
+    onClick={() => setActiveWindow(null)}
+    options={{
+        gestureHandling: 'cooperative'
+    }}
+>
                             {mapPoints.map((point) => (
-                                <MarkerF
-                                    key={point.id}
-                                    position={point.position}
-                                    icon={point.icon}
-                                    onClick={() => setActiveWindow(point)}
-                                />
+                               <MarkerF
+    key={point.id}
+    position={point.position}
+    icon={point.icon}
+    onClick={() => {
+        setActiveWindow(point);
+    }}
+/>
                             ))}
 
                             {activeWindow && (
@@ -289,7 +292,7 @@ function OperationalObservations({ data }) {
                                     position={activeWindow.position}
                                     onCloseClick={() => setActiveWindow(null)}
                                 >
-                                    <div className='p-1 max-w-[290px] font-sans antialiased text-slate-800'>
+                                   <div className='w-[310px] rounded-[16px] bg-white text-slate-800 overflow-hidden'>
                                         {/* Type badge */}
                                         <div className='flex items-center gap-1.5 mb-1.5'>
                                             <span className={`flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider text-white
@@ -303,17 +306,26 @@ function OperationalObservations({ data }) {
                                             </span>
                                         </div>
 
-                                        <h4 className='text-[13px] font-bold text-slate-900 m-0 leading-tight'>
+                                        <h4 className='text-[15px] font-[800] text-slate-900 leading-tight'>
                                             {activeWindow.title}
                                         </h4>
-                                        <p className='text-[11px] text-slate-500 my-0.5'>
+                                       <p className='mt-[4px] text-[12px] text-slate-500'>
                                             {activeWindow.subtitle}
                                         </p>
 
-                                        <div className='border-t border-slate-100 pt-1.5 mt-1.5 flex flex-col gap-1'>
+                                        <div className='grid grid-cols-2 gap-[8px] mt-[14px]'>
                                             {Object.entries(activeWindow.meta).map(([key, value]) => (
-                                                <div key={key} className='text-[11px] text-slate-600'>
-                                                    <span className='font-semibold text-slate-800'>{key}:</span> {value}
+                                                <div
+                                                    key={key}
+                                                    className='rounded-[10px] border border-slate-200 bg-slate-50 p-[8px]'
+                                                >
+                                                    <div className='text-[9px] font-[700] uppercase tracking-wide text-slate-400'>
+                                                        {key}
+                                                    </div>
+
+                                                    <div className='mt-[2px] text-[12px] font-[700] text-slate-800'>
+                                                        {value}
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
@@ -326,9 +338,17 @@ function OperationalObservations({ data }) {
                                                 </span>
                                                 <div className='flex flex-col gap-1 max-h-[100px] overflow-y-auto pr-1'>
                                                     {activeWindow.violationsList.map((v) => (
-                                                        <div key={v.id} className='text-[10px] bg-amber-50/70 border-l-2 border-amber-500 p-1 rounded-sm'>
-                                                            <div className='font-bold text-amber-900'>{v.group_desc}</div>
-                                                            <div className='text-slate-600 mt-0.5 leading-snug'>{v.section_desc}</div>
+                                                        <div
+                                                            key={v.id}
+                                                            className='rounded-[10px] border border-amber-200 bg-amber-50 px-[10px] py-[8px]'
+                                                        >
+                                                        <div className='text-[11px] font-[800] text-amber-900'>
+                                                            {v.group_desc}
+                                                        </div>
+
+                                                        <div className='mt-[4px] text-[10px] leading-[1.4] text-slate-600'>
+                                                            {v.section_desc}
+                                                        </div>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -347,7 +367,6 @@ function OperationalObservations({ data }) {
                     <div className='rounded-[14px] border border-[#e5e7eb] bg-[#f8fafc] px-[14px] py-[16px] sm:px-[18px] sm:py-[18px] xl:px-[22px]'>
                         <div className='grid grid-cols-1 gap-[18px] lg:grid-cols-12 lg:items-center'>
 
-                            {/* Inspections Matrix */}
                             <div className='lg:col-span-3'>
                                 <p className='mb-[12px] text-[10px] font-[800] uppercase tracking-[1.5px] text-[#94a3b8] sm:text-[11px]'>
                                     Inspections Matrix

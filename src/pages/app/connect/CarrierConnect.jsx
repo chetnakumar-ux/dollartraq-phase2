@@ -115,7 +115,8 @@ class CarrierConnect extends Component {
                         this.exportPdf();
                     }
                 },
-                {key: 'carrier_add', label: 'Add New Carrier'}
+                {key: 'carrier_add', label: 'Add New Carrier'},
+                
                 ]}
             >
                 <DataTable

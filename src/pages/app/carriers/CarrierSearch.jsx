@@ -14,6 +14,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 import Main from 'components/Main';
+
 import CarrierCard from 'components/blocks/CarrierCards';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -75,7 +76,6 @@ function CarrierSearch() {
     const [authorityVerified, setAuthorityVerified] = useState('');
 	const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-
 
     useEffect(function () {
 
@@ -152,7 +152,6 @@ function CarrierSearch() {
         params.append('page', pageNumber);
         params.append('per_page', 10);
 
-        // Risk Filter
         if (selectedRisk === 'Low') {
 
             params.append('risk_low', 'true');
@@ -183,7 +182,7 @@ function CarrierSearch() {
 
         }
 
-        fetch( `http://192.168.20.43:8000/api/carrier/search?${params}`,
+        fetch( `https://laravel.dollartraq.com/api/carrier/search?${params}`,
             
             {
                 method: 'GET',
@@ -197,7 +196,8 @@ function CarrierSearch() {
                 return res.json();
 
             })
-.then(function (data) {
+
+            .then(function (data) {
 
                 setCarriers(data.data || []);
                 setTotal(data.total || (data.data || []).length);
@@ -216,6 +216,7 @@ function CarrierSearch() {
 
             });
     }
+
     function handleKeyDown(event) {
 
         if (event.key === 'Enter') {
@@ -259,6 +260,7 @@ function CarrierSearch() {
             runSearch(query, 1, value);
         }
     }
+
     function renderSortLabel(selected) {
 
     const labelMap = {
@@ -338,7 +340,9 @@ function CarrierSearch() {
                                 <div className='text-sm text-gray-500'>
 
                                     <span className='text-sm mr-2 inline-flex items-center gap-1 font-semibold mb-2 text-[#8B93A7]'>
+
                                         <FiberManualRecordIcon sx={{ fontSize: 8, color: '#2563EB' }} />
+                                        
                                         Search Results
                                     </span>
 
@@ -421,7 +425,6 @@ function CarrierSearch() {
 
                                     </div> */}
 
-                                    {/* Sort By */}
                                     <Select
                                         value={sortBy}
                                         onChange={handleSortChange}

@@ -93,7 +93,11 @@ function CarrierProfileSection(props) {
 
                         {(props.leftItems || []).map(function (item, index) {
 
-                            const isStatus = item.label === 'STATUS';
+                        const isStatus = item.label === 'STATUS';
+
+                        const isActiveStatus =
+                            item.value &&
+                            item.value.toString().toLowerCase() === 'active';
 
                             return (
 
@@ -114,13 +118,25 @@ function CarrierProfileSection(props) {
                                                 .
                                             </div>
 
-                                            <div className='flex h-[40px] w-fit items-center gap-[8px] rounded-full border border-[#caecd7] bg-[#ecfbf2] px-[20px] text-[14px] font-[700] uppercase text-[#2f9e55] xl:px-[24px] xl:text-[15px]'>
+                                        <div className={`flex h-[40px] w-fit items-center gap-[8px] rounded-full border px-[20px] text-[14px] font-[700] uppercase xl:px-[24px] xl:text-[15px] animate-pulse
+                                            ${
+                                                isActiveStatus
+                                                    ? 'border-[#caecd7] bg-[#ecfbf2] text-[#2f9e55]'
+                                                    : 'border-[#fecaca] bg-[#fff1f1] text-[#dc2626]'
+                                            }`}
+                                        >
 
-                                                <span className='h-[9px] w-[9px] rounded-full bg-[#2ecc71]' />
+                                            <span
+                                                className={`h-[9px] w-[9px] rounded-full ${
+                                                    isActiveStatus
+                                                        ? 'bg-[#2ecc71]'
+                                                        : 'bg-[#dc2626]'
+                                                }`}
+                                            />
 
-                                                {renderValue(item.value)}
+                                            {renderValue(item.value)}
 
-                                            </div>
+                                        </div>
 
                                         </div>
 

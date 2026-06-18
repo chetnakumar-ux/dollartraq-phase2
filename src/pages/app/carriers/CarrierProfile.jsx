@@ -94,7 +94,7 @@ function CarrierProfile() {
 
         fetch(
 
-            `http://192.168.20.43:8000/api/carrier/detail/${row_id}`,
+            `https://laravel.dollartraq.com/api/carrier/detail/${row_id}`,
 
             {
                 method: 'POST',
@@ -695,28 +695,28 @@ function CarrierProfile() {
                 subtitle={carrier.dba_name || 'NA'}
                 leftItems={[
                     {
-                        label: 'STATUS',
-                        value: (
-                            <span
-                                className={`inline-flex items-center px-[10px] py-[4px] rounded-full text-[15px] font-[700] animate-pulse ${
-                                    carrier.computed?.status_code?.toLowerCase() === 'active'
-                                        ? 'bg-[#edfdf3] text-[#15924c]'
-                                        : 'bg-[#fff1f1] text-[#dc2626]'
-                                }`}
-                            >
-                                {carrier.computed?.status_code || 'NA'}
-                            </span>
-                        ),
-                        icon: (
-                            <CheckCircle
-                                className={`!text-[15px] ${
-                                    carrier.computed?.status_code?.toLowerCase() === 'active'
-                                        ? '!text-[#15924c]'
-                                        : '!text-[#dc2626]'
-                                }`}
-                            />
-                        )
-                    },
+    label: 'STATUS',
+    value: (
+        <span
+            className={`inline-flex items-center px-[10px] py-[4px] rounded-full text-[15px] font-[700] animate-pulse ${
+                carrier.computed?.status_code?.toLowerCase() === 'active'
+                    ? 'bg-[#edfdf3] text-[#15924c]'
+                    : 'bg-[#fff1f1] text-[#dc2626]'
+            }`}
+        >
+            {carrier.computed?.status_code || 'NA'}
+        </span>
+    ),
+    icon: (
+        <CheckCircle
+            className={`!text-[15px] ${
+                carrier.computed?.status_code?.toLowerCase() === 'active'
+                    ? '!text-[#15924c]'
+                    : '!text-[#dc2626]'
+            }`}
+        />
+    )
+},
                     {
                         label: 'YEARS ACTIVE',
                         value: carrier.computed?.dot_age
@@ -841,11 +841,11 @@ function CarrierProfile() {
                             data={carrier}
                         />
 
-                        <HighFrequencyLanes
+                        {/* <HighFrequencyLanes
                             lanes={
                                 carrier?.computed?.preferred_lanes
                             }
-                        />
+                        /> */}
 
                     </div>
 

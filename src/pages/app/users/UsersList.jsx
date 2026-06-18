@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 
 import DataTable from 'components/wd/data_table/DataTable';
 import WdForm from 'components/wd/form/WdForm';
@@ -6,12 +7,458 @@ import WdForm from 'components/wd/form/WdForm';
 import Btn from 'components/Btn';
 
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
+import CloseIcon from '@mui/icons-material/Close';
+import EastIcon from '@mui/icons-material/East';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutlined';
+import MailOutlineIcon from '@mui/icons-material/MailOutlined';
+import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlined';
 
 import Api from 'api/Api';
 
 import Main from 'components/Main';
 
 import LayoutHelper from 'helpers/LayoutHelper'
+
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Autocomplete from '@mui/material/Autocomplete';
+import IconButton from '@mui/material/IconButton';
+import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import InputAdornment from '@mui/material/InputAdornment';
+import CircularProgress from '@mui/material/CircularProgress';
+
+const BRAND = '#1e40af';
+const BRAND_SOFT = '#eff6ff';
+const INK = '#0f172a';
+const SUBTLE = '#64748b';
+const BORDER = '#e2e8f0';
+
+const fieldSx = {
+    '& .MuiOutlinedInput-root': {
+        borderRadius: '12px',
+        backgroundColor: '#fff',
+        transition: 'box-shadow 120ms ease, border-color 120ms ease',
+        '& fieldset': {
+            borderColor: BORDER,
+        },
+        '&:hover fieldset': {
+            borderColor: '#cbd5e1',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: BRAND,
+            borderWidth: '1.5px',
+        },
+        '&.Mui-focused': {
+            boxShadow: `0 0 0 4px ${BRAND_SOFT}`,
+        },
+        '&.Mui-error.Mui-focused': {
+            boxShadow: '0 0 0 4px #fee2e2',
+        },
+    },
+    '& .MuiInputLabel-root': {
+        color: SUBTLE,
+        '&.Mui-focused': {
+            color: BRAND,
+        },
+    },
+    '& .MuiFormHelperText-root': {
+        marginLeft: '2px',
+        fontSize: '12px',
+    },
+};
+
+const adornmentIconSx = { fontSize: '18px', color: SUBTLE };
+
+const RequiredLabel = ({ text }) => (
+    <>
+        {text}
+        <Box component="span" sx={{ color: '#dc2626' }}> *</Box>
+    </>
+);
+
+const sectionLabelSx = {
+    fontSize: '11px',
+    fontWeight: 700,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    color: SUBTLE,
+    mb: 2.5,
+};
+
+
+function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess }) {
+
+    const [submitError, setSubmitError] = useState('');
+
+    const {
+        register,
+        handleSubmit,
+        control,
+        reset,
+        formState: { errors, isSubmitting },
+    } = useForm({
+        mode: 'onTouched',
+        defaultValues: {
+            first_name: '',
+            last_name: '',
+            email: '',
+            contact: '',
+            roles: [],
+        },
+    });
+
+    const handleClose = () => {
+        reset();
+        setSubmitError('');
+        onClose();
+    };
+
+    const onSubmit = (data) => {
+        return new Promise((resolve) => {
+
+            let formData = new FormData();
+
+            formData.append('account_token', accountToken);
+            formData.append('users_of', usersOf);
+            formData.append('first_name', data.first_name);
+            formData.append('last_name', data.last_name);
+            formData.append('email', data.email);
+            formData.append('contact', data.contact);
+            formData.append('roles', JSON.stringify(data.roles.map((role) => role.value)));
+
+            Api.post('app/users/invite', formData, (res) => {
+
+                if (res.status) {
+
+                    setSubmitError('');
+                    reset();
+                    onSuccess();
+
+                } else {
+
+                    setSubmitError(res.message);
+                }
+
+                resolve();
+            });
+        });
+    };
+
+    return (
+        <Dialog
+            open={open}
+            maxWidth="sm"
+            fullWidth
+            onClose={handleClose}
+            slotProps={{
+                paper: {
+                    sx: {
+                        borderRadius: '20px',
+                        boxShadow: '0 24px 60px -16px rgba(15, 23, 42, 0.28)',
+                        overflow: 'hidden',
+                    }
+                }
+            }}
+        >
+
+            {/* Header */}
+            <Box
+                sx={{
+                    position: 'relative',
+                    px: 4,
+                    pt: 3.5,
+                    pb: 3,
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 2,
+                    background: `linear-gradient(135deg, ${BRAND_SOFT} 0%, #ffffff 65%)`,
+                    borderBottom: `1px solid ${BORDER}`,
+                }}
+            >
+                <Avatar
+                    sx={{
+                        bgcolor: '#ffffff',
+                        color: BRAND,
+                        width: 44,
+                        height: 44,
+                        boxShadow: `0 0 0 1px ${BORDER}`,
+                    }}
+                >
+                    <PersonAddAlt1Icon fontSize="small" />
+                </Avatar>
+
+                <Box sx={{ pt: 0.25 }}>
+                    <Typography sx={{ fontSize: '18px', fontWeight: 700, color: INK, lineHeight: 1.3 }}>
+                        Invite a teammate
+                    </Typography>
+                    <Typography sx={{ fontSize: '13px', color: SUBTLE, mt: 0.25 }}>
+                        They'll get an email with steps to set up their account.
+                    </Typography>
+                </Box>
+
+                <IconButton
+                    onClick={handleClose}
+                    size="small"
+                    sx={{
+                        position: 'absolute',
+                        top: 14,
+                        right: 14,
+                        color: SUBTLE,
+                        '&:hover': { backgroundColor: '#f1f5f9' },
+                    }}
+                >
+                    <CloseIcon fontSize="small" />
+                </IconButton>
+            </Box>
+
+            {/* A real, native <form> — react-hook-form wires validation into it */}
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+
+                <DialogContent sx={{ px: 4, py: 3.5, backgroundColor: '#fafbfc' }}>
+
+                    {/* Personal details */}
+                    <Box
+                        sx={{
+                            mb: 2.5,
+                            p: 2.5,
+                            backgroundColor: '#fff',
+                            border: `1px solid ${BORDER}`,
+                            borderRadius: '14px',
+                        }}
+                    >
+                        <Typography sx={sectionLabelSx}>Personal details</Typography>
+
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                            <TextField
+                                label={<RequiredLabel text="First name" />}
+                                fullWidth
+                                size="small"
+                                sx={fieldSx}
+                                error={!!errors.first_name}
+                                helperText={errors.first_name?.message || ' '}
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <PersonOutlineIcon sx={adornmentIconSx} />
+                                            </InputAdornment>
+                                        ),
+                                    },
+                                }}
+                                {...register('first_name', { required: 'First name is required' })}
+                            />
+
+                            <TextField
+                                label={<RequiredLabel text="Last name" />}
+                                fullWidth
+                                size="small"
+                                sx={fieldSx}
+                                error={!!errors.last_name}
+                                helperText={errors.last_name?.message || ' '}
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <PersonOutlineIcon sx={adornmentIconSx} />
+                                            </InputAdornment>
+                                        ),
+                                    },
+                                }}
+                                {...register('last_name', { required: 'Last name is required' })}
+                            />
+
+                            <TextField
+                                label={<RequiredLabel text="Email" />}
+                                type="email"
+                                fullWidth
+                                size="small"
+                                sx={fieldSx}
+                                error={!!errors.email}
+                                helperText={errors.email?.message || ' '}
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <MailOutlineIcon sx={adornmentIconSx} />
+                                            </InputAdornment>
+                                        ),
+                                    },
+                                }}
+                                {...register('email', {
+                                    required: 'Email is required',
+                                    pattern: {
+                                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                        message: 'Enter a valid email address',
+                                    },
+                                })}
+                            />
+
+                            <TextField
+                                label={<RequiredLabel text="Mobile" />}
+                                fullWidth
+                                size="small"
+                                sx={fieldSx}
+                                error={!!errors.contact}
+                                helperText={errors.contact?.message || ' '}
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <PhoneIphoneIcon sx={adornmentIconSx} />
+                                            </InputAdornment>
+                                        ),
+                                    },
+                                }}
+                                {...register('contact', {
+                                    required: 'Mobile number is required',
+                                    pattern: {
+                                        value: /^\d{10,}$/,
+                                        message: 'Numbers only, at least 10 digits',
+                                    },
+                                })}
+                            />
+                        </Box>
+                    </Box>
+
+                    {/* Access */}
+                    <Box
+                        sx={{
+                            p: 2.5,
+                            backgroundColor: '#fff',
+                            border: `1px solid ${BORDER}`,
+                            borderRadius: '14px',
+                        }}
+                    >
+                        <Typography sx={sectionLabelSx}>Access</Typography>
+
+                        <Controller
+                            name="roles"
+                            control={control}
+                            rules={{
+                                validate: (value) => (value && value.length > 0) || 'Select at least one role',
+                            }}
+                            render={({ field }) => (
+                                <Autocomplete
+                                    multiple
+                                    size="small"
+                                    options={roles}
+                                    value={field.value}
+                                    onChange={(e, value) => field.onChange(value)}
+                                    onBlur={field.onBlur}
+                                    getOptionLabel={(option) => (typeof option === 'string' ? option : option?.value ?? '')}
+                                    getOptionKey={(option) => option?.key ?? option}
+                                    isOptionEqualToValue={(option, value) => option?.key === value?.key}
+                                    slotProps={{
+                                        popper: {
+                                            style: { zIndex: 1400 },
+                                        },
+                                    }}
+                                    sx={{
+                                        '& .MuiAutocomplete-tag': {
+                                            backgroundColor: BRAND_SOFT,
+                                            color: BRAND,
+                                            fontWeight: 600,
+                                            borderRadius: '6px',
+                                        },
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label={<RequiredLabel text="Roles" />}
+                                            placeholder={field.value.length === 0 ? 'Select one or more roles' : ''}
+                                            error={!!errors.roles}
+                                            helperText={errors.roles?.message || ' '}
+                                            sx={fieldSx}
+                                        />
+                                    )}
+                                />
+                            )}
+                        />
+                    </Box>
+
+                    {submitError && (
+                        <Box
+                            sx={{
+                                mt: 2,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                px: 1.5,
+                                py: 1,
+                                borderRadius: '10px',
+                                backgroundColor: '#fef2f2',
+                                border: '1px solid #fecaca',
+                            }}
+                        >
+                            <ErrorOutlineIcon sx={{ fontSize: '18px', color: '#dc2626' }} />
+                            <Typography sx={{ fontSize: '13px', color: '#b91c1c' }}>
+                                {submitError}
+                            </Typography>
+                        </Box>
+                    )}
+
+                </DialogContent>
+
+                <DialogActions
+                    sx={{
+                        px: 4,
+                        py: 2.5,
+                        borderTop: `1px solid ${BORDER}`,
+                        backgroundColor: '#ffffff',
+                    }}
+                >
+                    <Button
+                        onClick={handleClose}
+                        disabled={isSubmitting}
+                        sx={{
+                            color: SUBTLE,
+                            fontWeight: 600,
+                            textTransform: 'none',
+                            borderRadius: '10px',
+                            px: 2,
+                        }}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={isSubmitting}
+                        endIcon={isSubmitting ? null : <EastIcon sx={{ fontSize: '16px' }} />}
+                        startIcon={isSubmitting ? <CircularProgress size={14} sx={{ color: '#fff' }} /> : null}
+                        sx={{
+                            backgroundColor: BRAND,
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            borderRadius: '10px',
+                            px: 2.5,
+                            boxShadow: 'none',
+                            '&:hover': {
+                                backgroundColor: '#1c3899',
+                                boxShadow: 'none',
+                            },
+                            '&.Mui-disabled': {
+                                backgroundColor: '#94a3b8',
+                                color: '#ffffff',
+                            },
+                        }}
+                    >
+                        {isSubmitting ? 'Sending…' : 'Send invite'}
+                    </Button>
+                </DialogActions>
+
+            </form>
+        </Dialog>
+    );
+}
 
 class UsersList extends Component {
 
@@ -32,7 +479,9 @@ class UsersList extends Component {
 
             row_id: false,
 
-            add_new: false
+            add_new: false,
+
+            invite_user: false,
         }
     }
     componentDidMount = () => {
@@ -76,10 +525,26 @@ class UsersList extends Component {
                 error_message={this.state.error_message}
                 success_message={this.state.success_message}
 
-                title_action={[{key: 'users_add', label: 'Add User', onClick: () => {
-
-                    this.setState({add_new: true})
-                }}]}
+          title_action={[
+    {
+        key: 'users_add',
+        label: 'Add User',
+        onClick: () => {
+            this.setState({ add_new: true });
+        }
+    },
+{
+    key: 'users_invite',
+    label: 'Invite',
+    backgroundColor: '#ffffff',
+    textColor: '#0f172a',
+    borderColor: '#e2e8f0',
+    icon: 'person_add',
+    onClick: () => {
+        this.setState({ invite_user: true });
+    }
+}
+]}
             >
 
                 <DataTable
@@ -206,6 +671,15 @@ class UsersList extends Component {
                             },
                         ]
                     }}
+                />
+
+                <InviteUserForm
+                    open={this.state.invite_user}
+                    onClose={() => this.setState({ invite_user: false })}
+                    roles={this.state.roles}
+                    accountToken={this.state.account_token}
+                    usersOf={this.state.user.row_id}
+                    onSuccess={() => this.setState({ invite_user: false, success_message: 'Invitation sent successfully.' })}
                 />
             </Main>
             

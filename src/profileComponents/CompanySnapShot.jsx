@@ -245,18 +245,89 @@ class CompanySnapshot extends React.Component {
                                 Authority Type & History
                             </h3>
                         </div>
-                        <div className="flex items-center gap-[6px]">
-                            {Array.from({ length: totalHistoryPages }).map((_, index) => {
-                                return (
-                                    <button 
-                                        key={index}
-                                        onClick={() => { this.setState({ historyPage: index }); }}
-                                        className={"h-[6px] w-[6px] rounded-full transition-all " + (this.state.historyPage === index ? "bg-[#2563eb] scale-125" : "bg-[#cbd5e1]")}
-                                        aria-label={"Page " + (index + 1)}
-                                    />
-                                );
-                            })}
-                        </div>
+<div className="flex items-center gap-[6px]">
+
+    <button
+        disabled={this.state.historyPage === 0}
+        onClick={() =>
+            this.setState({
+                historyPage: this.state.historyPage - 1
+            })
+        }
+        className="h-[30px] w-[30px] rounded border border-[#e2e8f0] text-[#64748b] disabled:opacity-40"
+    >
+        ‹
+    </button>
+
+    {Array.from({ length: totalHistoryPages })
+        .filter((_, index) => {
+            return (
+                index < 3 ||
+                index === totalHistoryPages - 1 ||
+                index === this.state.historyPage
+            );
+        })
+        .map((_, index, arr) => {
+            const actualIndex = Array.from({ length: totalHistoryPages })
+                .findIndex((__, i) =>
+                    i < 3 ||
+                    i === totalHistoryPages - 1 ||
+                    i === this.state.historyPage
+                );
+
+            return null;
+        })}
+
+    {Array.from({ length: Math.min(3, totalHistoryPages) }).map((_, index) => (
+        <button
+            key={index}
+            onClick={() => this.setState({ historyPage: index })}
+            className={
+                "h-[20px] min-w-[20px] rounded border text-[12px] font-[700] " +
+                (this.state.historyPage === index
+                    ? "border-[#2563eb] bg-[#2563eb] text-white"
+                    : "border-[#e2e8f0] text-[#64748b]")
+            }
+        >
+            {index + 1}
+        </button>
+    ))}
+
+    {totalHistoryPages > 4 && (
+        <>
+            <span className="px-[2px] text-[#94a3b8]">...</span>
+
+            <button
+                onClick={() =>
+                    this.setState({
+                        historyPage: totalHistoryPages - 1
+                    })
+                }
+                className={
+                    "h-[30px] min-w-[30px] rounded border text-[12px] font-[700] " +
+                    (this.state.historyPage === totalHistoryPages - 1
+                        ? "border-[#2563eb] bg-[#2563eb] text-white"
+                        : "border-[#e2e8f0] text-[#64748b]")
+                }
+            >
+                {totalHistoryPages}
+            </button>
+        </>
+    )}
+
+    <button
+        disabled={this.state.historyPage === totalHistoryPages - 1}
+        onClick={() =>
+            this.setState({
+                historyPage: this.state.historyPage + 1
+            })
+        }
+        className="h-[30px] w-[30px] rounded border border-[#e2e8f0] text-[#64748b] disabled:opacity-40"
+    >
+        ›
+    </button>
+
+</div>
                     </div>
 
                     <table className="w-full border-collapse">
