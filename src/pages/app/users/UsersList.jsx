@@ -92,10 +92,16 @@ const sectionLabelSx = {
     mb: 2.5,
 };
 
-
+// ---------------------------------------------------------------------
+// InviteUserForm
+// A real <form>, validated with react-hook-form — no WdForm involved.
+// Lives as its own function component because hooks (useForm) can only
+// be used inside function components, not inside the UsersList class.
+// ---------------------------------------------------------------------
 function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess }) {
 
     const [submitError, setSubmitError] = useState('');
+    const [checking, setChecking] = useState({ email: false, contact: false });
 
     const {
         register,
@@ -114,6 +120,36 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
         },
     });
 
+    // Same "unique" check WdForm runs via validations: ['unique|app/users/unique/email']
+    // — posts the current value to that endpoint under its real field name
+    // (e.g. 'email' / 'contact') and expects { status: true } when it's free to use.
+    const checkUnique = (field, url, paramName) => (value) => {
+
+        if (!value) {
+            return true;
+        }
+
+        setChecking((c) => ({ ...c, [field]: true }));
+
+        return new Promise((resolve) => {
+
+            let formData = new FormData();
+            formData.append('account_token', accountToken);
+            formData.append(paramName, value);
+
+            Api.post(url, formData, (res) => {
+
+                setChecking((c) => ({ ...c, [field]: false }));
+
+                if (res.status) {
+                    resolve(true);
+                } else {
+                    resolve(res.message || 'This is already in use');
+                }
+            });
+        });
+    };
+
     const handleClose = () => {
         reset();
         setSubmitError('');
@@ -131,7 +167,7 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
             formData.append('last_name', data.last_name);
             formData.append('email', data.email);
             formData.append('contact', data.contact);
-            formData.append('roles', JSON.stringify(data.roles.map((role) => role.value)));
+            formData.append('roles', JSON.stringify(data.roles.map((role) => role.key)));
 
             Api.post('app/users/invite', formData, (res) => {
 
@@ -281,7 +317,7 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                                 size="small"
                                 sx={fieldSx}
                                 error={!!errors.email}
-                                helperText={errors.email?.message || ' '}
+                                helperText={errors.email?.message || (checking.email ? 'Checking availability…' : ' ')}
                                 slotProps={{
                                     input: {
                                         startAdornment: (
@@ -289,6 +325,11 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                                                 <MailOutlineIcon sx={adornmentIconSx} />
                                             </InputAdornment>
                                         ),
+                                        endAdornment: checking.email ? (
+                                            <InputAdornment position="end">
+                                                <CircularProgress size={14} sx={{ color: SUBTLE }} />
+                                            </InputAdornment>
+                                        ) : null,
                                     },
                                 }}
                                 {...register('email', {
@@ -297,6 +338,7 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                                         value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                         message: 'Enter a valid email address',
                                     },
+                                    validate: checkUnique('email', 'app/users/unique/email', 'email'),
                                 })}
                             />
 
@@ -306,7 +348,7 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                                 size="small"
                                 sx={fieldSx}
                                 error={!!errors.contact}
-                                helperText={errors.contact?.message || ' '}
+                                helperText={errors.contact?.message || (checking.contact ? 'Checking availability…' : ' ')}
                                 slotProps={{
                                     input: {
                                         startAdornment: (
@@ -314,6 +356,11 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                                                 <PhoneIphoneIcon sx={adornmentIconSx} />
                                             </InputAdornment>
                                         ),
+                                        endAdornment: checking.contact ? (
+                                            <InputAdornment position="end">
+                                                <CircularProgress size={14} sx={{ color: SUBTLE }} />
+                                            </InputAdornment>
+                                        ) : null,
                                     },
                                 }}
                                 {...register('contact', {
@@ -322,6 +369,7 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                                         value: /^\d{10,}$/,
                                         message: 'Numbers only, at least 10 digits',
                                     },
+                                    validate: checkUnique('contact', 'app/users/unique/mobile', 'contact'),
                                 })}
                             />
                         </Box>
@@ -679,7 +727,14 @@ class UsersList extends Component {
                     roles={this.state.roles}
                     accountToken={this.state.account_token}
                     usersOf={this.state.user.row_id}
-                    onSuccess={() => this.setState({ invite_user: false, success_message: 'Invitation sent successfully.' })}
+                    onSuccess={() => {
+
+                        this.setState({ invite_user: false, success_message: 'Invitation sent successfully.' });
+
+                        setTimeout(() => {
+                            this.setState({ do_reload: true });
+                        }, 1500);
+                    }}
                 />
             </Main>
             
