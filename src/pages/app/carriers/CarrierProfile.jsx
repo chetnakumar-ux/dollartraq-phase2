@@ -29,6 +29,8 @@ import Main from '@/components/Main';
 
 import Skeleton from '@mui/material/Skeleton';
 
+import Api from '@/api/Api';
+
 import {Add,Bolt,CheckCircle,WarningAmber,LocalShipping,Groups,History,InfoOutlined,Timeline,Assessment} from '@mui/icons-material';
 
 function CarrierProfile() {
@@ -54,6 +56,19 @@ function CarrierProfile() {
     const [shortlisting, setShortlisting] = useState(false);
 
     const [isShortlisted, setIsShortlisted] = useState(false);
+
+    const accountToken = localStorage.getItem(
+    import.meta.env.VITE_ACCOUNT_TOKEN
+);
+  
+
+const [initing, setIniting] = useState(false);
+const [connectRequest, setConnectRequest] = useState(null);
+const [doc, setDoc] = useState(null);
+
+const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+const [isDiditVerified, setIsDiditVerified] = useState(false);
+const [isBankVerified, setIsBankVerified] = useState(false);
 
     const informationTabs = [
         'COMPANY ASSOCIATIONS',
@@ -285,6 +300,32 @@ function CarrierProfile() {
             });
 
     }
+
+ function handleConnect(carrierRowId) {
+    fetch(
+        `http://192.168.20.120:8080/api/handle/backend/carriers/connect/request`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${import.meta.env.VITE_BARRIER_TOKEN}`
+            },
+            body: JSON.stringify({
+                receiver: carrierRowId,
+                account_token: accountToken
+            })
+        }
+    )
+        .then(function (res) {
+            return res.json();
+        })
+        .then(function (data) {
+            console.log(data);
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+}
 
     useEffect(function () {
 
@@ -695,28 +736,18 @@ function CarrierProfile() {
                 subtitle={carrier.dba_name || 'NA'}
                 leftItems={[
                     {
-    label: 'STATUS',
-    value: (
-        <span
-            className={`inline-flex items-center px-[10px] py-[4px] rounded-full text-[15px] font-[700] animate-pulse ${
-                carrier.computed?.status_code?.toLowerCase() === 'active'
-                    ? 'bg-[#edfdf3] text-[#15924c]'
-                    : 'bg-[#fff1f1] text-[#dc2626]'
-            }`}
-        >
-            {carrier.computed?.status_code || 'NA'}
-        </span>
-    ),
-    icon: (
-        <CheckCircle
-            className={`!text-[15px] ${
-                carrier.computed?.status_code?.toLowerCase() === 'active'
-                    ? '!text-[#15924c]'
-                    : '!text-[#dc2626]'
-            }`}
-        />
-    )
-},
+                        label: 'STATUS',
+                        value: carrier.computed?.status_code || 'NA',
+                        icon: (
+                            <CheckCircle
+                                className={`!text-[15px] ${
+                                    carrier.computed?.status_code?.toLowerCase() === 'active'
+                                        ? '!text-[#15924c]'
+                                        : '!text-[#dc2626]'
+                                }`}
+                            />
+                        )
+                    },
                     {
                         label: 'YEARS ACTIVE',
                         value: carrier.computed?.dot_age
@@ -760,12 +791,12 @@ function CarrierProfile() {
                         variant: 'primary',
                         onClick: () => navigate('/payment'),
                     },
-
-                {
-                    label: 'Connect',
-                    icon: <Bolt className='!text-[18px]' />,
-                    variant: isShortlisted ? 'secondary' : 'primary'
-                }
+                    {
+                        label: 'Connect',
+                        icon: <Bolt className='!text-[18px]' />,
+                        variant: isShortlisted ? 'secondary' : 'primary',
+                        onClick: () => handleConnect(row_id)
+                    }
             ]}
             />
 

@@ -246,98 +246,144 @@ function Basics({ data }) {
 
 			</div>
 
-			{/* METRICS */}
+{/* METRICS */}
 
-			<div className='grid grid-cols-7 gap-4'>
+<div className='grid grid-cols-7 gap-4'>
 
-				{METRIC_CONFIG.map(function (config) {
+    {METRIC_CONFIG.map(function (config) {
 
-					const smsMeasures =
-						basics?.sms_measures || {};
+        const smsMeasures = basics?.sms_measures || {};
+        const inspections = basics?.inspections || [];
 
-					let rawValue = 0;
+        let rawValue = 0;
 
-					switch (config.key) {
+        switch (config.key) {
 
-						case 'unsafeDriving':
+            case 'unsafeDriving':
 
-							rawValue =
-								smsMeasures?.unsafe_driv_measure || 0;
+                rawValue =
+                    smsMeasures?.unsafe_driv_measure || 0;
 
-							break;
+                break;
 
-						case 'hosCompliance':
+            case 'crashIndicator':
 
-							rawValue =
-								smsMeasures?.hos_driv_measure || 0;
+                rawValue =
+                    smsMeasures?.crash_ind_measure || 0;
 
-							break;
+                break;
 
-						case 'vehicleMaint':
+            case 'hosCompliance':
 
-							rawValue =
-								smsMeasures?.veh_maint_measure || 0;
+                rawValue =
+                    smsMeasures?.hos_driv_measure || 0;
 
-							break;
+                break;
 
-						case 'driverFitness':
+            case 'vehicleMaint':
 
-							rawValue =
-								smsMeasures?.driv_fit_measure || 0;
+                rawValue =
+                    smsMeasures?.veh_maint_measure || 0;
 
-							break;
+                break;
 
-						default:
+            case 'controlledSubstances':
 
-							rawValue = 0;
+                rawValue = inspections.reduce(
+                    function (sum, item) {
 
-							break;
+                        return (
+                            sum +
+                            Number(
+                                item?.subt_alcohol_viol || 0
+                            )
+                        );
 
-					}
+                    },
+                    0
+                );
 
-					const roundedValue = Math.round(
-						Number(rawValue) || 0
-					);
+                break;
 
-					return (
+            case 'driverFitness':
 
-						<div
-							key={config.key}
-							className='rounded-xl border border-[#e2e8f0] bg-white p-4 shadow-sm'
-						>
+                rawValue =
+                    smsMeasures?.driv_fit_measure || 0;
 
-							<p className='mb-2 text-[10px] font-semibold uppercase text-[#94a3b8]'>
+                break;
 
-								{config.label}
+            case 'hazmat':
 
-							</p>
+                rawValue = inspections.reduce(
+                    function (sum, item) {
 
-							<span className='text-[20px] font-extrabold text-[#001b3d]'>
+                        return (
+                            sum +
+                            Number(
+                                item?.hm_viol || 0
+                            )
+                        );
 
-								{roundedValue}
+                    },
+                    0
+                );
 
-							</span>
+                break;
 
-							<div className='mt-6 h-[6px] w-full overflow-hidden rounded-full bg-slate-100'>
+            default:
 
-								<div
-									className='h-full rounded-full'
-									style={{
-										width: `${roundedValue}%`,
-										backgroundColor:
-											config.color
-									}}
-								/>
+                rawValue = 0;
 
-							</div>
+                break;
 
-						</div>
+        }
 
-					);
+        const roundedValue = Math.round(
+            Number(rawValue) || 0
+        );
 
-				})}
+        return (
 
-			</div>
+            <div
+                key={config.key}
+                className='rounded-xl border border-[#e2e8f0] bg-white p-4 shadow-sm'
+            >
+
+                <p className='mb-2 text-[10px] font-semibold uppercase text-[#94a3b8]'>
+
+                    {config.label}
+
+                </p>
+
+                <span className='text-[20px] font-extrabold text-[#001b3d]'>
+
+                    {roundedValue}
+
+                </span>
+
+                <div className='mt-6 h-[6px] w-full overflow-hidden rounded-full bg-slate-100'>
+
+                    <div
+                        className='h-full rounded-full'
+                        style={{
+                            width: `${Math.min(
+                                roundedValue,
+                                100
+                            )}%`,
+                            backgroundColor:
+                                config.color
+                        }}
+                    />
+
+                </div>
+
+            </div>
+
+        );
+
+    })}
+
+</div>
 
 			<div className='flex items-center justify-between rounded-2xl border border-[#fecaca] bg-[#fff1f2] px-6 py-4'>
 

@@ -24,20 +24,18 @@ function SafetyPerformance(props) {
             ? value
             : 'NA';
     }
-    const smsMeasures =
-        props.data?.sms_measures || {};
 
     const metrics = [
-        {
-            label: 'SAFETY RATING',
-            value: smsMeasures.risk_level,
-            badge: smsMeasures.risk_level,
-            badgeClass: 'bg-[#ecfbf2] text-[#2f9e55]',
-            icon: <ShieldOutlined />,
-            iconBg: 'bg-[#eef4ff]',
-            iconColor: 'text-[#2563eb]',
-            showBadge: true
-        },
+{
+    label: 'SAFETY RATING',
+    value: props.data?.risk_level,
+    badge: props.data?.risk_level,
+    badgeClass: 'bg-[#ecfbf2] text-[#2f9e55]',
+    icon: <ShieldOutlined />,
+    iconBg: 'bg-[#eef4ff]',
+    iconColor: 'text-[#2563eb]',
+    showBadge: true
+},
         {
             label: 'VEHICLE OOS',
             value:

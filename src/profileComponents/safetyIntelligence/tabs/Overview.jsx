@@ -25,8 +25,8 @@ function Overview({ data }) {
 const metrics = [
     {
         label: 'SAFETY RATING',
-        value: data?.sms_measures?.risk_level,
-        badge: data?.sms_measures?.risk_level,
+        value: data?.risk_level,
+        badge: data?.risk_level,
         badgeClass: 'bg-[#ecfbf2] text-[#2f9e55]',
         icon: <ShieldOutlined />,
         iconBg: 'bg-[#eef4ff]',

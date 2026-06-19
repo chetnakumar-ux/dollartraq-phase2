@@ -122,7 +122,11 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
 
     // Same "unique" check WdForm runs via validations: ['unique|app/users/unique/email']
     // — posts the current value to that endpoint under its real field name
-    // (e.g. 'email' / 'contact') and expects { status: true } when it's free to use.
+    // (e.g. 'email' / 'contact') and expects { status: true, code: 'u' | 'd' }.
+    // IMPORTANT: res.status === true only means the API call itself succeeded —
+    // it does NOT mean the value is unique. The actual uniqueness flag is
+    // res.code: 'u' = unique (ok to use), 'd' = duplicate (already in use).
+    // This mirrors WdFormBlock.validateUnique exactly.
     const checkUnique = (field, url, paramName) => (value) => {
 
         if (!value) {
@@ -142,8 +146,17 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                 setChecking((c) => ({ ...c, [field]: false }));
 
                 if (res.status) {
-                    resolve(true);
+
+                    if (res.code === 'd') {
+
+                        resolve('This is already in use');
+                    } else {
+
+                        resolve(true);
+                    }
+
                 } else {
+
                     resolve(res.message || 'This is already in use');
                 }
             });
@@ -167,7 +180,11 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
             formData.append('last_name', data.last_name);
             formData.append('email', data.email);
             formData.append('contact', data.contact);
-            formData.append('roles', data.roles.map((role) => role.key).join(','));
+
+            // Autocomplete here is single-select, so data.roles is a single
+            // { key, value } object, not an array. Send the raw key only
+            // (e.g. "35fry5fj56ggj"), not an array/JSON-wrapped value.
+            formData.append('roles', data.roles?.key ?? '');
 
             Api.post('app/users/invite', formData, (res) => {
 
@@ -390,37 +407,31 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                             name="roles"
                             control={control}
                             rules={{
-                                validate: (value) => (value && value.length > 0) || 'Select at least one role',
+                                required: 'Please select a role',
                             }}
                             render={({ field }) => (
                                 <Autocomplete
-                                    multiple
                                     size="small"
                                     options={roles}
-                                    value={field.value}
+                                    value={field.value || null}
                                     onChange={(e, value) => field.onChange(value)}
                                     onBlur={field.onBlur}
-                                    getOptionLabel={(option) => (typeof option === 'string' ? option : option?.value ?? '')}
-                                    getOptionKey={(option) => option?.key ?? option}
-                                    isOptionEqualToValue={(option, value) => option?.key === value?.key}
+                                    getOptionLabel={(option) =>
+                                        typeof option === 'string' ? option : option?.value ?? ''
+                                    }
+                                    isOptionEqualToValue={(option, value) =>
+                                        option?.key === value?.key
+                                    }
                                     slotProps={{
                                         popper: {
                                             style: { zIndex: 1400 },
                                         },
                                     }}
-                                    sx={{
-                                        '& .MuiAutocomplete-tag': {
-                                            backgroundColor: BRAND_SOFT,
-                                            color: BRAND,
-                                            fontWeight: 600,
-                                            borderRadius: '6px',
-                                        },
-                                    }}
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
-                                            label={<RequiredLabel text="Roles" />}
-                                            placeholder={field.value.length === 0 ? 'Select one or more roles' : ''}
+                                            label={<RequiredLabel text="Role" />}
+                                            placeholder="Select a role"
                                             error={!!errors.roles}
                                             helperText={errors.roles?.message || ' '}
                                             sx={fieldSx}
@@ -714,14 +725,13 @@ class UsersList extends Component {
                             {
                                 fields: [
                                     {key: 'password',type: 'input',name: 'password',label: 'Password',validations: ['r', 'min-6'],span: 6},
-                                    {key: 'roles',type: 'multiselect',name: 'roles',label: 'Roles',validations: ['r'],span: 6,options: this.state.roles}
+                                    {key: 'roles',type: 'dropdown',name: 'roles',label: 'Roles',validations: ['r'],span: 6,options: this.state.roles}
                                 ]
                             },
                         ]
                     }}
                 />
 
-                {/* ---------------- Invite User (real <form>, react-hook-form, no WdForm) ---------------- */}
                 <InviteUserForm
                     open={this.state.invite_user}
                     onClose={() => this.setState({ invite_user: false })}
@@ -730,12 +740,11 @@ class UsersList extends Component {
                     usersOf={this.state.user.row_id}
                     onSuccess={() => {
 
-                        this.setState({ invite_user: false, success_message: 'Invitation sent successfully.' });
+                        this.setState({ invite_user: false, success_message: 'Invitation sent successfully.', do_reload: true });
 
-                        // give the success message a moment on screen before the table refreshes
                         setTimeout(() => {
-                            this.setState({ do_reload: true });
-                        }, 1500);
+                            this.setState({ success_message: '' });
+                        }, 5000);
                     }}
                 />
             </Main>

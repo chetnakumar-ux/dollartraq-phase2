@@ -41,9 +41,12 @@ import CarrierProfile from 'pages/app/carriers/CarrierProfile';
 
 import PricingPage from 'pages/app/pricing/PricingPage';
 
+import OnboardPage from 'pages/app/connect';
+import CarrierNoData from 'pages/app/connect/CarrierNoData';
+
 import CarrierQuestions from 'pages/app/carrier-questions/CarrierQuestion';
 
-import CarrierConnect from 'pages/app/connect/CarrierConnect';
+import CarrierConnect from 'pages/app/CarrierConnect/CarrierConnect';
 
 
 function App(){
@@ -439,6 +442,12 @@ function App(){
                         <Route exact={true} path='/profile/carriers/shortlisted' element={<ShortlistedCarriers />}/>
 
                         <Route exact={true} path='/pricing' element={<PricingPage />} />
+
+                        <Route exact={true} path='/carrier/connect' element={<OnboardPage />}>
+                            <Route exact={true} path=':row_id' element={<OnboardPage />} />
+                        </Route>
+
+                        <Route exact={true} path='/carrier/invalid-access' element={<CarrierNoData />} />
 
                         <Route exact={true} path='/carrier-questions' element={<CarrierQuestions />} />
 

@@ -71,6 +71,23 @@ class CompanySnapshot extends React.Component {
             : 'bg-[#fef2f2] text-[#dc2626]';
     }
 
+    // Helper to map carrier_operation values to user-friendly text
+    getOperationText(operationValue) {
+        if (!operationValue) return '-';
+        
+        const normalized = operationValue.toString().trim().toUpperCase();
+        switch (normalized) {
+            case 'A':
+                return 'Interstate';
+            case 'B':
+                return 'Intrastate Hazardous Material';
+            case 'C':
+                return 'Intrastate Non-Hazardous Material';
+            default:
+                return operationValue; // fall back to raw value if it's something else
+        }
+    }
+
     handleInsurancePrev() {
         if (this.state.insurancePage > 0) {
             this.setState({ insurancePage: this.state.insurancePage - 1 });
@@ -121,6 +138,39 @@ class CompanySnapshot extends React.Component {
             }
         ];
 
+        const cargoCarriedOptions = [
+            {
+                label: 'General Freight',
+                value: 'crgo_genfreight',
+                selected: this.props.data.carrier_detail?.crgo_genfreight === 'X'
+            },
+            {
+                label: 'Bldg Mat',
+                value: 'crgo_bldgmat',
+                selected: this.props.data.carrier_detail?.crgo_bldgmat === 'X'
+            },
+            {
+                label: 'Machinery',
+                value: 'crgo_machlrg',
+                selected: this.props.data.carrier_detail?.crgo_machlrg === 'X'
+            },
+            {
+                label: 'Fresh Prod',
+                value: 'crgo_produce',
+                selected: this.props.data.carrier_detail?.crgo_produce === 'X'
+            },
+            {
+                label: 'Live Stock',
+                value: 'crgo_livestock',
+                selected: this.props.data.carrier_detail?.crgo_livestock === 'X'
+            },
+            {
+                label: 'Grain Feed',
+                value: 'crgo_grainfeed',
+                selected: this.props.data.carrier_detail?.crgo_grainfeed === 'X'
+            },
+        ];
+
         const historyItemsPerPage = 4;
         const totalHistoryItems = this.props.data.authority_history ? this.props.data.authority_history.length : 0;
         let totalHistoryPages = Math.ceil(totalHistoryItems / historyItemsPerPage);
@@ -149,6 +199,10 @@ class CompanySnapshot extends React.Component {
         const bipdCoverage = this.props.data.insurance_summary ? this.props.data.insurance_summary.bipd_coverage_total_amount : '-';
         const cargoInsurance = this.props.data.insurance_summary ? this.props.data.insurance_summary.cargo_insurance_total_amount : '-';
         const bondTrust = this.props.data.insurance_summary ? this.props.data.insurance_summary.bond_total_amount : '-';
+
+        // Check carrier_operation first, fallback to historical object structure
+        const rawOperationValue = this.props.data.carrier_operation || this.props.data.authorityStatus?.operation;
+        const parsedOperationText = this.getOperationText(rawOperationValue);
 
         return (
             <div className="space-y-[24px] bg-[#fbfbfc] p-[24px] rounded-[16px]">
@@ -208,8 +262,8 @@ class CompanySnapshot extends React.Component {
                             </div>
                             <div className="rounded-[10px] bg-[#eff6ff] p-[16px]">
                                 <p className="text-[9px] font-[700] uppercase tracking-wider text-[#94a3b8]">OPERATION</p>
-                                <p className="mt-[12px] text-[14px] font-[800] text-[#2563eb]">
-                                    {this.props.data.authorityStatus && this.props.data.authorityStatus.operation ? this.props.data.authorityStatus.operation : '-'}
+                                <p className="mt-[12px] text-[12px] font-[800] text-[#2563eb] leading-[16px]">
+                                    {parsedOperationText}
                                 </p>
                             </div>
                         </div>
@@ -245,89 +299,66 @@ class CompanySnapshot extends React.Component {
                                 Authority Type & History
                             </h3>
                         </div>
-<div className="flex items-center gap-[6px]">
+                        <div className="flex items-center gap-[6px]">
 
-    <button
-        disabled={this.state.historyPage === 0}
-        onClick={() =>
-            this.setState({
-                historyPage: this.state.historyPage - 1
-            })
-        }
-        className="h-[30px] w-[30px] rounded border border-[#e2e8f0] text-[#64748b] disabled:opacity-40"
-    >
-        ‹
-    </button>
+                            <button
+                                disabled={this.state.historyPage === 0}
+                                onClick={() =>
+                                    this.setState({
+                                        historyPage: this.state.historyPage - 1
+                                    })
+                                }
+                                className="h-[30px] w-[30px] rounded border border-[#e2e8f0] text-[#64748b] disabled:opacity-40"
+                            >
+                                ‹
+                            </button>
 
-    {Array.from({ length: totalHistoryPages })
-        .filter((_, index) => {
-            return (
-                index < 3 ||
-                index === totalHistoryPages - 1 ||
-                index === this.state.historyPage
-            );
-        })
-        .map((_, index, arr) => {
-            const actualIndex = Array.from({ length: totalHistoryPages })
-                .findIndex((__, i) =>
-                    i < 3 ||
-                    i === totalHistoryPages - 1 ||
-                    i === this.state.historyPage
-                );
+  {
+    Array.from({ length: totalHistoryPages }, (_, page) => page)
+        .filter(
+            page =>
+                page === 0 ||
+                page === totalHistoryPages - 1 ||
+                Math.abs(page - this.state.historyPage) <= 1
+        )
+        .map((page, index, arr) => (
+            <React.Fragment key={page}>
+                {index > 0 && page - arr[index - 1] > 1 && (
+                    <span className="px-[2px] text-[#94a3b8]">...</span>
+                )}
 
-            return null;
-        })}
+                <button
+                    onClick={() =>
+                        this.setState({
+                            historyPage: page
+                        })
+                    }
+                    className={
+                        "h-[30px] min-w-[30px] rounded border text-[12px] font-[700] " +
+                        (this.state.historyPage === page
+                            ? "border-[#2563eb] bg-[#2563eb] text-white"
+                            : "border-[#e2e8f0] text-[#64748b]")
+                    }
+                >
+                    {page + 1}
+                </button>
+            </React.Fragment>
+        ))
+}
 
-    {Array.from({ length: Math.min(3, totalHistoryPages) }).map((_, index) => (
-        <button
-            key={index}
-            onClick={() => this.setState({ historyPage: index })}
-            className={
-                "h-[20px] min-w-[20px] rounded border text-[12px] font-[700] " +
-                (this.state.historyPage === index
-                    ? "border-[#2563eb] bg-[#2563eb] text-white"
-                    : "border-[#e2e8f0] text-[#64748b]")
-            }
-        >
-            {index + 1}
-        </button>
-    ))}
+                            <button
+                                disabled={this.state.historyPage === totalHistoryPages - 1}
+                                onClick={() =>
+                                    this.setState({
+                                        historyPage: this.state.historyPage + 1
+                                    })
+                                }
+                                className="h-[30px] w-[30px] rounded border border-[#e2e8f0] text-[#64748b] disabled:opacity-40"
+                            >
+                                ›
+                            </button>
 
-    {totalHistoryPages > 4 && (
-        <>
-            <span className="px-[2px] text-[#94a3b8]">...</span>
-
-            <button
-                onClick={() =>
-                    this.setState({
-                        historyPage: totalHistoryPages - 1
-                    })
-                }
-                className={
-                    "h-[30px] min-w-[30px] rounded border text-[12px] font-[700] " +
-                    (this.state.historyPage === totalHistoryPages - 1
-                        ? "border-[#2563eb] bg-[#2563eb] text-white"
-                        : "border-[#e2e8f0] text-[#64748b]")
-                }
-            >
-                {totalHistoryPages}
-            </button>
-        </>
-    )}
-
-    <button
-        disabled={this.state.historyPage === totalHistoryPages - 1}
-        onClick={() =>
-            this.setState({
-                historyPage: this.state.historyPage + 1
-            })
-        }
-        className="h-[30px] w-[30px] rounded border border-[#e2e8f0] text-[#64748b] disabled:opacity-40"
-    >
-        ›
-    </button>
-
-</div>
+                        </div>
                     </div>
 
                     <table className="w-full border-collapse">
@@ -411,10 +442,10 @@ class CompanySnapshot extends React.Component {
                             </h4>
                         </div>
                         <div className="flex flex-wrap gap-[10px]">
-                            {this.props.data.cargoCarried && this.props.data.cargoCarried.options && this.props.data.cargoCarried.options.map((opt) => {
+                            {cargoCarriedOptions.map((opt) => {
                                 return (
                                     <SelectPill
-                                        key={opt.label}
+                                        key={opt.value}
                                         label={opt.label}
                                         selected={opt.selected}
                                     />
