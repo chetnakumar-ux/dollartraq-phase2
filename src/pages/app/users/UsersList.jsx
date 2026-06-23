@@ -92,12 +92,6 @@ const sectionLabelSx = {
     mb: 2.5,
 };
 
-// ---------------------------------------------------------------------
-// InviteUserForm
-// A real <form>, validated with react-hook-form — no WdForm involved.
-// Lives as its own function component because hooks (useForm) can only
-// be used inside function components, not inside the UsersList class.
-// ---------------------------------------------------------------------
 function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess }) {
 
     const [submitError, setSubmitError] = useState('');
@@ -120,13 +114,6 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
         },
     });
 
-    // Same "unique" check WdForm runs via validations: ['unique|app/users/unique/email']
-    // — posts the current value to that endpoint under its real field name
-    // (e.g. 'email' / 'contact') and expects { status: true, code: 'u' | 'd' }.
-    // IMPORTANT: res.status === true only means the API call itself succeeded —
-    // it does NOT mean the value is unique. The actual uniqueness flag is
-    // res.code: 'u' = unique (ok to use), 'd' = duplicate (already in use).
-    // This mirrors WdFormBlock.validateUnique exactly.
     const checkUnique = (field, url, paramName) => (value) => {
 
         if (!value) {
@@ -181,9 +168,6 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
             formData.append('email', data.email);
             formData.append('contact', data.contact);
 
-            // Autocomplete here is single-select, so data.roles is a single
-            // { key, value } object, not an array. Send the raw key only
-            // (e.g. "35fry5fj56ggj"), not an array/JSON-wrapped value.
             formData.append('roles', data.roles?.key ?? '');
 
             Api.post('app/users/invite', formData, (res) => {
@@ -221,7 +205,6 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
             }}
         >
 
-            {/* Header */}
             <Box
                 sx={{
                     position: 'relative',
@@ -248,12 +231,15 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                 </Avatar>
 
                 <Box sx={{ pt: 0.25 }}>
+
                     <Typography sx={{ fontSize: '18px', fontWeight: 700, color: INK, lineHeight: 1.3 }}>
                         Invite a teammate
                     </Typography>
+
                     <Typography sx={{ fontSize: '13px', color: SUBTLE, mt: 0.25 }}>
                         They'll get an email with steps to set up their account.
                     </Typography>
+
                 </Box>
 
                 <IconButton
@@ -271,24 +257,16 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                 </IconButton>
             </Box>
 
-            {/* A real, native <form> — react-hook-form wires validation into it */}
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
 
                 <DialogContent sx={{ px: 4, py: 3.5, backgroundColor: '#fafbfc' }}>
 
-                    {/* Personal details */}
-                    <Box
-                        sx={{
-                            mb: 2.5,
-                            p: 2.5,
-                            backgroundColor: '#fff',
-                            border: `1px solid ${BORDER}`,
-                            borderRadius: '14px',
-                        }}
-                    >
+                    <Box sx={{mb: 2.5, p: 2.5, backgroundColor: '#fff', border: `1px solid ${BORDER}`, borderRadius: '14px'}}>
+
                         <Typography sx={sectionLabelSx}>Personal details</Typography>
 
                         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+
                             <TextField
                                 label={<RequiredLabel text="First name" />}
                                 fullWidth
@@ -392,7 +370,6 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                         </Box>
                     </Box>
 
-                    {/* Access */}
                     <Box
                         sx={{
                             p: 2.5,
@@ -445,21 +422,14 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                     {submitError && (
                         <Box
                             sx={{
-                                mt: 2,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1,
-                                px: 1.5,
-                                py: 1,
-                                borderRadius: '10px',
-                                backgroundColor: '#fef2f2',
-                                border: '1px solid #fecaca',
+                                mt: 2, display: 'flex', alignItems: 'center', gap: 1, px: 1.5, py: 1, borderRadius: '10px', backgroundColor: '#fef2f2', border: '1px solid #fecaca',
                             }}
                         >
                             <ErrorOutlineIcon sx={{ fontSize: '18px', color: '#dc2626' }} />
                             <Typography sx={{ fontSize: '13px', color: '#b91c1c' }}>
                                 {submitError}
                             </Typography>
+                           
                         </Box>
                     )}
 
@@ -476,13 +446,7 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                     <Button
                         onClick={handleClose}
                         disabled={isSubmitting}
-                        sx={{
-                            color: SUBTLE,
-                            fontWeight: 600,
-                            textTransform: 'none',
-                            borderRadius: '10px',
-                            px: 2,
-                        }}
+                        sx={{color: SUBTLE, fontWeight: 600, textTransform: 'none', borderRadius: '10px', px: 2,}}
                     >
                         Cancel
                     </Button>
@@ -515,242 +479,232 @@ function InviteUserForm({ open, onClose, roles, accountToken, usersOf, onSuccess
                 </DialogActions>
 
             </form>
+
         </Dialog>
     );
 }
 
-class UsersList extends Component {
+    class UsersList extends Component {
 
-    constructor(props) {
-        super();
-        this.state = {
+        constructor(props) {
+            super();
+            this.state = {
 
-            error_message: '',
-            success_message: '',
+                error_message: '',
+                success_message: '',
 
-            user: false,
+                user: false,
 
-            account_token: false,
+                account_token: false,
 
-            roles: [],
+                roles: [],
 
-            do_reload: false,
+                do_reload: false,
 
-            row_id: false,
+                row_id: false,
 
-            add_new: false,
+                add_new: false,
 
-            invite_user: false,
+                invite_user: false,
+            }
         }
-    }
-    componentDidMount = () => {
+        componentDidMount = () => {
 
-        let account_token = localStorage.getItem(import.meta.env.VITE_ACCOUNT_TOKEN);
-        let user = localStorage.getItem(import.meta.env.VITE_ACCOUNT_USER);
+            let account_token = localStorage.getItem(import.meta.env.VITE_ACCOUNT_TOKEN);
+            let user = localStorage.getItem(import.meta.env.VITE_ACCOUNT_USER);
 
-        if (account_token) {
+            if (account_token) {
 
-            this.setState({
-                account_token: account_token,
-                user: JSON.parse(user)
-            });
+                this.setState({account_token: account_token,user: JSON.parse(user)});
 
-            let formData = new FormData();
-            formData.append('account_token', account_token);
+                let formData = new FormData();
+                formData.append('account_token', account_token);
 
-            Api.post('app/customer/roles/init', formData, (data) => {
+                Api.post('app/customer/roles/init', formData, (data) => {
 
-                console.log('Roles API Response =>', data);
+                    console.log('Roles API Response =>', data);
 
-                if (data.status) {
+                    if (data.status) {
 
-                    this.setState({
-                        roles: data.roles
-                    });
-                }
-            });
+                        this.setState({roles: data.roles});
+                    }
+                });
+            }
         }
-    }
 
-    render(){
+        render(){
 
-        return (
+            return (
 
-            <Main
-                page="users"
-                active_page="users"
-                title="Users"
-                subtitle="Enter carrier details to activate live telemetry and predictive delivery windows."
-                error_message={this.state.error_message}
-                success_message={this.state.success_message}
+                <Main
+                    page="users"
+                    active_page="users"
+                    title="Users"
+                    subtitle="Enter carrier details to activate live telemetry and predictive delivery windows."
+                    error_message={this.state.error_message}
+                    success_message={this.state.success_message}
 
-          title_action={[
-    {
-        key: 'users_add',
-        label: 'Add User',
-        onClick: () => {
-            this.setState({ add_new: true });
-        }
-    },
-{
-    key: 'users_invite',
-    label: 'Invite',
-    backgroundColor: '#ffffff',
-    textColor: '#0f172a',
-    borderColor: '#e2e8f0',
-    icon: 'person_add',
-    onClick: () => {
-        this.setState({ invite_user: true });
-    }
-}
-]}
-            >
+                    title_action={[
+                        {
+                            key: 'users_add',
+                            label: 'Add User',
+                            onClick: () => {
+                                this.setState({ add_new: true });
+                            }
+                        },
+                        {
+                            key: 'users_invite',
+                            label: 'Invite',
+                            backgroundColor: '#ffffff',
+                            textColor: '#0f172a',
+                            borderColor: '#e2e8f0',
+                            icon: 'person_add',
+                            onClick: () => {
+                                this.setState({ invite_user: true });
+                            }
+                        }
+                        ]}
+                >
 
-                <DataTable
-                    index="users"
-                    label="Users"
+                    <DataTable
+                        index="users"
+                        label="Users"
 
-                    active_row={this.state.active_row}
+                        active_row={this.state.active_row}
 
-                    do_reload={this.state.do_reload}
-                    relaodDone={() => {
+                        do_reload={this.state.do_reload}
+                        relaodDone={() => {
 
-                        this.setState({do_reload: false});
-                    }}
+                            this.setState({do_reload: false});
+                        }}
 
-                    columns={[
-                        {name: 'First Name', column: 'first_name', sortable: true, renderer: (row) => <span className="font-bold">{row.first_name}</span>},
-                        {name: 'Last Name', column: 'last_name', sortable: true},
-                        {name: 'Email', column: 'email', sortable: true},
-                       {name: 'Mobile', column: 'contact', sortable: true, renderer: (row) => <span className="font-bold">{row.contact}</span>},
-                        {name: 'Roles',column: 'role_names',sortable: true,hide_search: true},
-                        {name: 'Created On', column: 'added_on_formatted', sortable: true, hide_search: true}
-                    ]}
+                        columns={[
+                            {name: 'First Name', column: 'first_name', sortable: true, renderer: (row) => <span className="font-bold">{row.first_name}</span>},
+                            {name: 'Last Name', column: 'last_name', sortable: true},
+                            {name: 'Email', column: 'email', sortable: true},
+                            {name: 'Mobile', column: 'contact', sortable: true, renderer: (row) => <span className="font-bold">{row.contact}</span>},
+                            {name: 'Roles',column: 'role_names',sortable: true,hide_search: true},
+                            {name: 'Created On', column: 'added_on_formatted', sortable: true, hide_search: true}
+                        ]}
 
-                    row_actions={(row, row_index) => {
+                        row_actions={(row, row_index) => {
 
-                        return (
+                            return (
 
-                            <div className="hoverable-action">
-                                <div className="align-start">
+                                <div className="hoverable-action">
+                                    <div className="align-start">
 
-                                    <Btn
-                                    size="small"
-                                    variant="text"
-                                    disableRipple
-                                    sx={{
-                                        color: '#1e40af',
-                                        fontSize: '13px',
-                                        fontWeight: 600,
-                                        padding: '8px 10px',
-                                        '& .MuiButton-endIcon': {
-                                        marginLeft: '15px',
-                                        },
-                                    }}
-                                    endIcon={
-                                        <ArrowForwardIcon
+                                        <Btn
+                                        size="small"
+                                        variant="text"
+                                        disableRipple
                                         sx={{
-                                            fontSize: '12px',
-                                            transform: 'scale(0.75, 0.9)',
+                                            color: '#1e40af',
+                                            fontSize: '13px',
+                                            fontWeight: 600,
+                                            padding: '8px 10px',
+                                            '& .MuiButton-endIcon': {
+                                            marginLeft: '15px',
+                                            },
                                         }}
-                                        />
-                                    }
-                                    onClick={() => {
-                                        this.setState({
-                                        row_id: row.row_id,
-                                        add_new: true,
-                                        });
-                                    }}
-                                    >
-                                    View
-                                    </Btn>
+                                        endIcon={
+                                            <ArrowForwardIcon
+                                            sx={{
+                                                fontSize: '12px',
+                                                transform: 'scale(0.75, 0.9)',
+                                            }}
+                                            />
+                                        }
+                                        onClick={() => {this.setState({row_id: row.row_id,add_new: true,});}}>
+                                        View
+                                        </Btn>
+                                    </div>
                                 </div>
-                            </div>
-                        )
-                    }}
+                            )
+                        }}
 
-                    default_sort_by="added_on"
+                        default_sort_by="added_on"
 
-                    api_url="app/users"
+                        api_url="app/users"
 
-                    account_token={this.state.account_token}
-                    
-                    row_id="row_id"
-                />
+                        account_token={this.state.account_token}
+                        
+                        row_id="row_id"
+                    />
 
-                <WdForm                        
-                    drawer={true}
-                    open={this.state.add_new}
-                    position="bottom"
-                    size="medium"
-                    
-                    title='Sub User'
-                    back_label="Cancel"
-        
-                    submit_url='app/users/save'
-                    data_url='app/users/single'
-        
-                    onSubmit={(result) => {
-        
-                        this.setState({add_new: false, row_id: false, do_reload: true})
-                    }}
-                    onBack={() => {
-        
-                        this.setState({add_new: false, row_id: false})
-                    }}
-
-                    post_fields={[
-                        {key: 'users_of', value: this.state.user.row_id}
-                    ]}
-                
-                    row_id={this.state.row_id}
-                    id="row_id"
-                    title_field="first_name"
-                    updated_on="updated_on_formatted"
-                                            
-                    fields={{
-                        rows: [
-                            {
-                                fields: [
-                                    {key: 'first_name', type: 'input', name: 'first_name', label: 'First Name', validations: ['r'], span: 6},
-                                    {key: 'last_name', type: 'input', name: 'last_name', label: 'Last Name', validations: ['r'], span: 6},
-                                ]
-                            },
-                            {
-                                fields: [
-                                    {key: 'email', type: 'input', name: 'email', label: 'Email', validations: ['r', 'email', 'unique|app/users/unique/email'], span: 6},
-                                    {key: 'contact', type: 'input', name: 'contact', label: 'Mobile', validations: ['r', 'number', 'min-10', 'unique|app/users/unique/mobile'], span: 6},
-                                ]
-                            },
-                            {
-                                fields: [
-                                    {key: 'password',type: 'input',name: 'password',label: 'Password',validations: ['r', 'min-6'],span: 6},
-                                    {key: 'roles',type: 'dropdown',name: 'roles',label: 'Roles',validations: ['r'],span: 6,options: this.state.roles}
-                                ]
-                            },
-                        ]
-                    }}
-                />
-
-                <InviteUserForm
-                    open={this.state.invite_user}
-                    onClose={() => this.setState({ invite_user: false })}
-                    roles={this.state.roles}
-                    accountToken={this.state.account_token}
-                    usersOf={this.state.user.row_id}
-                    onSuccess={() => {
-
-                        this.setState({ invite_user: false, success_message: 'Invitation sent successfully.', do_reload: true });
-
-                        setTimeout(() => {
-                            this.setState({ success_message: '' });
-                        }, 5000);
-                    }}
-                />
-            </Main>
+                    <WdForm                        
+                        drawer={true}
+                        open={this.state.add_new}
+                        position="bottom"
+                        size="medium"
+                        
+                        title='Sub User'
+                        back_label="Cancel"
             
-        )
+                        submit_url='app/users/save'
+                        data_url='app/users/single'
+            
+                        onSubmit={(result) => {
+            
+                            this.setState({add_new: false, row_id: false, do_reload: true})
+                        }}
+                        onBack={() => {
+            
+                            this.setState({add_new: false, row_id: false})
+                        }}
+
+                        post_fields={[
+                            {key: 'users_of', value: this.state.user.row_id}
+                        ]}
+                    
+                        row_id={this.state.row_id}
+                        id="row_id"
+                        title_field="first_name"
+                        updated_on="updated_on_formatted"
+                                                
+                        fields={{
+                            rows: [
+                                {
+                                    fields: [
+                                        {key: 'first_name', type: 'input', name: 'first_name', label: 'First Name', validations: ['r'], span: 6},
+                                        {key: 'last_name', type: 'input', name: 'last_name', label: 'Last Name', validations: ['r'], span: 6},
+                                    ]
+                                },
+                                {
+                                    fields: [
+                                        {key: 'email', type: 'input', name: 'email', label: 'Email', validations: ['r', 'email', 'unique|app/users/unique/email'], span: 6},
+                                        {key: 'contact', type: 'input', name: 'contact', label: 'Mobile', validations: ['r', 'number', 'min-10', 'unique|app/users/unique/mobile'], span: 6},
+                                    ]
+                                },
+                                {
+                                    fields: [
+                                        {key: 'password',type: 'input',name: 'password',label: 'Password',validations: ['r', 'min-6'],span: 6},
+                                        {key: 'roles',type: 'dropdown',name: 'roles',label: 'Roles',validations: ['r'],span: 6,options: this.state.roles}
+                                    ]
+                                },
+                            ]
+                        }}
+                    />
+
+                    <InviteUserForm
+                        open={this.state.invite_user}
+                        onClose={() => this.setState({ invite_user: false })}
+                        roles={this.state.roles}
+                        accountToken={this.state.account_token}
+                        usersOf={this.state.user.row_id}
+                        onSuccess={() => {
+
+                            this.setState({ invite_user: false, success_message: 'Invitation sent successfully.', do_reload: true });
+
+                            setTimeout(() => {
+                                this.setState({ success_message: '' });
+                            }, 5000);
+                        }}
+                    />
+                </Main>
+                
+            )
+        }
     }
-}
 
 export default UsersList;

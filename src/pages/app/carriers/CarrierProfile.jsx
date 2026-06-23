@@ -301,31 +301,31 @@ const [isBankVerified, setIsBankVerified] = useState(false);
 
     }
 
- function handleConnect(carrierRowId) {
-    fetch(
-        `http://192.168.20.120:8080/api/handle/backend/carriers/connect/request`,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${import.meta.env.VITE_BARRIER_TOKEN}`
-            },
-            body: JSON.stringify({
-                receiver: carrierRowId,
-                account_token: accountToken
+    function handleConnect(carrierRowId) {
+        fetch(
+            `http://192.168.20.120:8080/api/handle/backend/carriers/connect/request`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${import.meta.env.VITE_BARRIER_TOKEN}`
+                },
+                body: JSON.stringify({
+                    receiver: carrierRowId,
+                    account_token: accountToken
+                })
+            }
+        )
+            .then(function (res) {
+                return res.json();
             })
-        }
-    )
-        .then(function (res) {
-            return res.json();
-        })
-        .then(function (data) {
-            console.log(data);
-        })
-        .catch(function (err) {
-            console.log(err);
-        });
-}
+            .then(function (data) {
+                console.log(data);
+            })
+            .catch(function (err) {
+                console.log(err);
+            });
+    }
 
     useEffect(function () {
 

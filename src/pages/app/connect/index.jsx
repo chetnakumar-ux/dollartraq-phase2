@@ -83,8 +83,8 @@ export default function OnboardPage() {
 
     const fetchCustomer = async () => {
         console.log(row_id)
-
-        Api.post(`backend/carriers/connect/load`, (res) => {
+ 
+        Api.post(`backend/carriers/connect/load`, {row_id: row_id},  (res) => {
 
             if(res.status){
 
